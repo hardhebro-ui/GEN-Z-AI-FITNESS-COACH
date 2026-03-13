@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, CheckCircle2, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface ReviewPromptProps {
   isOpen: boolean;
@@ -20,10 +22,11 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
     if (rating === 0) return;
     
     try {
-      await fetch('/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating, text, name: name || 'Anonymous' })
+      await addDoc(collection(db, 'reviews'), {
+        rating,
+        text: text ? text.substring(0, 200) : null,
+        name: name || 'Anonymous',
+        createdAt: serverTimestamp()
       });
       
       setSubmitted(true);

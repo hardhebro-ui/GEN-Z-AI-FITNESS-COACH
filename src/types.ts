@@ -59,7 +59,7 @@ export interface GeneratedPlan {
 }
 
 export interface Review {
-  id: number;
+  id: string | number;
   rating: number;
   text: string;
   name: string;

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Dumbbell, Star, ArrowRight } from 'lucide-react';
 import { Review } from '../types';
+import { collection, getDocs, query, orderBy, limit, getAggregateFromServer, average, count } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -12,16 +14,47 @@ export default function LandingPage({ onStart }: LandingPageProps) {
   const [stats, setStats] = useState({ totalCount: 0, averageRating: 0 });
 
   useEffect(() => {
-    fetch('/api/reviews')
-      .then(res => res.json())
-      .then(data => {
-        setReviews(data.reviews || []);
-        setStats({
-          totalCount: data.totalCount || 0,
-          averageRating: data.averageRating || 0
+    const fetchReviews = async () => {
+      try {
+        const collRef = collection(db, 'reviews');
+        
+        // Fetch stats
+        const aggregateQuery = await getAggregateFromServer(collRef, {
+          totalCount: count(),
+          averageRating: average('rating')
         });
-      })
-      .catch(err => console.error('Failed to fetch reviews:', err));
+        
+        const totalCount = aggregateQuery.data().totalCount;
+        const averageRating = aggregateQuery.data().averageRating || 0;
+        
+        setStats({
+          totalCount,
+          averageRating: Number(averageRating.toFixed(1))
+        });
+
+        // Fetch latest 11 reviews
+        const q = query(collRef, orderBy('createdAt', 'desc'), limit(11));
+        const querySnapshot = await getDocs(q);
+        const fetchedReviews: Review[] = [];
+        
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          fetchedReviews.push({
+            id: doc.id,
+            rating: data.rating,
+            text: data.text,
+            name: data.name,
+            date: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
+          });
+        });
+
+        setReviews(fetchedReviews);
+      } catch (err) {
+        console.error('Failed to fetch reviews from Firestore:', err);
+      }
+    };
+
+    fetchReviews();
   }, []);
 
   return (
