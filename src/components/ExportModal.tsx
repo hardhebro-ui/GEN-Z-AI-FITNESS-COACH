@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Heart, Share2, Download, CheckCircle2, Copy, Dumbbell } from 'lucide-react';
+import { X, Heart, Share2, Download, CheckCircle2, Copy, Dumbbell, Smartphone } from 'lucide-react';
 import { toPng } from 'html-to-image';
+import QRCode from 'react-qr-code';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -16,13 +17,25 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
   const [userName, setUserName] = useState('');
   const [hasShared, setHasShared] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [showUpi, setShowUpi] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
+  const upiId = "sarjil1432-1@okhdfcbank"; // Replace with your actual UPI ID
+  const upiName = "Fitness AI";
+  const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`;
+
   const handleDonate = () => {
-    // Simulate payment gateway
+    setShowUpi(true);
+  };
+
+  const handleVerifyPayment = () => {
+    setIsVerifying(true);
+    // Simulate payment verification
     setTimeout(() => {
+      setIsVerifying(false);
       onUnlock();
-    }, 1500);
+    }, 2000);
   };
 
   const handleShare = async () => {
@@ -105,55 +118,107 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
           <div className="p-6">
             {activeTab === 'donate' ? (
               <div className="space-y-6">
-                <div className="text-center space-y-2">
-                  <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Heart className="w-6 h-6" />
-                  </div>
-                  <h4 className="font-semibold text-lg">Keep this tool free!</h4>
-                  <p className="text-sm text-zinc-600">Your support helps us pay for AI costs and server hosting.</p>
-                </div>
+                {!showUpi ? (
+                  <>
+                    <div className="text-center space-y-2">
+                      <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Heart className="w-6 h-6" />
+                      </div>
+                      <h4 className="font-semibold text-lg">Keep this tool free!</h4>
+                      <p className="text-sm text-zinc-600">Your support helps us pay for AI costs and server hosting.</p>
+                    </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { amount: 10, label: '☕ Chai' },
-                    { amount: 20, label: '💻 Dev' },
-                    { amount: 50, label: '🚀 Grow' }
-                  ].map((tier) => (
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { amount: 10, label: '☕ Chai' },
+                        { amount: 20, label: '💻 Dev' },
+                        { amount: 50, label: '🚀 Grow' }
+                      ].map((tier) => (
+                        <button
+                          key={tier.amount}
+                          onClick={() => {
+                            setDonationAmount(tier.amount);
+                            setCustomAmount('');
+                          }}
+                          className={`p-3 rounded-xl border text-center transition-all ${donationAmount === tier.amount ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 hover:border-zinc-300 text-zinc-700'}`}
+                        >
+                          <div className="font-bold">₹{tier.amount}</div>
+                          <div className="text-xs opacity-80 mt-1">{tier.label}</div>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div>
+                      <input
+                        type="number"
+                        placeholder="Custom Amount (₹)"
+                        value={customAmount}
+                        onChange={(e) => {
+                          setCustomAmount(e.target.value);
+                          setDonationAmount(Number(e.target.value));
+                        }}
+                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none"
+                      />
+                    </div>
+
                     <button
-                      key={tier.amount}
-                      onClick={() => {
-                        setDonationAmount(tier.amount);
-                        setCustomAmount('');
-                      }}
-                      className={`p-3 rounded-xl border text-center transition-all ${donationAmount === tier.amount ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 hover:border-zinc-300 text-zinc-700'}`}
+                      onClick={handleDonate}
+                      disabled={!donationAmount || donationAmount <= 0}
+                      className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      <div className="font-bold">₹{tier.amount}</div>
-                      <div className="text-xs opacity-80 mt-1">{tier.label}</div>
+                      Pay ₹{donationAmount || 0} via UPI
+                      <Smartphone className="w-4 h-4" />
                     </button>
-                  ))}
-                </div>
+                  </>
+                ) : (
+                  <div className="space-y-6 text-center">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-lg">Pay ₹{donationAmount} via UPI</h4>
+                      <p className="text-sm text-zinc-600">Scan QR or click below to pay</p>
+                    </div>
+                    
+                    <div className="bg-white p-4 rounded-2xl border border-zinc-200 inline-block mx-auto">
+                      <QRCode value={upiUrl} size={180} />
+                    </div>
+                    
+                    <div className="flex items-center justify-center gap-2 text-sm text-zinc-600 bg-zinc-50 p-3 rounded-xl border border-zinc-200 mx-auto max-w-[200px]">
+                      <span className="font-mono truncate">{upiId}</span>
+                      <button 
+                        onClick={() => navigator.clipboard.writeText(upiId)}
+                        className="p-1 hover:text-emerald-600 transition-colors shrink-0"
+                        title="Copy UPI ID"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
 
-                <div>
-                  <input
-                    type="number"
-                    placeholder="Custom Amount (₹)"
-                    value={customAmount}
-                    onChange={(e) => {
-                      setCustomAmount(e.target.value);
-                      setDonationAmount(Number(e.target.value));
-                    }}
-                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none"
-                  />
-                </div>
-
-                <button
-                  onClick={handleDonate}
-                  disabled={!donationAmount || donationAmount <= 0}
-                  className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  Pay ₹{donationAmount || 0} & Download
-                  <Download className="w-4 h-4" />
-                </button>
+                    <div className="space-y-3">
+                      <a
+                        href={upiUrl}
+                        className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2"
+                      >
+                        Open UPI App
+                        <Smartphone className="w-4 h-4" />
+                      </a>
+                      
+                      <button
+                        onClick={handleVerifyPayment}
+                        disabled={isVerifying}
+                        className="w-full py-4 bg-zinc-100 text-zinc-900 font-semibold rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isVerifying ? 'Verifying...' : 'I have completed the payment'}
+                        {!isVerifying && <CheckCircle2 className="w-4 h-4" />}
+                      </button>
+                      
+                      <button
+                        onClick={() => setShowUpi(false)}
+                        className="text-sm text-zinc-500 hover:text-zinc-800 transition-colors"
+                      >
+                        Go back
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-6">
