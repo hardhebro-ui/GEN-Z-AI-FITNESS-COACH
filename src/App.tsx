@@ -17,7 +17,6 @@ export default function App() {
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
-  const [hasReviewed, setHasReviewed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleStart = () => {
@@ -101,12 +100,10 @@ export default function App() {
       
       try {
         await html2pdf().set(opt).from(element).save();
-        // Show review prompt after download if not already reviewed
-        if (!hasReviewed) {
-          setTimeout(() => {
-            setIsReviewPromptOpen(true);
-          }, 1000);
-        }
+        // Show review prompt after download
+        setTimeout(() => {
+          setIsReviewPromptOpen(true);
+        }, 1000);
       } catch (err) {
         console.error('PDF generation failed:', err);
         alert('Failed to generate PDF. Please try again.');
@@ -116,7 +113,6 @@ export default function App() {
 
   const handleReviewSubmit = () => {
     setIsReviewPromptOpen(false);
-    setHasReviewed(true);
     // Optionally return to landing page or stay on preview
     setAppState('landing');
     setPlan(null);
@@ -139,10 +135,10 @@ export default function App() {
       )}
       
       {appState === 'generating' && (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
-          <Loader2 className="w-16 h-16 text-emerald-600 animate-spin" />
-          <h2 className="text-3xl font-bold">Crafting Your Plan...</h2>
-          <p className="text-zinc-500 max-w-md">
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-6 bg-zinc-50">
+          <Loader2 className="w-12 h-12 md:w-16 md:h-16 text-emerald-600 animate-spin" />
+          <h2 className="text-2xl md:text-3xl font-bold text-zinc-900">Crafting Your Plan...</h2>
+          <p className="text-zinc-500 max-w-md text-sm md:text-base">
             Our AI is analyzing your profile and generating a personalized workout and diet strategy. This usually takes about 10-15 seconds.
           </p>
         </div>

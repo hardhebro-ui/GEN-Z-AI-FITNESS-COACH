@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserInputs } from '../types';
 import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
@@ -48,6 +48,14 @@ const initialData: UserInputs = {
 export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<UserInputs>(initialData);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Scroll to top on step change
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [step]);
 
   const updateData = (fields: Partial<UserInputs>) => {
     setData(prev => ({ ...prev, ...fields }));
@@ -776,42 +784,53 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col p-6">
-      <div className="max-w-2xl w-full mx-auto flex-1 flex flex-col">
-        <div className="mb-8">
-          <div className="flex items-center justify-between text-sm font-medium text-zinc-500 mb-4">
+    <div className="min-h-[100dvh] bg-zinc-50 text-zinc-900 flex flex-col font-sans">
+      {/* Top Progress Bar - Fixed */}
+      <div className="sticky top-0 z-10 bg-zinc-50/90 backdrop-blur-md pt-4 pb-4 px-4 md:px-6 border-b border-zinc-200">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-between text-sm font-semibold text-zinc-500 mb-3">
             <span>Step {step} of 8</span>
-            <span>{Math.round((step / 8) * 100)}% Completed</span>
+            <span className="text-emerald-600">{Math.round((step / 8) * 100)}%</span>
           </div>
-          <div className="h-2 bg-white rounded-full overflow-hidden">
+          <div className="h-2 bg-zinc-200 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-emerald-500"
+              className="h-full bg-emerald-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${(step / 8) * 100}%` }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
             />
           </div>
         </div>
+      </div>
 
-        <div className="flex-1">
+      {/* Main Content Area - Scrollable */}
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8 pb-32" // Extra padding bottom for sticky footer
+      >
+        <div className="max-w-2xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               {renderStep()}
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
 
-        <div className="mt-8 flex items-center justify-between pt-6 border-t border-zinc-900">
+      {/* Bottom Navigation - Sticky */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-zinc-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
           <button
             onClick={prevStep}
             disabled={step === 1}
-            className="p-4 rounded-full bg-white text-zinc-600 hover:text-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-4 rounded-2xl bg-zinc-100 text-zinc-600 hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
+            aria-label="Previous step"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
@@ -820,17 +839,17 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
             <button
               onClick={nextStep}
               disabled={!isStepValid()}
-              className="flex items-center gap-2 px-8 py-4 bg-emerald-500 text-zinc-950 font-semibold rounded-full hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
             >
-              Next Step
+              Next
               <ArrowRight className="w-5 h-5" />
             </button>
           ) : (
             <button
               onClick={() => onSubmit({ ...data, bmi: calculateBMI() ? parseFloat(calculateBMI()!.value) : undefined })}
-              className="flex items-center gap-2 px-8 py-4 bg-emerald-500 text-zinc-950 font-semibold rounded-full hover:bg-emerald-400 transition-all"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 transition-all active:scale-[0.98] shadow-lg shadow-emerald-600/20"
             >
-              🚀 Generate My AI Fitness Plan
+              Generate Plan
               <CheckCircle2 className="w-5 h-5" />
             </button>
           )}

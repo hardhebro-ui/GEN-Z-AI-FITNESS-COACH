@@ -50,23 +50,24 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-50/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-zinc-900/40 backdrop-blur-sm">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="w-full max-w-md bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-2xl"
+          initial={{ opacity: 0, y: '100%' }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="w-full max-w-md bg-white border-t md:border border-zinc-200 rounded-t-3xl md:rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
         >
-          <div className="flex items-center justify-between p-6 border-b border-zinc-200">
+          <div className="flex items-center justify-between p-5 md:p-6 border-b border-zinc-100 shrink-0">
             <h3 className="text-xl font-bold text-zinc-900">How was your experience?</h3>
             {!submitted && (
-              <button onClick={onClose} className="p-2 text-zinc-600 hover:text-zinc-900 rounded-full hover:bg-zinc-100 transition-colors">
+              <button onClick={onClose} className="p-2 text-zinc-400 hover:text-zinc-600 rounded-full hover:bg-zinc-100 transition-colors bg-zinc-50">
                 <X className="w-5 h-5" />
               </button>
             )}
           </div>
 
-          <div className="p-6">
+          <div className="p-5 md:p-6 overflow-y-auto">
             {submitted ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -101,7 +102,7 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
                   ))}
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-zinc-600 mb-2">Review (Optional)</label>
                     <textarea
@@ -109,7 +110,7 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
                       onChange={(e) => setText(e.target.value.substring(0, 200))}
                       placeholder="Tell us what you think..."
                       rows={3}
-                      className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none resize-none"
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-4 py-4 text-base text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none resize-none transition-all"
                     />
                     <div className="text-right text-xs text-zinc-500 mt-1">{text.length}/200</div>
                   </div>
@@ -121,14 +122,14 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Anonymous"
-                      className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none"
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-4 py-4 text-base text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none transition-all"
                     />
                   </div>
 
                   <button
                     onClick={handleSubmit}
                     disabled={rating === 0}
-                    className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2 active:scale-[0.98]"
                   >
                     Submit Review
                   </button>

@@ -86,21 +86,22 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-50/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-zinc-900/40 backdrop-blur-sm">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="w-full max-w-md bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-2xl"
+          initial={{ opacity: 0, y: '100%' }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="w-full max-w-md bg-white border-t md:border border-zinc-200 rounded-t-3xl md:rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
         >
-          <div className="flex items-center justify-between p-6 border-b border-zinc-200">
+          <div className="flex items-center justify-between p-5 md:p-6 border-b border-zinc-100 shrink-0">
             <h3 className="text-xl font-bold text-zinc-900">Unlock PDF Export</h3>
-            <button onClick={onClose} className="p-2 text-zinc-600 hover:text-zinc-900 rounded-full hover:bg-zinc-100 transition-colors">
+            <button onClick={onClose} className="p-2 text-zinc-400 hover:text-zinc-600 rounded-full hover:bg-zinc-100 transition-colors bg-zinc-50">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex border-b border-zinc-200">
+          <div className="flex border-b border-zinc-100 shrink-0">
             <button
               onClick={() => setActiveTab('donate')}
               className={`flex-1 py-4 text-sm font-medium transition-colors ${activeTab === 'donate' ? 'text-emerald-600 border-b-2 border-emerald-600' : 'text-zinc-600 hover:text-zinc-800'}`}
@@ -115,7 +116,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
             </button>
           </div>
 
-          <div className="p-6">
+          <div className="p-5 md:p-6 overflow-y-auto">
             {activeTab === 'donate' ? (
               <div className="space-y-6">
                 {!showUpi ? (
@@ -140,9 +141,9 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                             setDonationAmount(tier.amount);
                             setCustomAmount('');
                           }}
-                          className={`p-3 rounded-xl border text-center transition-all ${donationAmount === tier.amount ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 hover:border-zinc-300 text-zinc-700'}`}
+                          className={`p-3 rounded-2xl border text-center transition-all ${donationAmount === tier.amount ? 'border-emerald-600 bg-emerald-50 text-emerald-600 ring-2 ring-emerald-600/20' : 'border-zinc-200 hover:border-zinc-300 text-zinc-700 bg-white shadow-sm'}`}
                         >
-                          <div className="font-bold">₹{tier.amount}</div>
+                          <div className="font-bold text-lg">₹{tier.amount}</div>
                           <div className="text-xs opacity-80 mt-1">{tier.label}</div>
                         </button>
                       ))}
@@ -157,17 +158,17 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           setCustomAmount(e.target.value);
                           setDonationAmount(Number(e.target.value));
                         }}
-                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none"
+                        className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-4 py-4 text-base text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none transition-all shadow-sm"
                       />
                     </div>
 
                     <button
                       onClick={handleDonate}
                       disabled={!donationAmount || donationAmount <= 0}
-                      className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98]"
                     >
                       Pay ₹{donationAmount || 0} via UPI
-                      <Smartphone className="w-4 h-4" />
+                      <Smartphone className="w-5 h-5" />
                     </button>
                   </>
                 ) : (
@@ -195,24 +196,24 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                     <div className="space-y-3">
                       <a
                         href={upiUrl}
-                        className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 active:scale-[0.98]"
                       >
                         Open UPI App
-                        <Smartphone className="w-4 h-4" />
+                        <Smartphone className="w-5 h-5" />
                       </a>
                       
                       <button
                         onClick={handleVerifyPayment}
                         disabled={isVerifying}
-                        className="w-full py-4 bg-zinc-100 text-zinc-900 font-semibold rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-zinc-100 text-zinc-900 font-semibold text-lg rounded-2xl hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98]"
                       >
                         {isVerifying ? 'Verifying...' : 'I have completed the payment'}
-                        {!isVerifying && <CheckCircle2 className="w-4 h-4" />}
+                        {!isVerifying && <CheckCircle2 className="w-5 h-5" />}
                       </button>
                       
                       <button
                         onClick={() => setShowUpi(false)}
-                        className="text-sm text-zinc-500 hover:text-zinc-800 transition-colors"
+                        className="text-sm text-zinc-500 hover:text-zinc-800 transition-colors py-2"
                       >
                         Go back
                       </button>
@@ -237,7 +238,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                     placeholder="e.g. Alex"
-                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none"
+                    className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-4 py-4 text-base text-zinc-900 focus:ring-2 focus:ring-emerald-600 outline-none transition-all shadow-sm"
                   />
                 </div>
 
@@ -268,20 +269,20 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                   <button
                     onClick={handleShare}
                     disabled={!userName.trim() || isGeneratingImage}
-                    className="w-full py-4 bg-zinc-100 text-zinc-900 font-semibold rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-zinc-100 text-zinc-900 font-semibold text-lg rounded-2xl hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98]"
                   >
                     {isGeneratingImage ? 'Generating Image...' : '1. Download Share Image'}
-                    <Download className="w-4 h-4" />
+                    <Download className="w-5 h-5" />
                   </button>
 
-                  <label className="flex items-start gap-3 p-4 border border-zinc-200 rounded-xl cursor-pointer hover:bg-white/50 transition-colors">
+                  <label className="flex items-start gap-3 p-4 border border-zinc-200 rounded-2xl cursor-pointer hover:bg-zinc-50 transition-colors bg-white shadow-sm">
                     <input
                       type="checkbox"
                       checked={hasShared}
                       onChange={(e) => setHasShared(e.target.checked)}
-                      className="mt-1 w-5 h-5 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-600 bg-zinc-50"
+                      className="mt-1 w-5 h-5 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-600 bg-zinc-50 shrink-0"
                     />
-                    <span className="text-sm text-zinc-700">
+                    <span className="text-sm text-zinc-700 leading-relaxed">
                       I have shared this image with at least one person on WhatsApp, Instagram, or X.
                     </span>
                   </label>
@@ -289,10 +290,10 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                   <button
                     onClick={onUnlock}
                     disabled={!hasShared}
-                    className="w-full py-4 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98]"
                   >
                     2. Unlock My PDF
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 className="w-5 h-5" />
                   </button>
                 </div>
               </div>
