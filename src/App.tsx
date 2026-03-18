@@ -17,6 +17,7 @@ export default function App() {
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleStart = () => {
@@ -100,10 +101,12 @@ export default function App() {
       
       try {
         await html2pdf().set(opt).from(element).save();
-        // Show review prompt after download
-        setTimeout(() => {
-          setIsReviewPromptOpen(true);
-        }, 1000);
+        // Show review prompt after download if not already reviewed
+        if (!hasReviewed) {
+          setTimeout(() => {
+            setIsReviewPromptOpen(true);
+          }, 1000);
+        }
       } catch (err) {
         console.error('PDF generation failed:', err);
         alert('Failed to generate PDF. Please try again.');
@@ -113,6 +116,7 @@ export default function App() {
 
   const handleReviewSubmit = () => {
     setIsReviewPromptOpen(false);
+    setHasReviewed(true);
     // Optionally return to landing page or stay on preview
     setAppState('landing');
     setPlan(null);

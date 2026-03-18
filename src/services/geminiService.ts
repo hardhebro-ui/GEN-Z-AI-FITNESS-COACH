@@ -8,25 +8,36 @@ export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
     You are an expert fitness coach and nutritionist. Generate a highly personalized workout and diet plan based on the following user details:
     - Age: ${inputs.age}
     - Gender: ${inputs.gender}
-    - Height: ${inputs.height}
-    - Weight: ${inputs.weight}
+    - Height: ${inputs.height} ${inputs.heightUnit}
+    - Weight: ${inputs.weight} ${inputs.weightUnit}
+    - Goal Weight: ${inputs.goalWeight ? `${inputs.goalWeight} ${inputs.weightUnit}` : 'Not specified'}
+    - Body Fat Estimate: ${inputs.bodyFatEstimate || 'Not specified'}
     - BMI: ${inputs.bmi || 'Not calculated'}
     - Body Type: ${inputs.bodyType}
     - Fitness Level: ${inputs.fitnessLevel}
+    - Workout Experience: ${inputs.workoutExperience || 'Not specified'}
     - Primary Goal: ${inputs.primaryGoal}
+    - Goal Priority: ${inputs.goalPriority || 'Not specified'}
     - Target Areas: ${inputs.targetAreas?.join(', ') || 'Full Body'}
     - Plan Duration: ${inputs.planDuration}
     - Workout Location: ${inputs.workoutLocation}
-    - Equipment: ${inputs.equipment.join(', ')}
+    - Equipment: ${inputs.equipment?.join(', ') || 'None'}
     - Days per week: ${inputs.daysPerWeek}
     - Time per session: ${inputs.timePerSession}
+    - Preferred Workout Style: ${inputs.preferredWorkoutStyle || 'Not specified'}
+    - Workout Time Preference: ${inputs.workoutTimePreference || 'Not specified'}
     - Diet Type: ${inputs.dietType}
+    - Food Preference Style: ${inputs.foodPreferenceStyle || 'Not specified'}
+    - Protein Preference: ${inputs.proteinPreference || 'Not specified'}
     - Meals per day: ${inputs.mealsPerDay}
     - Allergies: ${inputs.allergies || 'None'}
     - Budget: ${inputs.budget}
     - Activity Level: ${inputs.activityLevel}
+    - Daily Steps: ${inputs.dailySteps || 'Not specified'}
+    - Stress Level: ${inputs.stressLevel || 'Not specified'}
     - Sleep Hours: ${inputs.sleepHours || 'Not specified'}
     - Hydration: ${inputs.hydration || 'Not specified'}
+    - Willingness for Rest Days: ${inputs.willingnessForRestDays || 'Not specified'}
     - Medical Conditions: ${inputs.medicalConditions || 'None'}
     - Past Injuries: ${inputs.pastInjuries || 'None'}
 

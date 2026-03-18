@@ -17,13 +17,20 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
     <div className="min-h-screen bg-zinc-50 text-zinc-900 p-6 pb-32">
       {/* Hidden Printable A4 Layout for PDF Export */}
       <div className="overflow-hidden h-0 w-0 absolute opacity-0 pointer-events-none">
-        <div id="pdf-content-light" className="w-[800px] bg-white text-black p-10 font-sans">
-          <div className="text-center mb-8 border-b-2 border-gray-200 pb-6">
+        <div id="pdf-content-light" className="w-[800px] bg-white text-black p-10 font-sans relative">
+          {/* Watermark */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0 overflow-hidden">
+            <div className="text-[120px] font-black rotate-[-45deg] whitespace-nowrap text-gray-900">
+              FITNESS AI
+            </div>
+          </div>
+          
+          <div className="text-center mb-8 border-b-2 border-gray-200 pb-6 relative z-10">
             <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-wider mb-2">Personalized Fitness & Diet Plan</h1>
             <p className="text-gray-600">Designed for {inputs.primaryGoal} • {inputs.planDuration}</p>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-8 relative z-10">
             <h2 className="text-xl font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4 uppercase tracking-wide">Profile Summary</h2>
             <div className="grid grid-cols-4 gap-4 text-sm">
               <div><span className="font-semibold text-gray-500 block">Stats</span>{inputs.age} yrs • {inputs.height}cm • {inputs.weight}kg</div>
