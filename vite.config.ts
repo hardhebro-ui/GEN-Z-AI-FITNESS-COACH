@@ -12,6 +12,9 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        workbox: {
+          maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB
+        },
         manifest: {
           name: 'AI Fitness Coach',
           short_name: 'FitnessAI',

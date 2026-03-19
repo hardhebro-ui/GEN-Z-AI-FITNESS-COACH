@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "Plan": {
+      "title": "Plan",
+      "description": "A generated fitness and diet plan.",
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "object",
+          "description": "The user inputs used to generate the plan."
+        },
+        "plan": {
+          "type": "object",
+          "description": "The generated plan data."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the plan was generated."
+        }
+      },
+      "required": ["inputs", "plan", "createdAt"]
+    },
+    "Stats": {
+      "title": "Stats",
+      "description": "Global application statistics.",
+      "type": "object",
+      "properties": {
+        "totalPlans": {
+          "type": "integer",
+          "description": "Total number of plans generated."
+        },
+        "totalReviews": {
+          "type": "integer",
+          "description": "Total number of reviews submitted."
+        },
+        "averageRating": {
+          "type": "number",
+          "description": "Average rating across all reviews."
+        }
+      }
+    },
+    "Review": {
+      "title": "Review",
+      "description": "A user review/success story.",
+      "type": "object",
+      "properties": {
+        "rating": {
+          "type": "integer",
+          "description": "Rating from 1 to 5."
+        },
+        "text": {
+          "type": "string",
+          "description": "Review comment text."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the reviewer."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the review was submitted."
+        }
+      },
+      "required": ["rating", "name", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/plans/{planId}": {
+      "schema": "Plan",
+      "description": "Collection of generated fitness plans."
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Collection of user reviews."
+    },
+    "/stats/global": {
+      "schema": "Stats",
+      "description": "Global stats like total plans and reviews."
+    }
+  }
+}

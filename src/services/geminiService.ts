@@ -1,11 +1,26 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { UserInputs, GeneratedPlan } from "../types";
+import { db } from "../firebase";
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  where, 
+  limit, 
+  serverTimestamp, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  increment,
+  runTransaction
+} from "firebase/firestore";
+import { handleFirestoreError, OperationType } from "../utils/firestoreErrorHandler";
 
 let aiInstance: GoogleGenAI | null = null;
 
 function getAiInstance() {
   if (!aiInstance) {
-    // Check environment variables first, then localStorage
     const apiKey = 
       process.env.GEMINI_API_KEY || 
       import.meta.env.VITE_GEMINI_API_KEY || 
@@ -19,7 +34,66 @@ function getAiInstance() {
   return aiInstance;
 }
 
+// Helper to create a stable hash or string representation of inputs for caching
+function getInputsHash(inputs: UserInputs): string {
+  // Select key fields that define the plan
+  const keyFields = {
+    age: inputs.age,
+    gender: inputs.gender,
+    height: inputs.height,
+    weight: inputs.weight,
+    goalWeight: inputs.goalWeight,
+    primaryGoal: inputs.primaryGoal,
+    fitnessLevel: inputs.fitnessLevel,
+    workoutLocation: inputs.workoutLocation,
+    dietType: inputs.dietType,
+    daysPerWeek: inputs.daysPerWeek
+  };
+  return JSON.stringify(keyFields);
+}
+
+export async function getTotalPlansCount(): Promise<number> {
+  const path = "stats/global";
+  try {
+    const statsDoc = await getDoc(doc(db, "stats", "global"));
+    if (statsDoc.exists()) {
+      return statsDoc.data().totalPlans || 0;
+    }
+    return 0;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, path);
+    return 0;
+  }
+}
+
+async function incrementTotalPlans() {
+  const path = "stats/global";
+  const statsRef = doc(db, "stats", "global");
+  try {
+    await setDoc(statsRef, { totalPlans: increment(1) }, { merge: true });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
+
 export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
+  // 1. Check for existing related plan (simple exact match on key fields for now)
+  const inputsHash = getInputsHash(inputs);
+  const path = "plans";
+  try {
+    const plansRef = collection(db, "plans");
+    const q = query(plansRef, where("inputsHash", "==", inputsHash), limit(1));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      console.log("Found existing related plan, reusing...");
+      return querySnapshot.docs[0].data().plan as GeneratedPlan;
+    }
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, path);
+  }
+
+  // 2. Generate new plan if not found
   const ai = getAiInstance();
   const prompt = `
     You are an expert fitness coach and nutritionist. Generate a highly personalized workout and diet plan based on the following user details:
@@ -144,5 +218,21 @@ export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
     throw new Error("Failed to generate plan");
   }
 
-  return JSON.parse(text) as GeneratedPlan;
+  const plan = JSON.parse(text) as GeneratedPlan;
+
+  // 3. Save new plan to Firestore and increment count
+  const savePath = "plans";
+  try {
+    await addDoc(collection(db, "plans"), {
+      inputs,
+      inputsHash,
+      plan,
+      createdAt: serverTimestamp()
+    });
+    await incrementTotalPlans();
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, savePath);
+  }
+
+  return plan;
 }

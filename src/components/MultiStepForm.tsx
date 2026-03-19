@@ -47,6 +47,7 @@ const initialData: UserInputs = {
 
 export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
   const [step, setStep] = useState(1);
+  const [direction, setDirection] = useState(0);
   const [data, setData] = useState<UserInputs>(initialData);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -62,8 +63,31 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
     setData(prev => ({ ...prev, ...fields }));
   };
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 8));
-  const prevStep = () => setStep(s => Math.max(s - 1, 1));
+  const nextStep = () => {
+    setDirection(1);
+    setStep(s => Math.min(s + 1, 8));
+  };
+  const prevStep = () => {
+    setDirection(-1);
+    setStep(s => Math.max(s - 1, 1));
+  };
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 100 : -100,
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 100 : -100,
+      opacity: 0
+    })
+  };
 
   const isStepValid = () => {
     switch (step) {
@@ -807,16 +831,21 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
       {/* Main Content Area - Scrollable */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8 pb-40" // Increased padding bottom for sticky footer
+        className="flex-1 overflow-y-auto px-4 py-10 md:px-8 md:py-12 pb-48" // Increased padding for better whitespace
       >
         <div className="max-w-2xl mx-auto">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
             >
               {renderStep()}
             </motion.div>

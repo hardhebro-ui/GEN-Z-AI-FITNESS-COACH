@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import MultiStepForm from './components/MultiStepForm';
 import PlanPreview from './components/PlanPreview';
 import ExportModal from './components/ExportModal';
 import ReviewPrompt from './components/ReviewPrompt';
-import SettingsModal from './components/SettingsModal';
 import { UserInputs, GeneratedPlan } from './types';
 import { generatePlan } from './services/geminiService';
-import { Loader2, Key } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 type AppState = 'landing' | 'form' | 'generating' | 'preview';
@@ -18,30 +17,63 @@ export default function App() {
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isCached, setIsCached] = useState(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (appState === 'generating') {
+      setProgress(0);
+      interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) return prev;
+          // Slower progress as it gets closer to 100
+          const increment = prev < 50 ? 5 : prev < 80 ? 2 : 1;
+          return prev + increment;
+        });
+      }, 500);
+    }
+    return () => clearInterval(interval);
+  }, [appState]);
 
   const handleStart = () => {
     setAppState('form');
+  };
+
+  const getCacheKey = (inputs: UserInputs) => {
+    // Create a unique key based on core inputs
+    return `plan_${inputs.primaryGoal}_${inputs.fitnessLevel}_${inputs.age}_${inputs.gender}_${inputs.weight}_${inputs.height}_${inputs.workoutFrequency}_${inputs.equipmentAccess}`;
   };
 
   const handleFormSubmit = async (inputs: UserInputs) => {
     setUserInputs(inputs);
     setAppState('generating');
     setError(null);
+    setIsCached(false);
     
+    const cacheKey = getCacheKey(inputs);
+    const cachedPlan = localStorage.getItem(cacheKey);
+
+    if (cachedPlan) {
+      setIsCached(true);
+      // Simulate a quick "finding" process
+      setTimeout(() => {
+        setPlan(JSON.parse(cachedPlan));
+        setAppState('preview');
+      }, 2000);
+      return;
+    }
+
     try {
       const generatedPlan = await generatePlan(inputs);
       setPlan(generatedPlan);
+      // Save to local cache
+      localStorage.setItem(cacheKey, JSON.stringify(generatedPlan));
       setAppState('preview');
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      if (err.message === 'MISSING_API_KEY') {
-        setError('API Key is missing. Please set your Gemini API key in the settings to continue.');
-        setIsSettingsModalOpen(true);
-      } else {
-        setError('Failed to generate plan. Please try again.');
-      }
+      setError('Failed to generate plan. Please try again.');
       setAppState('form');
     }
   };
@@ -55,14 +87,9 @@ export default function App() {
       const generatedPlan = await generatePlan(userInputs);
       setPlan(generatedPlan);
       setAppState('preview');
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      if (err.message === 'MISSING_API_KEY') {
-        setError('API Key is missing. Please set your Gemini API key in the settings to continue.');
-        setIsSettingsModalOpen(true);
-      } else {
-        setError('Failed to regenerate plan. Please try again.');
-      }
+      setError('Failed to regenerate plan. Please try again.');
       setAppState('preview');
     }
   };
@@ -147,12 +174,23 @@ export default function App() {
       )}
       
       {appState === 'generating' && (
-        <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-6 bg-zinc-50">
-          <Loader2 className="w-12 h-12 md:w-16 md:h-16 text-emerald-600 animate-spin" />
-          <h2 className="text-2xl md:text-3xl font-bold text-zinc-900">Crafting Your Plan...</h2>
-          <p className="text-zinc-500 max-w-md text-sm md:text-base">
-            Our AI is analyzing your profile and generating a personalized workout and diet strategy. This usually takes about 10-15 seconds.
-          </p>
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-8 bg-zinc-50">
+          <div className="relative flex items-center justify-center">
+            <Loader2 className="w-24 h-24 md:w-32 md:h-32 text-emerald-600 animate-spin" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xl md:text-2xl font-bold text-emerald-600">{progress}%</span>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-zinc-900 tracking-tight">
+              {isCached ? 'Found a Similar Plan!' : 'Crafting Your Plan...'}
+            </h2>
+            <p className="text-zinc-500 max-w-md text-base md:text-lg leading-relaxed mx-auto">
+              {isCached 
+                ? 'We found a plan in our database that perfectly matches your profile. Loading it for you now...' 
+                : 'Our AI is analyzing your profile and generating a personalized workout and diet strategy.'}
+            </p>
+          </div>
         </div>
       )}
       
@@ -183,20 +221,6 @@ export default function App() {
         onClose={() => setIsReviewPromptOpen(false)} 
         onSubmit={handleReviewSubmit} 
       />
-
-      <SettingsModal 
-        isOpen={isSettingsModalOpen} 
-        onClose={() => setIsSettingsModalOpen(false)} 
-      />
-      
-      {/* Floating Settings Button */}
-      <button
-        onClick={() => setIsSettingsModalOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-white shadow-xl rounded-2xl text-zinc-600 hover:text-emerald-600 transition-all hover:scale-110 active:scale-95 border border-zinc-100"
-        title="API Settings"
-      >
-        <Key className="w-6 h-6" />
-      </button>
     </div>
   );
 }

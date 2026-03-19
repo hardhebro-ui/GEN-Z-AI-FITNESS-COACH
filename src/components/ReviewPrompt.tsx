@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, CheckCircle2, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, runTransaction } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from '../utils/firestoreErrorHandler';
 import { db } from '../firebase';
 
 interface ReviewPromptProps {
@@ -22,11 +23,36 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
     if (rating === 0) return;
     
     try {
-      await addDoc(collection(db, 'reviews'), {
-        rating,
-        text: text ? text.substring(0, 200) : null,
-        name: name || 'Anonymous',
-        createdAt: serverTimestamp()
+      // Use a transaction to update stats and add review
+      await runTransaction(db, async (transaction) => {
+        const statsRef = doc(db, 'stats', 'global');
+        const statsDoc = await transaction.get(statsRef);
+        
+        const newReviewRef = doc(collection(db, 'reviews'));
+        
+        let newTotalReviews = 1;
+        let newAverageRating = rating;
+        
+        if (statsDoc.exists()) {
+          const data = statsDoc.data();
+          const currentTotal = data.totalReviews || 0;
+          const currentAvg = data.averageRating || 0;
+          
+          newTotalReviews = currentTotal + 1;
+          newAverageRating = ((currentAvg * currentTotal) + rating) / newTotalReviews;
+        }
+        
+        transaction.set(statsRef, { 
+          totalReviews: newTotalReviews, 
+          averageRating: newAverageRating 
+        }, { merge: true });
+        
+        transaction.set(newReviewRef, {
+          rating,
+          text: text ? text.substring(0, 200) : null,
+          name: name || 'Anonymous',
+          createdAt: serverTimestamp()
+        });
       });
       
       setSubmitted(true);
@@ -42,7 +68,7 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
         onSubmit(rating, text, name);
       }, 3000);
     } catch (err) {
-      console.error('Failed to submit review', err);
+      handleFirestoreError(err, OperationType.WRITE, 'reviews/stats');
     }
   };
 

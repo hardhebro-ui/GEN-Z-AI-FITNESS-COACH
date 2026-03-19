@@ -1,19 +1,88 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
-    function isAuthenticated() {
-      return request.auth != null;
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    // Check if the document contains only the allowed fields
+    function hasOnlyAllowedFields(data, fields) {
+      return data.keys().hasOnly(fields);
     }
 
-    // Reviews collection rules
-    match /reviews/{reviewId} {
-      // Anyone can create a review
-      allow create: if true;
-      // Only authenticated users can read reviews (or you can make it public if needed)
+    // Validate a workout/diet plan
+    function isValidPlan(data) {
+      return data.inputs is map &&
+             data.inputsHash is string && data.inputsHash.size() < 2000 &&
+             data.plan is map &&
+             data.createdAt is timestamp;
+    }
+
+    // Validate a review
+    function isValidReview(data) {
+      return data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             (data.text == null || (data.text is string && data.text.size() < 1000)) &&
+             data.name is string && data.name.size() < 100 &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // Plans collection: Used to store generated workout/diet plans
+    match /plans/{planId} {
+      // Anyone can read plans (to allow sharing/reuse)
       allow read: if true;
-      // No one can update or delete reviews for now
+      
+      // Anyone can create a plan
+      allow create: if isValidPlan(request.resource.data);
+      
+      // Plans are immutable once created
       allow update, delete: if false;
+    }
+
+    // Reviews collection: Used for community feedback
+    match /reviews/{reviewId} {
+      // Anyone can read the reviews
+      allow read: if true;
+      
+      // Anyone can create a new review
+      allow create: if isValidReview(request.resource.data);
+      
+      // Prevent people from modifying or deleting existing reviews
+      allow update, delete: if false;
+    }
+
+    // Stats collection: Used for global counters and averages
+    match /stats/global {
+      // Anyone can read the global stats
+      allow get: if true;
+      
+      // Anyone can update the global stats (totalPlans, totalReviews, averageRating)
+      // This rule supports the atomic increments and average calculations used in the app
+      allow write: if 
+        // Case 1: Creating the document for the first time
+        (!exists(/databases/$(database)/documents/stats/global) && 
+         (
+           (hasOnlyAllowedFields(request.resource.data, ['totalPlans']) && request.resource.data.totalPlans == 1) ||
+           (hasOnlyAllowedFields(request.resource.data, ['totalReviews', 'averageRating']) && request.resource.data.totalReviews == 1)
+         )
+        ) ||
+        // Case 2: Updating existing stats
+        (exists(/databases/$(database)/documents/stats/global) && 
+         (
+           // Subcase A: Incrementing totalPlans (when a new plan is generated)
+           (request.resource.data.totalPlans == resource.data.get('totalPlans', 0) + 1 && 
+            request.resource.data.get('totalReviews', 0) == resource.data.get('totalReviews', 0) && 
+            request.resource.data.get('averageRating', 0) == resource.data.get('averageRating', 0)) ||
+           
+           // Subcase B: Incrementing totalReviews and updating averageRating (when a review is submitted)
+           (request.resource.data.totalReviews == resource.data.get('totalReviews', 0) + 1 && 
+            request.resource.data.get('totalPlans', 0) == resource.data.get('totalPlans', 0) && 
+            request.resource.data.averageRating is number)
+         )
+        );
     }
 
     // Default deny for all other collections

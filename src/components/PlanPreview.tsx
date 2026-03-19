@@ -14,13 +14,13 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 p-6 pb-48">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 p-8 pb-64 md:p-12 md:pb-48">
       {/* Hidden Printable A4 Layout for PDF Export */}
       <div className="overflow-hidden h-0 w-0 absolute opacity-0 pointer-events-none">
-        <div id="pdf-content-light" className="w-[800px] bg-white text-black p-10 font-sans">
-          <div className="text-center mb-8 border-b-2 border-gray-200 pb-6">
-            <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-wider mb-2">Personalized Fitness & Diet Plan</h1>
-            <p className="text-gray-600">Designed for {inputs.primaryGoal} • {inputs.planDuration}</p>
+        <div id="pdf-content-light" className="w-[800px] bg-white text-black p-12 font-sans">
+          <div className="text-center mb-12 border-b-4 border-emerald-600 pb-8">
+            <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter mb-3">Personalized Fitness & Diet Plan</h1>
+            <p className="text-gray-500 text-lg font-medium tracking-wide">Designed for {inputs.primaryGoal} • {inputs.planDuration}</p>
           </div>
 
           <div className="mb-8">
@@ -125,9 +125,9 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
         </div>
         
         {/* Header */}
-        <div className="text-center space-y-4 pt-8 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Your Personalized Plan</h1>
-          <p className="text-zinc-600 text-lg">Designed for {inputs.primaryGoal} • {inputs.planDuration}</p>
+        <div className="text-center space-y-6 pt-12 pb-8 relative z-10">
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-zinc-900">Your Personalized Plan</h1>
+          <p className="text-zinc-500 text-xl md:text-2xl font-medium">Designed for {inputs.primaryGoal} • {inputs.planDuration}</p>
         </div>
 
         {/* User Summary */}
