@@ -136,82 +136,104 @@ export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
     Output the response strictly as a JSON object matching the provided schema. No markdown, no extra text.
   `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.1-pro-preview",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          workout: {
+  let response;
+  let retries = 0;
+  const maxRetries = 3;
+
+  while (retries < maxRetries) {
+    try {
+      response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
             type: Type.OBJECT,
             properties: {
-              weeklySplit: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    day: { type: Type.STRING, description: "Day number or name (e.g., Day 1, Monday)" },
-                    focus: { type: Type.STRING, description: "Focus of the day (e.g., Upper Body, Rest)" },
-                    exercises: {
-                      type: Type.ARRAY,
-                      items: {
-                        type: Type.OBJECT,
-                        properties: {
-                          name: { type: Type.STRING },
-                          setsReps: { type: Type.STRING },
-                          rest: { type: Type.STRING },
-                          alternative: { type: Type.STRING },
-                          notes: { type: Type.STRING }
-                        },
-                        required: ["name", "setsReps", "rest", "alternative", "notes"]
-                      }
-                    }
-                  },
-                  required: ["day", "focus", "exercises"]
-                }
-              }
-            },
-            required: ["weeklySplit"]
-          },
-          diet: {
-            type: Type.OBJECT,
-            properties: {
-              dailyCalories: { type: Type.STRING },
-              macros: {
+              workout: {
                 type: Type.OBJECT,
                 properties: {
-                  protein: { type: Type.STRING },
-                  carbs: { type: Type.STRING },
-                  fats: { type: Type.STRING }
+                  weeklySplit: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        day: { type: Type.STRING, description: "Day number or name (e.g., Day 1, Monday)" },
+                        focus: { type: Type.STRING, description: "Focus of the day (e.g., Upper Body, Rest)" },
+                        exercises: {
+                          type: Type.ARRAY,
+                          items: {
+                            type: Type.OBJECT,
+                            properties: {
+                              name: { type: Type.STRING },
+                              setsReps: { type: Type.STRING },
+                              rest: { type: Type.STRING },
+                              alternative: { type: Type.STRING },
+                              notes: { type: Type.STRING }
+                            },
+                            required: ["name", "setsReps", "rest", "alternative", "notes"]
+                          }
+                        }
+                      },
+                      required: ["day", "focus", "exercises"]
+                    }
+                  }
                 },
-                required: ["protein", "carbs", "fats"]
+                required: ["weeklySplit"]
               },
-              meals: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING, description: "Meal name (e.g., Breakfast)" },
-                    options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    alternatives: { type: Type.STRING }
+              diet: {
+                type: Type.OBJECT,
+                properties: {
+                  dailyCalories: { type: Type.STRING },
+                  macros: {
+                    type: Type.OBJECT,
+                    properties: {
+                      protein: { type: Type.STRING },
+                      carbs: { type: Type.STRING },
+                      fats: { type: Type.STRING }
+                    },
+                    required: ["protein", "carbs", "fats"]
                   },
-                  required: ["name", "options", "alternatives"]
-                }
+                  meals: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        name: { type: Type.STRING, description: "Meal name (e.g., Breakfast)" },
+                        options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        alternatives: { type: Type.STRING }
+                      },
+                      required: ["name", "options", "alternatives"]
+                    }
+                  }
+                },
+                required: ["dailyCalories", "macros", "meals"]
+              },
+              safetyNotes: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
               }
             },
-            required: ["dailyCalories", "macros", "meals"]
-          },
-          safetyNotes: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING }
+            required: ["workout", "diet", "safetyNotes"]
           }
-        },
-        required: ["workout", "diet", "safetyNotes"]
+        }
+      });
+      break; // Success
+    } catch (error: any) {
+      if (error?.message?.includes('429') || error?.status === 'RESOURCE_EXHAUSTED') {
+        retries++;
+        if (retries === maxRetries) throw error;
+        // Exponential backoff: 2s, 4s, 8s
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retries) * 1000));
+      } else {
+        throw error;
       }
     }
-  });
+  }
+
+  if (!response) {
+    throw new Error("Failed to generate plan after retries");
+  }
 
   const text = response.text;
   if (!text) {
