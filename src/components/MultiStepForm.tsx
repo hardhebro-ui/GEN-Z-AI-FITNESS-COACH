@@ -53,8 +53,9 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
   useEffect(() => {
     // Scroll to top on step change
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollRef.current.scrollTo({ top: 0, behavior: 'instant' });
     }
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [step]);
 
   const updateData = (fields: Partial<UserInputs>) => {
@@ -784,9 +785,9 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-50 text-zinc-900 flex flex-col font-sans">
+    <div className="h-[100dvh] bg-zinc-50 text-zinc-900 flex flex-col font-sans overflow-hidden">
       {/* Top Progress Bar - Fixed */}
-      <div className="sticky top-0 z-10 bg-zinc-50/90 backdrop-blur-md pt-4 pb-4 px-4 md:px-6 border-b border-zinc-200">
+      <div className="sticky top-0 z-30 bg-zinc-50/95 backdrop-blur-md pt-4 pb-4 px-4 md:px-6 border-b border-zinc-200 shrink-0">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between text-sm font-semibold text-zinc-500 mb-3">
             <span>Step {step} of 8</span>
@@ -806,7 +807,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
       {/* Main Content Area - Scrollable */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8 pb-32" // Extra padding bottom for sticky footer
+        className="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8 pb-40" // Increased padding bottom for sticky footer
       >
         <div className="max-w-2xl mx-auto">
           <AnimatePresence mode="wait">

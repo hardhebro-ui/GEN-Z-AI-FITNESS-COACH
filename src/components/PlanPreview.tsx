@@ -14,7 +14,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 p-6 pb-32">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 p-6 pb-48">
       {/* Hidden Printable A4 Layout for PDF Export */}
       <div className="overflow-hidden h-0 w-0 absolute opacity-0 pointer-events-none">
         <div id="pdf-content-light" className="w-[800px] bg-white text-black p-10 font-sans">

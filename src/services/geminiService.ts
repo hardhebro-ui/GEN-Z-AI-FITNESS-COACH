@@ -5,9 +5,14 @@ let aiInstance: GoogleGenAI | null = null;
 
 function getAiInstance() {
   if (!aiInstance) {
-    const apiKey = process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
+    // Check environment variables first, then localStorage
+    const apiKey = 
+      process.env.GEMINI_API_KEY || 
+      import.meta.env.VITE_GEMINI_API_KEY || 
+      localStorage.getItem('user_gemini_api_key');
+
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not set. Please configure it in your environment variables.");
+      throw new Error("MISSING_API_KEY");
     }
     aiInstance = new GoogleGenAI({ apiKey });
   }

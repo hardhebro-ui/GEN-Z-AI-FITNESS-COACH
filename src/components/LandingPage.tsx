@@ -143,7 +143,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="w-full max-w-6xl mt-12 md:mt-32 pb-24 md:pb-0"
+            className="w-full max-w-6xl mt-12 md:mt-32 pb-40 md:pb-12"
           >
             <div className="text-center mb-8 md:mb-12">
               <h2 className="text-2xl md:text-4xl font-bold mb-3">Trusted by Fitness Enthusiasts</h2>

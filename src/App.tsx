@@ -4,9 +4,10 @@ import MultiStepForm from './components/MultiStepForm';
 import PlanPreview from './components/PlanPreview';
 import ExportModal from './components/ExportModal';
 import ReviewPrompt from './components/ReviewPrompt';
+import SettingsModal from './components/SettingsModal';
 import { UserInputs, GeneratedPlan } from './types';
 import { generatePlan } from './services/geminiService';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Key } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 type AppState = 'landing' | 'form' | 'generating' | 'preview';
@@ -17,6 +18,7 @@ export default function App() {
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleStart = () => {
@@ -32,9 +34,14 @@ export default function App() {
       const generatedPlan = await generatePlan(inputs);
       setPlan(generatedPlan);
       setAppState('preview');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Failed to generate plan. Please try again.');
+      if (err.message === 'MISSING_API_KEY') {
+        setError('API Key is missing. Please set your Gemini API key in the settings to continue.');
+        setIsSettingsModalOpen(true);
+      } else {
+        setError('Failed to generate plan. Please try again.');
+      }
       setAppState('form');
     }
   };
@@ -48,9 +55,14 @@ export default function App() {
       const generatedPlan = await generatePlan(userInputs);
       setPlan(generatedPlan);
       setAppState('preview');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Failed to regenerate plan. Please try again.');
+      if (err.message === 'MISSING_API_KEY') {
+        setError('API Key is missing. Please set your Gemini API key in the settings to continue.');
+        setIsSettingsModalOpen(true);
+      } else {
+        setError('Failed to regenerate plan. Please try again.');
+      }
       setAppState('preview');
     }
   };
@@ -171,6 +183,20 @@ export default function App() {
         onClose={() => setIsReviewPromptOpen(false)} 
         onSubmit={handleReviewSubmit} 
       />
+
+      <SettingsModal 
+        isOpen={isSettingsModalOpen} 
+        onClose={() => setIsSettingsModalOpen(false)} 
+      />
+      
+      {/* Floating Settings Button */}
+      <button
+        onClick={() => setIsSettingsModalOpen(true)}
+        className="fixed bottom-6 right-6 z-50 p-4 bg-white shadow-xl rounded-2xl text-zinc-600 hover:text-emerald-600 transition-all hover:scale-110 active:scale-95 border border-zinc-100"
+        title="API Settings"
+      >
+        <Key className="w-6 h-6" />
+      </button>
     </div>
   );
 }
