@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Dumbbell, Star, ArrowRight, Zap, Flame, FileText, Activity } from 'lucide-react';
+import { Dumbbell, Star, ArrowRight, Zap, Flame, FileText, Activity, Coffee } from 'lucide-react';
 import { Review } from '../types';
 import { collection, getDocs, query, orderBy, limit, getAggregateFromServer, average, count } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -200,6 +200,37 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             `}} />
           </motion.div>
         )}
+
+        {/* Footer / Donation Section */}
+        <footer className="w-full max-w-6xl mt-20 pb-32 md:pb-12 border-t border-white/5 pt-12 flex flex-col items-center gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <p className="text-zinc-500 text-sm mb-4">Enjoying your personalized plan? Support the project!</p>
+            <a 
+              href="https://www.buymeacoffee.com/yourusername" // Replace with your actual link
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-6 py-3 bg-[#FFDD00] text-zinc-950 font-bold rounded-xl hover:scale-105 transition-all shadow-lg shadow-yellow-500/10"
+            >
+              <img 
+                src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" 
+                alt="Buy me a coffee" 
+                className="w-5 h-5"
+              />
+              <span>Buy me a coffee</span>
+            </a>
+          </motion.div>
+          
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-zinc-600 text-xs">
+              © 2026 AI Fitness Coach. Built with precision & AI.
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   );
