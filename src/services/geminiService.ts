@@ -1,9 +1,21 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { UserInputs, GeneratedPlan } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAiInstance() {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not set. Please configure it in your environment variables.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+}
 
 export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
+  const ai = getAiInstance();
   const prompt = `
     You are an expert fitness coach and nutritionist. Generate a highly personalized workout and diet plan based on the following user details:
     - Age: ${inputs.age}
