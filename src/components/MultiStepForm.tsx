@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserInputs } from '../types';
-import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 interface MultiStepFormProps {
   onSubmit: (data: UserInputs) => void;
@@ -144,53 +144,55 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
     switch (step) {
       case 1:
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Let’s Understand Your Body</h2>
-            <div className="space-y-4">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+              The <span className="text-neon">Basics</span>
+            </h2>
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-2">Age (13-80)</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Age (13-80)</label>
                   <input
                     type="number"
                     min="13"
                     max="80"
                     value={data.age}
                     onChange={e => updateData({ age: e.target.value })}
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                    className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-neon outline-none text-white font-bold transition-all"
                     placeholder="e.g. 25"
                     autoFocus
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-2">Gender (Optional)</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Gender</label>
                   <select
                     value={data.gender}
                     onChange={e => updateData({ gender: e.target.value })}
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                    className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-neon outline-none text-white font-bold transition-all appearance-none"
                   >
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Prefer not to say">Prefer not to say</option>
+                    <option value="" className="bg-zinc-950">Select</option>
+                    <option value="Male" className="bg-zinc-950">Male</option>
+                    <option value="Female" className="bg-zinc-950">Female</option>
+                    <option value="Other" className="bg-zinc-950">Other</option>
                   </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-zinc-600">Height</label>
-                    <div className="flex bg-zinc-100 rounded-lg p-0.5">
+                    <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Height</label>
+                    <div className="flex bg-zinc-900 rounded-xl p-1 border border-white/5">
                       <button
                         onClick={() => updateData({ heightUnit: 'cm' })}
-                        className={`px-2 py-1 text-xs rounded-md ${data.heightUnit === 'cm' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500'}`}
+                        className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${data.heightUnit === 'cm' ? 'bg-neon text-black shadow-lg' : 'text-zinc-500'}`}
                       >
-                        cm
+                        CM
                       </button>
                       <button
                         onClick={() => updateData({ heightUnit: 'ft/in' })}
-                        className={`px-2 py-1 text-xs rounded-md ${data.heightUnit === 'ft/in' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500'}`}
+                        className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${data.heightUnit === 'ft/in' ? 'bg-neon text-black shadow-lg' : 'text-zinc-500'}`}
                       >
-                        ft/in
+                        FT
                       </button>
                     </div>
                   </div>
@@ -198,25 +200,25 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                     type="text"
                     value={data.height}
                     onChange={e => updateData({ height: e.target.value })}
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                    className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-neon outline-none text-white font-bold transition-all"
                     placeholder={data.heightUnit === 'cm' ? "e.g. 175" : "e.g. 5'9\""}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-zinc-600">Current Weight</label>
-                    <div className="flex bg-zinc-100 rounded-lg p-0.5">
+                    <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Weight</label>
+                    <div className="flex bg-zinc-900 rounded-xl p-1 border border-white/5">
                       <button
                         onClick={() => updateData({ weightUnit: 'kg' })}
-                        className={`px-2 py-1 text-xs rounded-md ${data.weightUnit === 'kg' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500'}`}
+                        className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${data.weightUnit === 'kg' ? 'bg-neon text-black shadow-lg' : 'text-zinc-500'}`}
                       >
-                        kg
+                        KG
                       </button>
                       <button
                         onClick={() => updateData({ weightUnit: 'lbs' })}
-                        className={`px-2 py-1 text-xs rounded-md ${data.weightUnit === 'lbs' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500'}`}
+                        className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${data.weightUnit === 'lbs' ? 'bg-neon text-black shadow-lg' : 'text-zinc-500'}`}
                       >
-                        lbs
+                        LB
                       </button>
                     </div>
                   </div>
@@ -224,7 +226,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                     type="number"
                     value={data.weight}
                     onChange={e => updateData({ weight: e.target.value })}
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                    className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-neon outline-none text-white font-bold transition-all"
                     placeholder={data.weightUnit === 'kg' ? "e.g. 70" : "e.g. 154"}
                   />
                 </div>
@@ -232,41 +234,41 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-2">Goal Weight ({data.weightUnit}) (Optional)</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Goal Weight</label>
                   <input
                     type="number"
                     value={data.goalWeight}
                     onChange={e => updateData({ goalWeight: e.target.value })}
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                    className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-neon outline-none text-white font-bold transition-all"
                     placeholder={data.weightUnit === 'kg' ? "e.g. 65" : "e.g. 143"}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-2">Body Fat Estimate (Optional)</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Body Fat %</label>
                   <select
                     value={data.bodyFatEstimate}
                     onChange={e => updateData({ bodyFatEstimate: e.target.value })}
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                    className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-neon outline-none text-white font-bold transition-all appearance-none"
                   >
-                    <option value="">Not sure? AI will decide</option>
-                    <option value="Low">Low</option>
-                    <option value="Average">Average</option>
-                    <option value="High">High</option>
+                    <option value="" className="bg-zinc-950">Not Sure</option>
+                    <option value="Low" className="bg-zinc-950">Low (&lt; 15%)</option>
+                    <option value="Average" className="bg-zinc-950">Average (15-25%)</option>
+                    <option value="High" className="bg-zinc-950">High (&gt; 25%)</option>
                   </select>
                 </div>
               </div>
               
               {bmiData && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white border border-zinc-200 rounded-xl p-4 flex items-center justify-between"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 flex items-center justify-between shadow-2xl"
                 >
                   <div>
-                    <span className="text-zinc-600 text-sm block">Your BMI</span>
-                    <span className="text-2xl font-bold text-zinc-900">{bmiData.value}</span>
+                    <span className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] block mb-1">Body Mass Index</span>
+                    <span className="text-4xl font-black text-white font-display italic leading-none">{bmiData.value}</span>
                   </div>
-                  <div className={`px-3 py-1 rounded-full bg-zinc-100 border border-zinc-300 text-sm font-medium ${bmiData.color}`}>
+                  <div className={`px-4 py-2 rounded-xl bg-zinc-900 border border-white/5 text-xs font-black uppercase tracking-widest ${bmiData.color}`}>
                     {bmiData.category}
                   </div>
                 </motion.div>
@@ -295,64 +297,53 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
         ];
 
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Your Fitness Starting Point</h2>
-            <div className="space-y-6">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+              Your <span className="text-neon">Profile</span>
+            </h2>
+            <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Body Type</label>
-                <div className="w-full h-48 bg-white rounded-xl overflow-hidden mb-4 border border-zinc-300 flex items-center justify-center p-2">
-                  <img 
-                    src="/body-types.png" 
-                    alt="Body Types Reference" 
-                    className="w-full h-full object-contain" 
-                    onError={(e) => { 
-                      // Fallback if the user hasn't uploaded the image yet
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80'; 
-                      e.currentTarget.className = "w-full h-full object-cover opacity-50";
-                      e.currentTarget.parentElement!.className = "w-full h-48 bg-white rounded-xl overflow-hidden mb-4 border border-zinc-300";
-                    }} 
-                  />
-                </div>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Body Type</label>
                 <div className="grid grid-cols-3 gap-3">
                   {bodyTypes.map(type => (
                     <button
                       key={type.id}
                       onClick={() => updateData({ bodyType: type.id })}
-                      className={`relative overflow-hidden rounded-xl border text-left transition-all p-4 ${data.bodyType === type.id ? 'border-emerald-600 ring-1 ring-emerald-600 bg-emerald-50' : 'border-zinc-200 bg-white hover:border-zinc-300'}`}
+                      className={`relative overflow-hidden rounded-2xl border text-left transition-all p-5 ${data.bodyType === type.id ? 'border-neon bg-neon/10 shadow-[0_0_20px_rgba(204,255,0,0.1)]' : 'border-white/5 bg-zinc-900/40 hover:border-white/10'}`}
                     >
-                      <div className={`font-medium ${data.bodyType === type.id ? 'text-emerald-600' : 'text-zinc-800'}`}>{type.label}</div>
-                      <div className="text-xs text-zinc-500 mt-1">{type.desc}</div>
+                      <div className={`font-black uppercase italic text-sm ${data.bodyType === type.id ? 'text-neon' : 'text-white'}`}>{type.label}</div>
+                      <div className="text-[10px] text-zinc-500 mt-1 font-bold">{type.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Fitness Level</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Fitness Level</label>
                 <div className="grid grid-cols-3 gap-3">
                   {fitnessLevels.map(level => (
                     <button
                       key={level.id}
                       onClick={() => updateData({ fitnessLevel: level.id })}
-                      className={`relative overflow-hidden rounded-xl border text-left transition-all ${data.fitnessLevel === level.id ? 'border-emerald-600 ring-1 ring-emerald-600' : 'border-zinc-200 hover:border-zinc-300'}`}
+                      className={`relative overflow-hidden rounded-2xl border text-left transition-all group ${data.fitnessLevel === level.id ? 'border-neon bg-neon/10' : 'border-white/5 bg-zinc-900/40'}`}
                     >
-                      <div className="h-20 w-full bg-zinc-100">
-                        <img src={level.img} alt={level.label} className="w-full h-full object-cover opacity-90" />
+                      <div className="h-24 w-full bg-zinc-800 overflow-hidden">
+                        <img src={level.img} alt={level.label} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500" />
                       </div>
-                      <div className="p-3 bg-white">
-                        <div className={`font-medium ${data.fitnessLevel === level.id ? 'text-emerald-600' : 'text-zinc-800'}`}>{level.label}</div>
+                      <div className="p-4">
+                        <div className={`font-black uppercase italic text-sm ${data.fitnessLevel === level.id ? 'text-neon' : 'text-white'}`}>{level.label}</div>
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Workout Experience (Optional)</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Workout Experience</label>
+                <div className="grid grid-cols-2 gap-3">
                   {workoutExperiences.map(exp => (
                     <button
                       key={exp}
                       onClick={() => updateData({ workoutExperience: exp })}
-                      className={`p-3 rounded-xl border text-sm transition-all ${data.workoutExperience === exp ? 'border-emerald-600 ring-1 ring-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700'}`}
+                      className={`p-4 rounded-2xl border text-sm font-bold transition-all ${data.workoutExperience === exp ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {exp}
                     </button>
@@ -378,24 +369,26 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
         ];
 
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">What Do You Want to Achieve?</h2>
-            <div className="space-y-6">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+              Your <span className="text-neon">Goals</span>
+            </h2>
+            <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Primary Goal</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Primary Goal</label>
                 <div className="grid grid-cols-2 gap-3">
                   {goals.map(goal => (
                     <button
                       key={goal.id}
                       onClick={() => updateData({ primaryGoal: goal.id })}
-                      className={`relative overflow-hidden rounded-xl border text-left transition-all ${data.primaryGoal === goal.id ? 'border-emerald-600 ring-1 ring-emerald-600' : 'border-zinc-200 hover:border-zinc-300'}`}
+                      className={`relative overflow-hidden rounded-2xl border text-left transition-all group ${data.primaryGoal === goal.id ? 'border-neon ring-1 ring-neon' : 'border-white/5 hover:border-white/10'}`}
                     >
-                      <div className="absolute inset-0 bg-white">
-                        <img src={goal.img} alt={goal.label} className="w-full h-full object-cover opacity-90" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                      <div className="absolute inset-0 bg-zinc-900">
+                        <img src={goal.img} alt={goal.label} className="w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
                       </div>
-                      <div className="relative p-4 h-24 flex items-end">
-                        <span className={`font-medium ${data.primaryGoal === goal.id ? 'text-emerald-400' : 'text-white'}`}>{goal.label}</span>
+                      <div className="relative p-5 h-28 flex items-end">
+                        <span className={`font-black uppercase italic text-sm ${data.primaryGoal === goal.id ? 'text-neon' : 'text-white'}`}>{goal.label}</span>
                       </div>
                     </button>
                   ))}
@@ -403,23 +396,23 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Goal Priority</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Goal Priority</label>
                 <div className="grid grid-cols-3 gap-3">
                   {priorities.map(priority => (
                     <button
                       key={priority.id}
                       onClick={() => updateData({ goalPriority: priority.id })}
-                      className={`p-4 rounded-xl border text-left transition-all ${data.goalPriority === priority.id ? 'border-emerald-600 ring-1 ring-emerald-600 bg-emerald-50' : 'border-zinc-200 bg-white hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border text-left transition-all ${data.goalPriority === priority.id ? 'border-neon bg-neon/10 shadow-[0_0_20px_rgba(204,255,0,0.1)]' : 'border-white/5 bg-zinc-900/40 hover:border-white/10'}`}
                     >
-                      <div className={`font-medium ${data.goalPriority === priority.id ? 'text-emerald-600' : 'text-zinc-800'}`}>{priority.label}</div>
-                      <div className="text-xs text-zinc-500 mt-1">{priority.desc}</div>
+                      <div className={`font-black uppercase italic text-sm ${data.goalPriority === priority.id ? 'text-neon' : 'text-white'}`}>{priority.label}</div>
+                      <div className="text-[10px] text-zinc-500 mt-1 font-bold">{priority.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Target Areas (Multi-select)</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Target Areas</label>
                 <div className="grid grid-cols-3 gap-2">
                   {['Chest', 'Back', 'Legs', 'Core', 'Arms', 'Shoulders', 'Full Body'].map(area => (
                     <button
@@ -430,7 +423,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                           : [...data.targetAreas, area];
                         updateData({ targetAreas: newAreas });
                       }}
-                      className={`p-3 rounded-xl border text-sm ${data.targetAreas.includes(area) ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-4 rounded-2xl border text-xs font-bold transition-all ${data.targetAreas.includes(area) ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {area}
                     </button>
@@ -439,13 +432,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Plan Duration</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Plan Duration</label>
                 <div className="grid grid-cols-3 gap-3">
                   {['4 weeks', '8 weeks', '12 weeks'].map(duration => (
                     <button
                       key={duration}
                       onClick={() => updateData({ planDuration: duration })}
-                      className={`p-4 rounded-xl border ${data.planDuration === duration ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border font-bold transition-all ${data.planDuration === duration ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {duration}
                     </button>
@@ -456,41 +449,51 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
           </div>
         );
       case 4:
+        const scheduleOptions = ['3', '4', '5', '6'];
+        const durationOptions = ['20–30 min', '30–45 min', '45–60 min'];
+        const locations = ['Home', 'Gym'];
+        const styles = ['Strength training', 'Cardio focused', 'Mixed', 'Functional training'];
+        const preferences = ['Morning', 'Evening', 'Flexible'];
+
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Your Workout Setup</h2>
-            <div className="space-y-6">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+              Your <span className="text-neon">Routine</span>
+            </h2>
+            <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Workout Location</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Workout Location</label>
                 <div className="grid grid-cols-2 gap-3">
-                  {['Home', 'Gym'].map(loc => (
+                  {locations.map(loc => (
                     <button
                       key={loc}
                       onClick={() => updateData({ workoutLocation: loc })}
-                      className={`p-4 rounded-xl border ${data.workoutLocation === loc ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border font-bold transition-all ${data.workoutLocation === loc ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {loc}
                     </button>
                   ))}
                 </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Preferred Workout Style</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Preferred Style</label>
                 <div className="grid grid-cols-2 gap-3">
-                  {['Strength training', 'Cardio focused', 'Mixed', 'Functional training'].map(style => (
+                  {styles.map(style => (
                     <button
                       key={style}
                       onClick={() => updateData({ preferredWorkoutStyle: style })}
-                      className={`p-4 rounded-xl border ${data.preferredWorkoutStyle === style ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border text-xs font-bold transition-all ${data.preferredWorkoutStyle === style ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {style}
                     </button>
                   ))}
                 </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Equipment Available (Multi-select)</label>
-                <div className="grid grid-cols-2 gap-3">
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Equipment Available</label>
+                <div className="grid grid-cols-2 gap-2">
                   {['None / Bodyweight', 'Dumbbells', 'Resistance bands', 'Barbell', 'Machines'].map(eq => (
                     <button
                       key={eq}
@@ -500,22 +503,23 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                           : [...data.equipment, eq];
                         updateData({ equipment: newEq });
                       }}
-                      className={`p-4 rounded-xl border ${data.equipment.includes(eq) ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-4 rounded-2xl border text-xs font-bold transition-all ${data.equipment.includes(eq) ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {eq}
                     </button>
                   ))}
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Days per week</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Days per Week</label>
                   <div className="grid grid-cols-4 gap-2">
-                    {['3', '4', '5', '6'].map(days => (
+                    {scheduleOptions.map(days => (
                       <button
                         key={days}
                         onClick={() => updateData({ daysPerWeek: days })}
-                        className={`p-3 rounded-xl border ${data.daysPerWeek === days ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-4 rounded-2xl border font-bold transition-all ${data.daysPerWeek === days ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {days}
                       </button>
@@ -523,13 +527,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Time per session</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Time per Session</label>
                   <div className="grid grid-cols-1 gap-2">
-                    {['20–30 min', '30–45 min', '45–60 min'].map(time => (
+                    {durationOptions.map(time => (
                       <button
                         key={time}
                         onClick={() => updateData({ timePerSession: time })}
-                        className={`p-3 rounded-xl border ${data.timePerSession === time ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-4 rounded-2xl border text-xs font-bold transition-all ${data.timePerSession === time ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {time}
                       </button>
@@ -537,14 +541,15 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                   </div>
                 </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Workout Time Preference</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Time Preference</label>
                 <div className="grid grid-cols-3 gap-3">
-                  {['Morning', 'Evening', 'Flexible'].map(time => (
+                  {preferences.map(time => (
                     <button
                       key={time}
                       onClick={() => updateData({ workoutTimePreference: time })}
-                      className={`p-4 rounded-xl border ${data.workoutTimePreference === time ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border font-bold transition-all ${data.workoutTimePreference === time ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {time}
                     </button>
@@ -556,17 +561,19 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
         );
       case 5:
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Your Eating Style</h2>
-            <div className="space-y-6">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+              Your <span className="text-neon">Fuel</span>
+            </h2>
+            <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Diet Type</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Diet Type</label>
                 <div className="grid grid-cols-3 gap-3">
                   {['Vegetarian', 'Non-Vegetarian', 'Vegan'].map(type => (
                     <button
                       key={type}
                       onClick={() => updateData({ dietType: type })}
-                      className={`p-4 rounded-xl border ${data.dietType === type ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border font-bold transition-all ${data.dietType === type ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {type}
                     </button>
@@ -574,7 +581,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Food Preference Style</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Food Style</label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {[
                     { id: 'Indian home-style', label: 'Indian home-style 🇮🇳' },
@@ -584,7 +591,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                     <button
                       key={style.id}
                       onClick={() => updateData({ foodPreferenceStyle: style.id })}
-                      className={`p-4 rounded-xl border text-sm ${data.foodPreferenceStyle === style.id ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border text-xs font-bold transition-all ${data.foodPreferenceStyle === style.id ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {style.label}
                     </button>
@@ -593,13 +600,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Meals per day</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Meals per Day</label>
                   <div className="grid grid-cols-3 gap-3">
                     {['3', '4', '5'].map(meals => (
                       <button
                         key={meals}
                         onClick={() => updateData({ mealsPerDay: meals })}
-                        className={`p-3 rounded-xl border ${data.mealsPerDay === meals ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-5 rounded-2xl border font-bold transition-all ${data.mealsPerDay === meals ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {meals}
                       </button>
@@ -607,13 +614,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Budget Preference</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Budget</label>
                   <div className="grid grid-cols-3 gap-3">
                     {['Low', 'Medium', 'High'].map(budget => (
                       <button
                         key={budget}
                         onClick={() => updateData({ budget })}
-                        className={`p-3 rounded-xl border ${data.budget === budget ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-5 rounded-2xl border text-[10px] font-bold transition-all ${data.budget === budget ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {budget}
                       </button>
@@ -622,13 +629,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Protein Preference</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Protein Preference</label>
                 <div className="grid grid-cols-3 gap-3">
                   {['High protein focus', 'Normal', 'Not important'].map(pref => (
                     <button
                       key={pref}
                       onClick={() => updateData({ proteinPreference: pref })}
-                      className={`p-4 rounded-xl border text-sm ${data.proteinPreference === pref ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border text-xs font-bold transition-all ${data.proteinPreference === pref ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {pref}
                     </button>
@@ -636,12 +643,12 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">Allergies or restrictions (Optional)</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Allergies / Restrictions</label>
                 <input
                   type="text"
                   value={data.allergies}
                   onChange={e => updateData({ allergies: e.target.value })}
-                  className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                  className="w-full bg-zinc-900/60 border border-white/5 rounded-2xl p-6 text-white placeholder:text-zinc-600 focus:outline-none focus:border-neon transition-all font-bold"
                   placeholder="e.g. Peanuts, Gluten"
                 />
               </div>
@@ -650,17 +657,19 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
         );
       case 6:
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Your Lifestyle & Health</h2>
-            <div className="space-y-6">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+              Daily <span className="text-neon">Activity</span>
+            </h2>
+            <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Daily Activity Level</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Activity Level</label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {['Sedentary', 'Moderately active', 'Highly active'].map(level => (
                     <button
                       key={level}
                       onClick={() => updateData({ activityLevel: level })}
-                      className={`p-4 rounded-xl border ${data.activityLevel === level ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border font-bold transition-all ${data.activityLevel === level ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {level}
                     </button>
@@ -669,13 +678,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Daily Steps (Optional)</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Daily Steps</label>
                   <div className="grid grid-cols-1 gap-2">
                     {['Less than 3k', '3k–7k', '7k–10k', '10k+'].map(steps => (
                       <button
                         key={steps}
                         onClick={() => updateData({ dailySteps: steps })}
-                        className={`p-3 rounded-xl border text-sm ${data.dailySteps === steps ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-4 rounded-2xl border text-xs font-bold transition-all ${data.dailySteps === steps ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {steps}
                       </button>
@@ -683,13 +692,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Stress Level (Optional)</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Stress Level</label>
                   <div className="grid grid-cols-1 gap-2">
                     {['Low', 'Moderate', 'High'].map(stress => (
                       <button
                         key={stress}
                         onClick={() => updateData({ stressLevel: stress })}
-                        className={`p-3 rounded-xl border text-sm ${data.stressLevel === stress ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-4 rounded-2xl border text-xs font-bold transition-all ${data.stressLevel === stress ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {stress}
                       </button>
@@ -698,22 +707,31 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">Medical Conditions (Optional)</label>
+                <div className="flex items-center justify-between mb-4">
+                  <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Medical Conditions</label>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                    <ShieldAlert className="w-3 h-3 text-amber-500" />
+                    <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Safety Check</span>
+                  </div>
+                </div>
                 <input
                   type="text"
                   value={data.medicalConditions}
                   onChange={e => updateData({ medicalConditions: e.target.value })}
-                  className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                  className="w-full bg-zinc-900/60 border border-white/5 rounded-2xl p-6 text-white placeholder:text-zinc-600 focus:outline-none focus:border-neon transition-all font-bold"
                   placeholder="e.g. Asthma, Hypertension"
                 />
+                <p className="mt-2 text-[9px] text-zinc-600 font-bold leading-relaxed">
+                  * We use this to adapt your plan for safety. Always consult a doctor first.
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">Past Injuries (Optional)</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Past Injuries</label>
                 <input
                   type="text"
                   value={data.pastInjuries}
                   onChange={e => updateData({ pastInjuries: e.target.value })}
-                  className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-600 outline-none"
+                  className="w-full bg-zinc-900/60 border border-white/5 rounded-2xl p-6 text-white placeholder:text-zinc-600 focus:outline-none focus:border-neon transition-all font-bold"
                   placeholder="e.g. Knee surgery, Lower back pain"
                 />
               </div>
@@ -722,18 +740,20 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
         );
       case 7:
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Recovery & Hydration</h2>
-            <div className="space-y-6">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+              Recovery & <span className="text-neon">Hydration</span>
+            </h2>
+            <div className="space-y-8">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Average Sleep per Night</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Sleep per Night</label>
                   <div className="grid grid-cols-1 gap-2">
                     {['Less than 5 hours', '5-6 hours', '7-8 hours', 'More than 8 hours'].map(sleep => (
                       <button
                         key={sleep}
                         onClick={() => updateData({ sleepHours: sleep })}
-                        className={`p-3 rounded-xl border text-sm ${data.sleepHours === sleep ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-4 rounded-2xl border text-xs font-bold transition-all ${data.sleepHours === sleep ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {sleep}
                       </button>
@@ -741,13 +761,13 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-3">Daily Water Intake</label>
+                  <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Water Intake</label>
                   <div className="grid grid-cols-1 gap-2">
                     {['Less than 1L', '1-2 Liters', '2-3 Liters', 'More than 3L'].map(water => (
                       <button
                         key={water}
                         onClick={() => updateData({ hydration: water })}
-                        className={`p-3 rounded-xl border text-sm ${data.hydration === water ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                        className={`p-4 rounded-2xl border text-xs font-bold transition-all ${data.hydration === water ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                       >
                         {water}
                       </button>
@@ -756,7 +776,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-3">Willingness for Rest Days</label>
+                <label className="block text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">Willingness for Rest Days</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { id: 'Yes', label: 'Yes, I need recovery' },
@@ -765,7 +785,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
                     <button
                       key={rest.id}
                       onClick={() => updateData({ willingnessForRestDays: rest.id })}
-                      className={`p-4 rounded-xl border text-sm ${data.willingnessForRestDays === rest.id ? 'border-emerald-600 bg-emerald-50 text-emerald-600' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300'}`}
+                      className={`p-5 rounded-2xl border text-xs font-bold transition-all ${data.willingnessForRestDays === rest.id ? 'border-neon bg-neon/10 text-neon' : 'border-white/5 bg-zinc-900/40 text-zinc-400 hover:border-white/10'}`}
                     >
                       {rest.label}
                     </button>
@@ -777,31 +797,112 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
         );
       case 8:
         return (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Review & Confirm</h2>
-            <div className="bg-white border border-zinc-200 rounded-2xl p-6 space-y-6">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="bg-zinc-50 p-4 rounded-xl">
-                  <span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Body</span>
-                  <span className="text-zinc-800 font-medium">{data.age} yrs / {data.height}{data.heightUnit} / {data.weight}{data.weightUnit}</span>
-                  {data.goalWeight && <span className="text-zinc-600 block mt-1">Goal: {data.goalWeight}{data.weightUnit}</span>}
+          <div className="space-y-8">
+            <div className="space-y-2">
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter font-display uppercase italic leading-none">
+                Review <span className="text-neon">Profile</span>
+              </h2>
+              <p className="text-zinc-500 font-bold text-sm uppercase tracking-widest">Confirm your details before we build your plan</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-neon/10 flex items-center justify-center text-neon">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  <h3 className="font-black uppercase italic text-sm tracking-wider">Physical Stats</h3>
                 </div>
-                <div className="bg-zinc-50 p-4 rounded-xl">
-                  <span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Goal</span>
-                  <span className="text-zinc-800 font-medium">{data.primaryGoal}</span>
-                  {data.goalPriority && <span className="text-zinc-600 block mt-1">{data.goalPriority}</span>}
-                </div>
-                <div className="bg-zinc-50 p-4 rounded-xl">
-                  <span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Workout</span>
-                  <span className="text-zinc-800 font-medium">{data.workoutLocation}, {data.daysPerWeek} days/wk</span>
-                  {data.preferredWorkoutStyle && <span className="text-zinc-600 block mt-1">{data.preferredWorkoutStyle}</span>}
-                </div>
-                <div className="bg-zinc-50 p-4 rounded-xl">
-                  <span className="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Diet</span>
-                  <span className="text-zinc-800 font-medium">{data.dietType}, {data.mealsPerDay} meals/day</span>
-                  {data.foodPreferenceStyle && <span className="text-zinc-600 block mt-1">{data.foodPreferenceStyle}</span>}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Age / Gender</span>
+                    <span className="text-sm font-bold">{data.age} yrs / {data.gender}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Height / Weight</span>
+                    <span className="text-sm font-bold">{data.height}{data.heightUnit} / {data.weight}{data.weightUnit}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Body Type</span>
+                    <span className="text-sm font-bold">{data.bodyType}</span>
+                  </div>
                 </div>
               </div>
+
+              <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-neon/10 flex items-center justify-center text-neon">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  <h3 className="font-black uppercase italic text-sm tracking-wider">Fitness Goals</h3>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Primary Goal</span>
+                    <span className="text-sm font-bold text-neon">{data.primaryGoal}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Level</span>
+                    <span className="text-sm font-bold">{data.fitnessLevel}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Duration</span>
+                    <span className="text-sm font-bold">{data.planDuration}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-neon/10 flex items-center justify-center text-neon">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  <h3 className="font-black uppercase italic text-sm tracking-wider">Workout Routine</h3>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Location</span>
+                    <span className="text-sm font-bold">{data.workoutLocation}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Frequency</span>
+                    <span className="text-sm font-bold">{data.daysPerWeek} days/wk</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Style</span>
+                    <span className="text-sm font-bold">{data.preferredWorkoutStyle}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-neon/10 flex items-center justify-center text-neon">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  <h3 className="font-black uppercase italic text-sm tracking-wider">Nutrition</h3>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Diet Type</span>
+                    <span className="text-sm font-bold">{data.dietType}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Meals</span>
+                    <span className="text-sm font-bold">{data.mealsPerDay} / day</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase">Budget</span>
+                    <span className="text-sm font-bold">{data.budget}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-neon/5 border border-neon/20">
+              <p className="text-xs text-zinc-400 font-medium leading-relaxed">
+                By clicking <span className="text-neon font-bold">Generate My Plan</span>, our AI will analyze your profile and create a personalized workout and nutrition strategy tailored specifically for your goals and lifestyle.
+              </p>
             </div>
           </div>
         );
@@ -809,20 +910,20 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
   };
 
   return (
-    <div className="h-[100dvh] bg-zinc-50 text-zinc-900 flex flex-col font-sans overflow-hidden">
+    <div className="h-[100dvh] bg-zinc-950 text-white flex flex-col font-sans overflow-hidden">
       {/* Top Progress Bar - Fixed */}
-      <div className="sticky top-0 z-30 bg-zinc-50/95 backdrop-blur-md pt-4 pb-4 px-4 md:px-6 border-b border-zinc-200 shrink-0">
+      <div className="sticky top-0 z-30 bg-zinc-950/80 backdrop-blur-xl pt-6 pb-6 px-6 md:px-10 border-b border-white/5 shrink-0">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between text-sm font-semibold text-zinc-500 mb-3">
-            <span>Step {step} of 8</span>
-            <span className="text-emerald-600">{Math.round((step / 8) * 100)}%</span>
+          <div className="flex items-center justify-between text-xs font-black text-zinc-500 mb-4 uppercase tracking-[0.2em]">
+            <span>Step {step} <span className="text-zinc-700">/</span> 8</span>
+            <span className="text-neon">{Math.round((step / 8) * 100)}%</span>
           </div>
-          <div className="h-2 bg-zinc-200 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-zinc-900 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-emerald-500 rounded-full"
+              className="h-full bg-neon shadow-[0_0_15px_rgba(204,255,0,0.5)]"
               initial={{ width: 0 }}
               animate={{ width: `${(step / 8) * 100}%` }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             />
           </div>
         </div>
@@ -831,7 +932,7 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
       {/* Main Content Area - Scrollable */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-10 md:px-8 md:py-12 pb-48" // Increased padding for better whitespace
+        className="flex-1 overflow-y-auto px-4 py-10 md:px-8 md:py-12 pb-48 custom-scrollbar"
       >
         <div className="max-w-2xl mx-auto">
           <AnimatePresence mode="wait" custom={direction}>
@@ -854,12 +955,12 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
       </div>
 
       {/* Bottom Navigation - Sticky */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-zinc-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent z-20 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
           <button
             onClick={prevStep}
             disabled={step === 1}
-            className="p-4 rounded-2xl bg-zinc-100 text-zinc-600 hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
+            className="p-5 rounded-2xl bg-zinc-900/50 backdrop-blur-xl text-zinc-400 border border-white/5 hover:bg-zinc-800 disabled:opacity-20 disabled:cursor-not-allowed transition-all shrink-0 active:scale-90"
             aria-label="Previous step"
           >
             <ArrowLeft className="w-6 h-6" />
@@ -869,18 +970,18 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
             <button
               onClick={nextStep}
               disabled={!isStepValid()}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-neon text-black font-black text-xl rounded-2xl md:rounded-3xl hover:shadow-[0_0_30px_rgba(204,255,0,0.3)] disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-[0.95] font-display uppercase italic"
             >
-              Next
-              <ArrowRight className="w-5 h-5" />
+              Next Step
+              <ArrowRight className="w-6 h-6" />
             </button>
           ) : (
             <button
               onClick={() => onSubmit({ ...data, bmi: calculateBMI() ? parseFloat(calculateBMI()!.value) : undefined })}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-600 text-white font-semibold text-lg rounded-2xl hover:bg-emerald-500 transition-all active:scale-[0.98] shadow-lg shadow-emerald-600/20"
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-neon text-black font-black text-xl rounded-2xl md:rounded-3xl hover:shadow-[0_0_40px_rgba(204,255,0,0.4)] transition-all active:scale-[0.95] shadow-lg font-display uppercase italic"
             >
               Generate Plan
-              <CheckCircle2 className="w-5 h-5" />
+              <CheckCircle2 className="w-6 h-6" />
             </button>
           )}
         </div>

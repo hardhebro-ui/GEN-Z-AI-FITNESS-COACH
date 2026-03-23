@@ -77,4 +77,5 @@ export interface Review {
   text: string;
   name: string;
   date: string;
+  tags?: string[];
 }

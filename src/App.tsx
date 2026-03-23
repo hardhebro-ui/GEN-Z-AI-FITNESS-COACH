@@ -7,6 +7,7 @@ import ReviewPrompt from './components/ReviewPrompt';
 import { UserInputs, GeneratedPlan } from './types';
 import { generatePlan } from './services/geminiService';
 import { Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import html2pdf from 'html2pdf.js';
 
 type AppState = 'landing' | 'form' | 'generating' | 'preview';
@@ -18,19 +19,39 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('Initializing AI Engine...');
   const [error, setError] = useState<string | null>(null);
   const [isCached, setIsCached] = useState(false);
+
+  const loadingMessages = [
+    { threshold: 0, message: 'Initializing AI Engine...' },
+    { threshold: 10, message: 'Analyzing your body type...' },
+    { threshold: 25, message: 'Calculating metabolic rate...' },
+    { threshold: 40, message: 'Performing Safety Check...' },
+    { threshold: 55, message: 'Designing your workout split...' },
+    { threshold: 70, message: 'Creating your diet plan...' },
+    { threshold: 85, message: 'Finalizing elite protocol...' },
+    { threshold: 95, message: 'Securing your data...' },
+  ];
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (appState === 'generating') {
       setProgress(0);
+      setLoadingMessage(loadingMessages[0].message);
       interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 95) return prev;
-          // Slower progress as it gets closer to 100
           const increment = prev < 50 ? 5 : prev < 80 ? 2 : 1;
-          return prev + increment;
+          const nextProgress = prev + increment;
+          
+          // Update message based on threshold
+          const currentMsg = [...loadingMessages].reverse().find(m => nextProgress >= m.threshold);
+          if (currentMsg && currentMsg.message !== loadingMessage) {
+            setLoadingMessage(currentMsg.message);
+          }
+          
+          return nextProgress;
         });
       }, 500);
     }
@@ -42,8 +63,31 @@ export default function App() {
   };
 
   const getCacheKey = (inputs: UserInputs) => {
-    // Create a unique key based on core inputs
-    return `plan_${inputs.primaryGoal}_${inputs.fitnessLevel}_${inputs.age}_${inputs.gender}_${inputs.weight}_${inputs.height}_${inputs.workoutFrequency}_${inputs.equipmentAccess}`;
+    // Normalize height to CM
+    let h = parseFloat(inputs.height);
+    if (inputs.heightUnit === 'ft/in') {
+      if (inputs.height.includes("'")) {
+        const parts = inputs.height.split("'");
+        const ft = parseFloat(parts[0]) || 0;
+        const inches = parseFloat(parts[1]?.replace('"', '')) || 0;
+        h = (ft * 12 + inches) * 2.54;
+      } else {
+        h = h * 30.48;
+      }
+    }
+
+    // Normalize weight to KG
+    let w = parseFloat(inputs.weight);
+    if (inputs.weightUnit === 'lbs') {
+      w = w * 0.453592;
+    }
+
+    // Grouping into ranges for fuzzy matching
+    const ageRange = Math.floor(parseInt(inputs.age) / 5) * 5;
+    const weightRange = Math.floor(w / 5) * 5;
+    const heightRange = Math.floor(h / 5) * 5;
+
+    return `plan_fuzzy_${inputs.primaryGoal}_${inputs.fitnessLevel}_${ageRange}_${inputs.gender}_${weightRange}_${heightRange}_${inputs.daysPerWeek}_${inputs.workoutLocation}`;
   };
 
   const handleFormSubmit = async (inputs: UserInputs) => {
@@ -53,23 +97,28 @@ export default function App() {
     setIsCached(false);
     
     const cacheKey = getCacheKey(inputs);
-    const cachedPlan = localStorage.getItem(cacheKey);
+    const localCachedPlan = localStorage.getItem(cacheKey);
 
-    if (cachedPlan) {
+    if (localCachedPlan) {
       setIsCached(true);
-      // Simulate a quick "finding" process
+      // Simulate a quick "finding" process for UX
       setTimeout(() => {
-        setPlan(JSON.parse(cachedPlan));
+        setPlan(JSON.parse(localCachedPlan));
         setAppState('preview');
-      }, 2000);
+      }, 1500);
       return;
     }
 
     try {
-      const generatedPlan = await generatePlan(inputs);
+      const { plan: generatedPlan, fromCache } = await generatePlan(inputs);
       setPlan(generatedPlan);
-      // Save to local cache
+      setIsCached(fromCache);
+      
+      // Save to local cache for next time
       localStorage.setItem(cacheKey, JSON.stringify(generatedPlan));
+      
+      // If it was from global cache, we might want to skip the "generating" delay
+      // but the service already returns quickly. The UI will transition when state updates.
       setAppState('preview');
     } catch (err) {
       console.error(err);
@@ -84,7 +133,7 @@ export default function App() {
     setError(null);
     
     try {
-      const generatedPlan = await generatePlan(userInputs);
+      const { plan: generatedPlan } = await generatePlan(userInputs);
       setPlan(generatedPlan);
       setAppState('preview');
     } catch (err) {
@@ -105,13 +154,14 @@ export default function App() {
     const element = document.getElementById('pdf-content-light');
     if (element) {
       const opt = {
-        margin:       10,
+        margin:       0,
         filename:     'my-fitness-plan.pdf',
         image:        { type: 'jpeg' as const, quality: 0.98 },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] },
         html2canvas:  { 
           scale: 2, 
           useCORS: true,
-          windowWidth: 800, // Ensure html2canvas renders the hidden element at correct width
+          windowWidth: 800,
           onclone: (clonedDoc: Document) => {
             const styleTags = clonedDoc.querySelectorAll('style');
             styleTags.forEach(style => {
@@ -159,56 +209,100 @@ export default function App() {
   };
 
   return (
-    <div className="bg-zinc-50 min-h-screen text-zinc-900 font-sans">
-      {appState === 'landing' && <LandingPage onStart={handleStart} />}
-      
-      {appState === 'form' && (
-        <>
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-600 p-4 m-6 rounded-xl text-center">
-              {error}
+    <div className="bg-zinc-950 min-h-[100dvh] text-zinc-100 font-sans selection:bg-neon selection:text-black overflow-x-hidden">
+      <AnimatePresence mode="wait">
+        {appState === 'landing' && (
+          <motion.div
+            key="landing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <LandingPage onStart={handleStart} />
+          </motion.div>
+        )}
+        
+        {appState === 'form' && (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="min-h-[100dvh] bg-zinc-950"
+          >
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 m-6 rounded-2xl text-center font-medium">
+                {error}
+              </div>
+            )}
+            <MultiStepForm onSubmit={handleFormSubmit} />
+          </motion.div>
+        )}
+        
+        {appState === 'generating' && (
+          <motion.div
+            key="generating"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.4 }}
+            className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-12 bg-zinc-950"
+          >
+            <div className="relative flex items-center justify-center">
+              <div className="absolute inset-0 bg-neon/20 blur-3xl rounded-full animate-pulse" />
+              <Loader2 className="w-24 h-24 md:w-32 md:h-32 text-neon animate-spin relative z-10" />
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <span className="text-xl md:text-2xl font-black text-neon font-display">{progress}%</span>
+              </div>
             </div>
-          )}
-          <MultiStepForm onSubmit={handleFormSubmit} />
-        </>
-      )}
-      
-      {appState === 'generating' && (
-        <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-8 bg-zinc-50">
-          <div className="relative flex items-center justify-center">
-            <Loader2 className="w-24 h-24 md:w-32 md:h-32 text-emerald-600 animate-spin" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xl md:text-2xl font-bold text-emerald-600">{progress}%</span>
+            <div className="space-y-6 max-w-lg relative z-10">
+              <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight font-display italic uppercase">
+                {isCached ? 'Found a Similar Plan!' : 'Crafting Your Plan...'}
+              </h2>
+              <div className="h-8 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={loadingMessage}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-zinc-400 text-lg md:text-xl leading-relaxed"
+                  >
+                    {isCached 
+                      ? 'We found a plan in our database that perfectly matches your profile. Loading it for you now...' 
+                      : loadingMessage}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
             </div>
-          </div>
-          <div className="space-y-4">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-zinc-900 tracking-tight">
-              {isCached ? 'Found a Similar Plan!' : 'Crafting Your Plan...'}
-            </h2>
-            <p className="text-zinc-500 max-w-md text-base md:text-lg leading-relaxed mx-auto">
-              {isCached 
-                ? 'We found a plan in our database that perfectly matches your profile. Loading it for you now...' 
-                : 'Our AI is analyzing your profile and generating a personalized workout and diet strategy.'}
-            </p>
-          </div>
-        </div>
-      )}
-      
-      {appState === 'preview' && plan && userInputs && (
-        <>
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-600 p-4 m-6 rounded-xl text-center fixed top-0 left-0 right-0 z-50">
-              {error}
-            </div>
-          )}
-          <PlanPreview 
-            plan={plan} 
-            inputs={userInputs} 
-            onRegenerate={handleRegenerate}
-            onExport={handleExportClick}
-          />
-        </>
-      )}
+          </motion.div>
+        )}
+        
+        {appState === 'preview' && plan && userInputs && (
+          <motion.div
+            key="preview"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-zinc-950 min-h-[100dvh]"
+          >
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 m-6 rounded-2xl text-center font-medium fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
+                {error}
+              </div>
+            )}
+            <PlanPreview 
+              plan={plan} 
+              inputs={userInputs} 
+              onRegenerate={handleRegenerate}
+              onExport={handleExportClick}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <ExportModal 
         isOpen={isExportModalOpen} 

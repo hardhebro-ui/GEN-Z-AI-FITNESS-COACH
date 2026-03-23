@@ -34,22 +34,48 @@ function getAiInstance() {
   return aiInstance;
 }
 
-// Helper to create a stable hash or string representation of inputs for caching
+// Helper to create a fuzzy key for caching based on ranges and core inputs
 function getInputsHash(inputs: UserInputs): string {
-  // Select key fields that define the plan
-  const keyFields = {
-    age: inputs.age,
+  // Normalize height to CM
+  let h = parseFloat(inputs.height);
+  if (inputs.heightUnit === 'ft/in') {
+    if (inputs.height.includes("'")) {
+      const parts = inputs.height.split("'");
+      const ft = parseFloat(parts[0]) || 0;
+      const inches = parseFloat(parts[1]?.replace('"', '')) || 0;
+      h = (ft * 12 + inches) * 2.54;
+    } else {
+      h = h * 30.48;
+    }
+  }
+
+  // Normalize weight to KG
+  let w = parseFloat(inputs.weight);
+  if (inputs.weightUnit === 'lbs') {
+    w = w * 0.453592;
+  }
+
+  // Grouping into ranges for fuzzy matching
+  const ageRange = Math.floor(parseInt(inputs.age) / 5) * 5; // Group by 5 years
+  const weightRange = Math.floor(w / 5) * 5; // Group by 5kg
+  const heightRange = Math.floor(h / 5) * 5; // Group by 5cm
+
+  // Select key fields that define the plan similarity
+  const fuzzyKey = {
+    ageRange,
     gender: inputs.gender,
-    height: inputs.height,
-    weight: inputs.weight,
-    goalWeight: inputs.goalWeight,
+    heightRange,
+    weightRange,
     primaryGoal: inputs.primaryGoal,
     fitnessLevel: inputs.fitnessLevel,
     workoutLocation: inputs.workoutLocation,
     dietType: inputs.dietType,
-    daysPerWeek: inputs.daysPerWeek
+    daysPerWeek: inputs.daysPerWeek,
+    // Sort equipment to ensure consistent key regardless of selection order
+    equipment: [...(inputs.equipment || [])].sort().join(',')
   };
-  return JSON.stringify(keyFields);
+  
+  return JSON.stringify(fuzzyKey);
 }
 
 export async function getTotalPlansCount(): Promise<number> {
@@ -76,8 +102,8 @@ async function incrementTotalPlans() {
   }
 }
 
-export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
-  // 1. Check for existing related plan (simple exact match on key fields for now)
+export async function generatePlan(inputs: UserInputs): Promise<{ plan: GeneratedPlan; fromCache: boolean }> {
+  // 1. Check for existing related plan (fuzzy match on key fields)
   const inputsHash = getInputsHash(inputs);
   const path = "plans";
   try {
@@ -87,7 +113,10 @@ export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
     
     if (!querySnapshot.empty) {
       console.log("Found existing related plan, reusing...");
-      return querySnapshot.docs[0].data().plan as GeneratedPlan;
+      return { 
+        plan: querySnapshot.docs[0].data().plan as GeneratedPlan,
+        fromCache: true 
+      };
     }
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, path);
@@ -96,7 +125,7 @@ export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
   // 2. Generate new plan if not found
   const ai = getAiInstance();
   const prompt = `
-    You are an expert fitness coach and nutritionist. Generate a highly personalized workout and diet plan based on the following user details:
+    You are an elite AI Fitness & Nutrition Coach. Your goal is to generate a highly personalized, realistic, and SAFE workout and diet plan based on the following user details:
     - Age: ${inputs.age}
     - Gender: ${inputs.gender}
     - Height: ${inputs.height} ${inputs.heightUnit}
@@ -132,7 +161,14 @@ export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
     - Medical Conditions: ${inputs.medicalConditions || 'None'}
     - Past Injuries: ${inputs.pastInjuries || 'None'}
 
-    Provide a realistic, safe, and effective plan. Include budget-friendly Indian food options if applicable.
+    CRITICAL SAFETY & REALISM GUIDELINES:
+    1. If the user has medical conditions or injuries, adapt the plan to be low-impact or avoid affected areas.
+    2. Ensure calorie targets are realistic (not dangerously low).
+    3. Recommendations must be practical for the user's equipment and location.
+    4. Emphasize that this is an AI-generated plan and NOT professional medical advice.
+    5. All exercises must include clear notes on form and safety.
+    6. Include budget-friendly Indian food options if applicable.
+
     Output the response strictly as a JSON object matching the provided schema. No markdown, no extra text.
   `;
 
@@ -256,5 +292,5 @@ export async function generatePlan(inputs: UserInputs): Promise<GeneratedPlan> {
     handleFirestoreError(error, OperationType.WRITE, savePath);
   }
 
-  return plan;
+  return { plan, fromCache: false };
 }

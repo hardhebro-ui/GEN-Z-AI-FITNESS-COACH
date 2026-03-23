@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 import { GeneratedPlan, UserInputs } from '../types';
-import { Download, RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Download, RefreshCw, AlertTriangle, CheckCircle2, User, Target, Activity, Zap, Utensils, ShieldAlert } from 'lucide-react';
 import { motion } from 'motion/react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface PlanPreviewProps {
   plan: GeneratedPlan;
@@ -12,186 +13,445 @@ interface PlanPreviewProps {
 
 export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: PlanPreviewProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const appUrl = window.location.origin;
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 p-8 pb-64 md:p-12 md:pb-48">
+    <div className="min-h-[100dvh] bg-zinc-950 text-white flex flex-col font-sans overflow-hidden">
       {/* Hidden Printable A4 Layout for PDF Export */}
       <div className="overflow-hidden h-0 w-0 absolute opacity-0 pointer-events-none">
-        <div id="pdf-content-light" className="w-[800px] bg-white text-black p-12 font-sans">
-          <div className="text-center mb-12 border-b-4 border-emerald-600 pb-8">
-            <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter mb-3">Personalized Fitness & Diet Plan</h1>
-            <p className="text-gray-500 text-lg font-medium tracking-wide">Designed for {inputs.primaryGoal} • {inputs.planDuration}</p>
-          </div>
+        <div id="pdf-content-light" className="w-[800px] bg-white text-zinc-900 p-0 font-sans relative">
+          
+          {/* PAGE 1: COVER PAGE */}
+          <div className="h-[1120px] flex flex-col items-center justify-center relative overflow-hidden bg-zinc-950 text-white p-20 text-center">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon/20 blur-[120px] rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-neon/10 blur-[120px] rounded-full" />
+            
+            <div className="relative z-10 space-y-8">
+              <div className="w-24 h-24 bg-neon rounded-3xl flex items-center justify-center mx-auto mb-12 rotate-12 shadow-[0_0_50px_rgba(204,255,0,0.3)]">
+                <Zap className="w-12 h-12 text-black fill-black" />
+              </div>
+              
+              <h1 className="text-7xl font-black uppercase italic tracking-tighter leading-none">
+                Elite <span className="text-neon">Protocol</span>
+              </h1>
+              
+              <div className="h-1 w-32 bg-neon mx-auto" />
+              
+              <div className="space-y-2">
+                <p className="text-zinc-500 uppercase font-black tracking-[0.4em] text-sm">Personalized For</p>
+                <h2 className="text-4xl font-bold text-white uppercase tracking-tight">Elite Athlete</h2>
+              </div>
 
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4 uppercase tracking-wide">Profile Summary</h2>
-            <div className="grid grid-cols-4 gap-4 text-sm">
-              <div><span className="font-semibold text-gray-500 block">Stats</span>{inputs.age} yrs • {inputs.height}cm • {inputs.weight}kg</div>
-              <div><span className="font-semibold text-gray-500 block">Body Type</span>{inputs.bodyType}</div>
-              <div><span className="font-semibold text-gray-500 block">Fitness Level</span>{inputs.fitnessLevel}</div>
-              <div><span className="font-semibold text-gray-500 block">Activity</span>{inputs.activityLevel}</div>
-            </div>
-          </div>
-
-          <div className="mb-8 break-before-auto">
-            <h2 className="text-xl font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4 uppercase tracking-wide">Workout Schedule</h2>
-            {plan.workout.weeklySplit.map((day, i) => (
-              <div key={i} className="mb-6 break-inside-avoid">
-                <div className="bg-gray-100 p-3 font-bold text-gray-800 border-l-4 border-emerald-600 mb-2">
-                  {day.day} - <span className="text-emerald-600">{day.focus}</span>
+              <div className="pt-12 grid grid-cols-2 gap-8 max-w-md mx-auto">
+                <div className="text-left border-l-2 border-neon pl-6">
+                  <p className="text-zinc-500 uppercase font-black tracking-widest text-[10px] mb-1">Primary Goal</p>
+                  <p className="text-xl font-bold text-white uppercase italic">{inputs.primaryGoal}</p>
                 </div>
-                <table className="w-full text-sm text-left border-collapse">
-                  <thead>
-                    <tr className="border-b-2 border-gray-300 text-gray-600">
-                      <th className="py-2 px-2 w-1/3">Exercise</th>
-                      <th className="py-2 px-2 w-1/6">Sets × Reps</th>
-                      <th className="py-2 px-2 w-1/6">Rest</th>
-                      <th className="py-2 px-2 w-1/3">Alternative</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {day.exercises.map((ex, j) => (
-                      <tr key={j} className="border-b border-gray-200">
-                        <td className="py-2 px-2">
-                          <div className="font-bold text-gray-800">{ex.name}</div>
-                          <div className="text-xs text-gray-500">{ex.notes}</div>
-                        </td>
-                        <td className="py-2 px-2 font-semibold text-emerald-600">{ex.setsReps}</td>
-                        <td className="py-2 px-2 text-gray-600">{ex.rest}</td>
-                        <td className="py-2 px-2 text-gray-600 text-xs">{ex.alternative}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="text-left border-l-2 border-neon pl-6">
+                  <p className="text-zinc-500 uppercase font-black tracking-widest text-[10px] mb-1">Duration</p>
+                  <p className="text-xl font-bold text-white uppercase italic">{inputs.planDuration}</p>
+                </div>
               </div>
-            ))}
-          </div>
 
-          <div className="mb-8 break-before-page">
-            <h2 className="text-xl font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4 uppercase tracking-wide">Nutrition Guide</h2>
-            <div className="flex justify-between bg-gray-100 p-4 rounded mb-4 border-l-4 border-emerald-600">
-              <div>
-                <span className="block text-xs text-gray-500 uppercase font-bold">Daily Target</span>
-                <span className="text-2xl font-bold text-emerald-600">{plan.diet.dailyCalories} kcal</span>
-              </div>
-              <div className="flex gap-6 text-sm">
-                <div><span className="block text-gray-500">Protein</span><span className="font-bold">{plan.diet.macros.protein}</span></div>
-                <div><span className="block text-gray-500">Carbs</span><span className="font-bold">{plan.diet.macros.carbs}</span></div>
-                <div><span className="block text-gray-500">Fats</span><span className="font-bold">{plan.diet.macros.fats}</span></div>
+              {/* Trust Badges in PDF Cover */}
+              <div className="pt-16 flex justify-center gap-4 opacity-60">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+                  <ShieldAlert className="w-3 h-3 text-neon" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">No Data Stored</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+                  <Zap className="w-3 h-3 text-neon" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">AI Generated</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+                  <AlertTriangle className="w-3 h-3 text-neon" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">Not Medical Advice</span>
+                </div>
               </div>
             </div>
-            <table className="w-full text-sm text-left border-collapse">
+
+            <div className="absolute bottom-20 left-0 right-0 flex flex-col items-center space-y-4">
+              <p className="text-zinc-600 uppercase font-black tracking-[0.5em] text-[10px]">Generated by Gen-Z AI Fitness</p>
+              <div className="text-zinc-800 font-black text-xs uppercase tracking-widest">© {new Date().getFullYear()} Elite Protocol</div>
+            </div>
+          </div>
+
+          {/* PAGE 2: PROFILE & ANALYSIS */}
+          <div className="min-h-[1120px] p-16 bg-white break-before-page relative">
+            <div className="flex justify-between items-start mb-16">
+              <div>
+                <h2 className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900 mb-2">01 Profile Analysis</h2>
+                <div className="h-1 w-20 bg-neon" />
+              </div>
+              <div className="text-right">
+                <p className="text-zinc-400 uppercase font-black tracking-widest text-[10px]">Reference ID</p>
+                <p className="text-zinc-900 font-bold text-xs">EP-{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 mb-16">
+              <div className="bg-zinc-50 p-8 rounded-3xl border border-zinc-100 flex items-start gap-6">
+                <div className="w-12 h-12 bg-neon/10 rounded-2xl flex items-center justify-center shrink-0">
+                  <User className="w-6 h-6 text-zinc-900" />
+                </div>
+                <div>
+                  <p className="text-zinc-400 uppercase font-black tracking-widest text-[10px] mb-2">Physical Stats</p>
+                  <p className="text-lg font-bold text-zinc-900 leading-tight">
+                    {inputs.age} Years Old<br/>
+                    {inputs.height} {inputs.heightUnit}<br/>
+                    {inputs.weight} {inputs.weightUnit}
+                  </p>
+                </div>
+              </div>
+              <div className="bg-zinc-50 p-8 rounded-3xl border border-zinc-100 flex items-start gap-6">
+                <div className="w-12 h-12 bg-neon/10 rounded-2xl flex items-center justify-center shrink-0">
+                  <Target className="w-6 h-6 text-zinc-900" />
+                </div>
+                <div>
+                  <p className="text-zinc-400 uppercase font-black tracking-widest text-[10px] mb-2">Body Profile</p>
+                  <p className="text-lg font-bold text-zinc-900 leading-tight">
+                    {inputs.bodyType}<br/>
+                    {inputs.fitnessLevel} Level
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <h3 className="text-zinc-400 uppercase font-black tracking-widest text-xs border-b border-zinc-100 pb-4">Lifestyle & Environment</h3>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="space-y-1">
+                  <p className="text-zinc-400 font-black uppercase text-[9px] tracking-widest">Location</p>
+                  <p className="font-bold text-zinc-900">{inputs.workoutLocation}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-zinc-400 font-black uppercase text-[9px] tracking-widest">Activity Level</p>
+                  <p className="font-bold text-zinc-900">{inputs.activityLevel}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-zinc-400 font-black uppercase text-[9px] tracking-widest">Diet Type</p>
+                  <p className="font-bold text-zinc-900">{inputs.dietType}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-24 p-8 bg-zinc-900 rounded-3xl text-white flex items-center justify-between">
+              <div className="space-y-2">
+                <h4 className="text-neon font-black uppercase italic tracking-tighter text-xl">Coach's Insight</h4>
+                <p className="text-zinc-400 text-xs leading-relaxed max-w-md">Based on your {inputs.fitnessLevel} level and {inputs.primaryGoal} goal, we've engineered a high-intensity protocol that prioritizes {inputs.targetAreas?.join(', ') || 'overall functional strength'}.</p>
+              </div>
+              <Zap className="w-12 h-12 text-neon/20" />
+            </div>
+
+            {/* Safety Protocol in PDF */}
+            <div className="mt-16 p-10 bg-zinc-50 rounded-[2.5rem] border-2 border-neon/20">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-10 h-10 bg-neon rounded-xl flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-black" />
+                </div>
+                <h3 className="text-xl font-black uppercase italic tracking-tight text-zinc-900">Safety Protocol</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {plan.safetyNotes.map((note, i) => (
+                  <div key={i} className="flex items-start gap-3 p-4 bg-white rounded-2xl border border-zinc-100">
+                    <div className="w-1.5 h-1.5 rounded-full bg-neon mt-1.5 shrink-0" />
+                    <p className="text-[10px] font-bold text-zinc-600 leading-relaxed">{note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Medical Disclaimer in PDF */}
+            <div className="mt-8 p-8 bg-zinc-100 rounded-3xl text-center">
+              <p className="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-2">Medical Disclaimer</p>
+              <p className="text-[9px] text-zinc-500 leading-relaxed max-w-xl mx-auto italic">
+                This plan is generated by an Artificial Intelligence and is intended for informational and educational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition or before starting a new fitness or nutrition program.
+              </p>
+            </div>
+
+            {/* Footer Watermark */}
+            <div className="absolute bottom-8 left-16 right-16 flex justify-between items-center border-t border-zinc-100 pt-4 opacity-30">
+              <span className="text-[8px] font-black uppercase tracking-[0.3em]">Elite Protocol • Profile Analysis</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em]">Page 02</span>
+            </div>
+          </div>
+
+          {/* PAGE 3+: TRAINING PROTOCOL */}
+          <div className="min-h-[1120px] p-16 bg-white break-before-page relative">
+            <div className="flex justify-between items-start mb-16">
+              <div>
+                <h2 className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900 mb-2">02 Training Protocol</h2>
+                <div className="h-1 w-20 bg-neon" />
+              </div>
+              <div className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center">
+                <Activity className="w-5 h-5 text-neon" />
+              </div>
+            </div>
+
+            <div className="space-y-12">
+              {plan.workout.weeklySplit.map((day, i) => (
+                <div key={i} className="break-inside-avoid border-b border-zinc-100 pb-12 last:border-0">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-black uppercase italic tracking-tight text-zinc-900">{day.day}</h3>
+                    <span className="px-4 py-1 bg-zinc-900 text-neon text-[10px] font-black uppercase tracking-widest rounded-full">{day.focus}</span>
+                  </div>
+                  
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="text-zinc-400 border-b border-zinc-100">
+                        <th className="py-4 font-black uppercase text-[9px] tracking-widest w-1/3">Exercise</th>
+                        <th className="py-4 font-black uppercase text-[9px] tracking-widest w-1/6">Sets × Reps</th>
+                        <th className="py-4 font-black uppercase text-[9px] tracking-widest w-1/6">Rest</th>
+                        <th className="py-4 font-black uppercase text-[9px] tracking-widest w-1/3">Alternative</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-50">
+                      {day.exercises.map((ex, j) => (
+                        <tr key={j}>
+                          <td className="py-6 pr-4">
+                            <p className="font-bold text-zinc-900 text-sm uppercase italic tracking-tight">{ex.name}</p>
+                            <p className="text-[10px] text-zinc-400 mt-1 leading-relaxed">{ex.notes}</p>
+                          </td>
+                          <td className="py-6 pr-4 font-black text-zinc-900 text-xs tracking-widest">{ex.setsReps}</td>
+                          <td className="py-6 pr-4 text-zinc-500 font-bold text-[10px] uppercase tracking-widest">{ex.rest}</td>
+                          <td className="py-6 text-zinc-400 text-[10px] font-medium italic">{ex.alternative}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer Watermark */}
+            <div className="absolute bottom-8 left-16 right-16 flex justify-between items-center border-t border-zinc-100 pt-4 opacity-30">
+              <span className="text-[8px] font-black uppercase tracking-[0.3em]">Elite Protocol • Training Protocol</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em]">Page 03</span>
+            </div>
+          </div>
+
+          {/* PAGE 4+: FUELING STRATEGY */}
+          <div className="min-h-[1120px] p-16 bg-white break-before-page relative">
+            <div className="flex justify-between items-start mb-16">
+              <div>
+                <h2 className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900 mb-2">03 Fueling Strategy</h2>
+                <div className="h-1 w-20 bg-neon" />
+              </div>
+              <div className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center">
+                <Utensils className="w-5 h-5 text-neon" />
+              </div>
+            </div>
+
+            <div className="bg-zinc-950 rounded-[2.5rem] p-12 text-white mb-16 flex items-center justify-between overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-neon/10 blur-[80px] rounded-full -mr-32 -mt-32" />
+              <div className="relative z-10">
+                <p className="text-zinc-500 uppercase font-black tracking-[0.3em] text-[10px] mb-4">Daily Energy Target</p>
+                <p className="text-6xl font-black text-neon italic tracking-tighter leading-none">{plan.diet.dailyCalories} <span className="text-xl text-zinc-500 not-italic uppercase tracking-widest">kcal</span></p>
+              </div>
+              <div className="relative z-10 flex gap-12 text-center">
+                <div><p className="text-zinc-500 uppercase text-[9px] font-black tracking-widest mb-2">Protein</p><p className="font-black text-white text-lg tracking-widest">{plan.diet.macros.protein}</p></div>
+                <div><p className="text-zinc-500 uppercase text-[9px] font-black tracking-widest mb-2">Carbs</p><p className="font-black text-white text-lg tracking-widest">{plan.diet.macros.carbs}</p></div>
+                <div><p className="text-zinc-500 uppercase text-[9px] font-black tracking-widest mb-2">Fats</p><p className="font-black text-white text-lg tracking-widest">{plan.diet.macros.fats}</p></div>
+              </div>
+            </div>
+
+            <table className="w-full text-left border-collapse mb-16">
               <thead>
-                <tr className="border-b-2 border-gray-300 text-gray-600">
-                  <th className="py-2 px-2 w-1/4">Meal</th>
-                  <th className="py-2 px-2 w-1/2">Options</th>
-                  <th className="py-2 px-2 w-1/4">Alternative</th>
+                <tr className="text-zinc-400 border-b border-zinc-100">
+                  <th className="py-4 font-black uppercase text-[9px] tracking-widest w-1/4">Meal</th>
+                  <th className="py-4 font-black uppercase text-[9px] tracking-widest w-1/2">Menu Options</th>
+                  <th className="py-4 font-black uppercase text-[9px] tracking-widest w-1/4">Swap Out</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-zinc-50">
                 {plan.diet.meals.map((meal, i) => (
-                  <tr key={i} className="border-b border-gray-200">
-                    <td className="py-3 px-2 font-bold text-emerald-600 align-top">{meal.name}</td>
-                    <td className="py-3 px-2 align-top">
-                      <ul className="list-disc list-inside text-gray-800 space-y-1">
-                        {meal.options.map((opt, j) => <li key={j}>{opt}</li>)}
+                  <tr key={i}>
+                    <td className="py-8 pr-6 align-top">
+                      <h4 className="font-black text-zinc-900 uppercase italic tracking-tight text-sm">{meal.name}</h4>
+                    </td>
+                    <td className="py-8 pr-6 align-top">
+                      <ul className="space-y-3">
+                        {meal.options.map((opt, j) => (
+                          <li key={j} className="flex items-start gap-3 text-xs text-zinc-600 font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-neon mt-1.5 shrink-0" />
+                            {opt}
+                          </li>
+                        ))}
                       </ul>
                     </td>
-                    <td className="py-3 px-2 text-gray-600 text-xs align-top italic">{meal.alternatives}</td>
+                    <td className="py-8 align-top text-zinc-400 text-[10px] font-bold italic leading-relaxed">
+                      <div className="flex items-start gap-2">
+                        <RefreshCw className="w-3 h-3 mt-0.5 shrink-0 text-neon" />
+                        <span>{meal.alternatives}</span>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            <div className="p-8 bg-zinc-50 rounded-3xl border border-zinc-100">
+              <div className="flex items-center gap-4 mb-4">
+                <ShieldAlert className="w-5 h-5 text-zinc-400" />
+                <h4 className="text-zinc-900 font-black uppercase text-xs tracking-widest">Safety Protocol</h4>
+              </div>
+              <ul className="grid grid-cols-2 gap-x-12 gap-y-3">
+                {plan.safetyNotes.map((note, i) => (
+                  <li key={i} className="text-[9px] text-zinc-500 font-bold flex items-start gap-3">
+                    <span className="w-1 h-1 rounded-full bg-zinc-300 mt-1.5 shrink-0" />
+                    {note}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Footer Watermark */}
+            <div className="absolute bottom-8 left-16 right-16 flex justify-between items-center border-t border-zinc-100 pt-4 opacity-30">
+              <span className="text-[8px] font-black uppercase tracking-[0.3em]">Elite Protocol • Fueling Strategy</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em]">Page 04</span>
+            </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-300 text-xs text-gray-500 break-inside-avoid">
-            <h3 className="font-bold text-gray-700 mb-2 uppercase">Safety & Disclaimer</h3>
-            <ul className="list-disc list-inside space-y-1 mb-6">
-              {plan.safetyNotes.map((note, i) => <li key={i}>{note}</li>)}
-            </ul>
-            <div className="text-center mt-8 pt-4 border-t border-gray-200">
-              Generated by Fitness AI • fitness-ai.app
+          {/* PAGE 5: FOOTER & QR */}
+          <div className="h-[1120px] p-20 bg-zinc-950 text-white flex flex-col items-center justify-center text-center break-before-page relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+            
+            <div className="relative z-10 space-y-12">
+              <div className="space-y-4">
+                <h2 className="text-4xl font-black uppercase italic tracking-tighter">Stay <span className="text-neon">Consistent</span></h2>
+                <p className="text-zinc-500 text-sm max-w-sm mx-auto leading-relaxed">Consistency is the bridge between goals and accomplishment. Scan the code below to access your dashboard and track your progress.</p>
+              </div>
+
+              <div className="p-6 bg-white rounded-[2.5rem] inline-block shadow-[0_0_50px_rgba(204,255,0,0.1)]">
+                <QRCodeSVG value={appUrl} size={160} level="H" includeMargin={false} />
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-zinc-500 uppercase font-black tracking-[0.4em] text-[10px]">Access Your Dashboard</p>
+                <p className="text-neon font-bold text-xs">{appUrl.replace('https://', '')}</p>
+              </div>
+            </div>
+
+            <div className="absolute bottom-20 left-0 right-0 opacity-10 pointer-events-none">
+              <div className="text-[120px] font-black uppercase italic tracking-tighter whitespace-nowrap">ELITE PROTOCOL • ELITE PROTOCOL</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto space-y-12 relative" ref={contentRef} id="pdf-content">
+      <div className="flex-1 overflow-y-auto px-6 pt-12 pb-48 md:px-12 md:pt-20 custom-scrollbar relative">
+        <div className="max-w-4xl mx-auto space-y-12 relative" ref={contentRef} id="pdf-content">
         {/* Watermark */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] z-0 overflow-hidden">
-          <div className="text-[150px] font-black rotate-[-45deg] whitespace-nowrap">
-            FITNESS AI
+        <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.02] z-0 overflow-hidden">
+          <div className="text-[200px] font-black rotate-[-45deg] whitespace-nowrap uppercase italic font-display">
+            GEN-Z AI
           </div>
         </div>
         
         {/* Header */}
-        <div className="text-center space-y-6 pt-12 pb-8 relative z-10">
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-zinc-900">Your Personalized Plan</h1>
-          <p className="text-zinc-500 text-xl md:text-2xl font-medium">Designed for {inputs.primaryGoal} • {inputs.planDuration}</p>
+        <div className="text-center space-y-4 pt-12 pb-8 relative z-10">
+          <div className="flex flex-wrap justify-center gap-3 mb-6">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/30 backdrop-blur-md rounded-full border border-white/5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+              <ShieldAlert className="w-3 h-3 text-neon" />
+              No Data Stored
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/30 backdrop-blur-md rounded-full border border-white/5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+              <Zap className="w-3 h-3 text-neon" />
+              AI-Generated Plan
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/30 backdrop-blur-md rounded-full border border-white/5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+              <AlertTriangle className="w-3 h-3 text-neon" />
+              Not Medical Advice
+            </div>
+          </div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-8xl font-black tracking-tighter text-white uppercase italic font-display leading-none"
+          >
+            Your <span className="text-neon">Elite</span> Plan
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-zinc-500 text-lg md:text-xl font-bold uppercase tracking-[0.3em]"
+          >
+            {inputs.primaryGoal} • {inputs.planDuration}
+          </motion.p>
         </div>
 
         {/* User Summary */}
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 md:p-8">
-          <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-[#10b9811a] text-emerald-600 flex items-center justify-center text-sm shrink-0">1</span>
-            Profile Summary
+        <div className="bg-zinc-900/40 border border-white/5 rounded-[2rem] p-6 md:p-10 backdrop-blur-xl relative z-10">
+          <h2 className="text-xl md:text-2xl font-black mb-8 flex items-center gap-4 uppercase italic tracking-tight">
+            <span className="w-10 h-10 rounded-full bg-neon/10 text-neon flex items-center justify-center text-sm font-black shrink-0">01</span>
+            Profile Analysis
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-              <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Stats</p>
-              <p className="font-medium text-zinc-900">{inputs.age} yrs<br/>{inputs.height}cm<br/>{inputs.weight}kg</p>
+            <div className="bg-zinc-950/40 p-5 rounded-2xl border border-white/5">
+              <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Physical Stats</p>
+              <p className="font-bold text-white leading-relaxed">{inputs.age} yrs<br/>{inputs.height}{inputs.heightUnit}<br/>{inputs.weight}{inputs.weightUnit}</p>
             </div>
-            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-              <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Body Type</p>
-              <p className="font-medium text-zinc-900">{inputs.bodyType}</p>
+            <div className="bg-zinc-950/40 p-5 rounded-2xl border border-white/5">
+              <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Body Type</p>
+              <p className="font-bold text-white">{inputs.bodyType}</p>
             </div>
-            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-              <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Fitness Level</p>
-              <p className="font-medium text-zinc-900">{inputs.fitnessLevel}</p>
+            <div className="bg-zinc-950/40 p-5 rounded-2xl border border-white/5">
+              <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Fitness Level</p>
+              <p className="font-bold text-white">{inputs.fitnessLevel}</p>
             </div>
-            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-              <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Activity</p>
-              <p className="font-medium text-zinc-900">{inputs.activityLevel}</p>
+            <div className="bg-zinc-950/40 p-5 rounded-2xl border border-white/5">
+              <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Activity</p>
+              <p className="font-bold text-white">{inputs.activityLevel}</p>
             </div>
           </div>
         </div>
 
         {/* Workout Plan */}
-        <div className="space-y-6 break-before-page">
-          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-[#10b9811a] text-emerald-600 flex items-center justify-center text-lg shrink-0">2</span>
-            Workout Schedule
+        <div className="space-y-8 relative z-10">
+          <h2 className="text-2xl md:text-4xl font-black flex items-center gap-4 uppercase italic tracking-tight">
+            <span className="w-12 h-12 rounded-full bg-neon/10 text-neon flex items-center justify-center text-lg font-black shrink-0">02</span>
+            Training Protocol
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-6">
             {plan.workout.weeklySplit.map((day, i) => (
-              <details key={i} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden break-inside-avoid" open={true}>
-                <summary className="flex items-center justify-between p-5 md:p-6 cursor-pointer select-none">
+              <motion.details 
+                key={i} 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="group bg-zinc-900/40 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-xl" 
+                open={i === 0}
+              >
+                <summary className="flex items-center justify-between p-6 md:p-8 cursor-pointer select-none">
                   <div>
-                    <h3 className="text-lg md:text-xl font-semibold">{day.day}</h3>
-                    <p className="text-emerald-600 font-medium mt-1 text-sm md:text-base">{day.focus}</p>
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-open:text-neon transition-colors">{day.day}</h3>
+                    <p className="text-zinc-500 font-bold mt-1 text-xs md:text-sm uppercase tracking-widest">{day.focus}</p>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-open:rotate-180 transition-transform shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-open:rotate-180 transition-all shrink-0 group-hover:bg-white/10">
                     <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M1.5 1.5L6 6L10.5 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
                 </summary>
-                <div className="px-5 md:px-6 pb-5 md:pb-6 pt-2">
+                <div className="px-6 md:px-8 pb-8 pt-2">
                   <div className="space-y-4 md:space-y-0 md:overflow-x-auto">
                     {/* Mobile View: Cards */}
                     <div className="md:hidden space-y-4">
                       {day.exercises.map((ex, j) => (
-                        <div key={j} className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
-                          <p className="font-semibold text-zinc-900 mb-1">{ex.name}</p>
-                          <p className="text-xs text-zinc-500 mb-3">{ex.notes}</p>
-                          <div className="flex flex-wrap gap-2 text-sm">
-                            <span className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-medium">{ex.setsReps}</span>
-                            <span className="px-3 py-1.5 bg-zinc-200 text-zinc-700 rounded-lg">{ex.rest} rest</span>
+                        <div key={j} className="bg-zinc-950/40 rounded-2xl p-5 border border-white/5">
+                          <p className="font-black uppercase italic text-sm mb-2 tracking-tight">{ex.name}</p>
+                          <p className="text-[10px] text-zinc-500 mb-4 font-bold uppercase tracking-wider leading-relaxed">{ex.notes}</p>
+                          <div className="flex flex-wrap gap-2 text-[10px]">
+                            <span className="px-3 py-2 bg-neon/10 text-neon rounded-lg font-black uppercase tracking-widest">{ex.setsReps}</span>
+                            <span className="px-3 py-2 bg-white/5 text-zinc-400 rounded-lg font-black uppercase tracking-widest">{ex.rest} rest</span>
                           </div>
                           {ex.alternative && (
-                            <div className="mt-3 pt-3 border-t border-zinc-200">
-                              <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-1">Alternative</p>
-                              <p className="text-sm text-zinc-700">{ex.alternative}</p>
+                            <div className="mt-4 pt-4 border-t border-white/5">
+                              <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em] mb-2">Alternative</p>
+                              <p className="text-xs text-zinc-400 font-bold">{ex.alternative}</p>
                             </div>
                           )}
                         </div>
@@ -199,80 +459,85 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
                     </div>
 
                     {/* Desktop View: Table */}
-                    <table className="hidden md:table w-full text-left text-sm">
+                    <table className="hidden md:table w-full text-left">
                       <thead>
-                        <tr className="text-zinc-500 border-b border-zinc-200">
-                          <th className="pb-3 font-medium">Exercise</th>
-                          <th className="pb-3 font-medium">Sets × Reps</th>
-                          <th className="pb-3 font-medium">Rest</th>
-                          <th className="pb-3 font-medium">Alternative</th>
+                        <tr className="text-zinc-500 border-b border-white/5">
+                          <th className="pb-4 font-black uppercase text-[10px] tracking-[0.2em]">Exercise</th>
+                          <th className="pb-4 font-black uppercase text-[10px] tracking-[0.2em]">Sets × Reps</th>
+                          <th className="pb-4 font-black uppercase text-[10px] tracking-[0.2em]">Rest</th>
+                          <th className="pb-4 font-black uppercase text-[10px] tracking-[0.2em]">Alternative</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-zinc-200">
+                      <tbody className="divide-y divide-white/5">
                         {day.exercises.map((ex, j) => (
-                          <tr key={j}>
-                            <td className="py-4 pr-4">
-                              <p className="font-medium text-zinc-800">{ex.name}</p>
-                              <p className="text-xs text-zinc-500 mt-1">{ex.notes}</p>
+                          <tr key={j} className="group/row hover:bg-white/[0.02] transition-colors">
+                            <td className="py-6 pr-6">
+                              <p className="font-black uppercase italic text-sm tracking-tight text-white group-hover/row:text-neon transition-colors">{ex.name}</p>
+                              <p className="text-[10px] text-zinc-500 mt-2 font-bold uppercase tracking-wider max-w-xs">{ex.notes}</p>
                             </td>
-                            <td className="py-4 pr-4 whitespace-nowrap text-emerald-600 font-medium">{ex.setsReps}</td>
-                            <td className="py-4 pr-4 whitespace-nowrap text-zinc-600">{ex.rest}</td>
-                            <td className="py-4 text-zinc-600">{ex.alternative}</td>
+                            <td className="py-6 pr-6 whitespace-nowrap text-neon font-black text-sm tracking-widest">{ex.setsReps}</td>
+                            <td className="py-6 pr-6 whitespace-nowrap text-zinc-400 font-bold text-xs uppercase tracking-widest">{ex.rest}</td>
+                            <td className="py-6 text-zinc-500 text-xs font-bold">{ex.alternative}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
-              </details>
+              </motion.details>
             ))}
           </div>
         </div>
 
         {/* Diet Plan */}
-        <div className="space-y-6 break-before-page">
-          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-[#10b9811a] text-emerald-600 flex items-center justify-center text-lg shrink-0">3</span>
-            Nutrition Guide
+        <div className="space-y-8 relative z-10">
+          <h2 className="text-2xl md:text-4xl font-black flex items-center gap-4 uppercase italic tracking-tight">
+            <span className="w-12 h-12 rounded-full bg-neon/10 text-neon flex items-center justify-center text-lg font-black shrink-0">03</span>
+            Fueling Strategy
           </h2>
-          <div className="bg-white border border-zinc-200 rounded-3xl overflow-hidden">
-            <div className="p-5 md:p-6 border-b border-zinc-200 bg-zinc-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-zinc-900/40 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-xl">
+            <div className="p-6 md:p-10 border-b border-white/5 bg-zinc-950/40 flex flex-col md:flex-row md:items-center justify-between gap-8">
               <div>
-                <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Daily Target</p>
-                <p className="text-3xl font-bold text-emerald-600">{plan.diet.dailyCalories} <span className="text-lg text-zinc-600 font-normal">kcal</span></p>
+                <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-3">Daily Energy Target</p>
+                <p className="text-5xl font-black text-neon italic tracking-tighter">{plan.diet.dailyCalories} <span className="text-xl text-zinc-500 font-bold uppercase tracking-widest not-italic">kcal</span></p>
               </div>
               <div className="grid grid-cols-3 gap-3 md:gap-6 w-full md:w-auto">
-                <div className="bg-white p-3 rounded-xl border border-zinc-200 text-center">
-                  <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Protein</p>
-                  <p className="font-bold text-zinc-900">{plan.diet.macros.protein}</p>
+                <div className="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 text-center">
+                  <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Protein</p>
+                  <p className="font-black text-white text-sm tracking-widest">{plan.diet.macros.protein}</p>
                 </div>
-                <div className="bg-white p-3 rounded-xl border border-zinc-200 text-center">
-                  <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Carbs</p>
-                  <p className="font-bold text-zinc-900">{plan.diet.macros.carbs}</p>
+                <div className="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 text-center">
+                  <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Carbs</p>
+                  <p className="font-black text-white text-sm tracking-widest">{plan.diet.macros.carbs}</p>
                 </div>
-                <div className="bg-white p-3 rounded-xl border border-zinc-200 text-center">
-                  <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold mb-1">Fats</p>
-                  <p className="font-bold text-zinc-900">{plan.diet.macros.fats}</p>
+                <div className="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 text-center">
+                  <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Fats</p>
+                  <p className="font-black text-white text-sm tracking-widest">{plan.diet.macros.fats}</p>
                 </div>
               </div>
             </div>
-            <div className="p-5 md:p-6">
+            <div className="p-6 md:p-10">
               <div className="space-y-6 md:space-y-0 md:overflow-x-auto">
                 {/* Mobile View: Cards */}
                 <div className="md:hidden space-y-4">
                   {plan.diet.meals.map((meal, i) => (
-                    <div key={i} className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
-                      <h4 className="font-bold text-emerald-600 mb-3 text-lg">{meal.name}</h4>
-                      <div className="space-y-2 mb-4">
-                        <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Options</p>
-                        <ul className="list-disc list-inside text-zinc-800 space-y-1 text-sm">
-                          {meal.options.map((opt, j) => <li key={j}>{opt}</li>)}
+                    <div key={i} className="bg-zinc-950/40 rounded-2xl p-6 border border-white/5">
+                      <h4 className="font-black text-neon mb-4 text-lg uppercase italic tracking-tight">{meal.name}</h4>
+                      <div className="space-y-3 mb-6">
+                        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">Menu Options</p>
+                        <ul className="space-y-2">
+                          {meal.options.map((opt, j) => (
+                            <li key={j} className="flex items-start gap-3 text-sm text-zinc-300 font-bold">
+                              <span className="w-1.5 h-1.5 rounded-full bg-neon mt-1.5 shrink-0" />
+                              {opt}
+                            </li>
+                          ))}
                         </ul>
                       </div>
-                      <div className="pt-3 border-t border-zinc-200">
-                        <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-1">Alternative</p>
-                        <div className="flex items-start gap-2 text-sm text-zinc-700">
-                          <RefreshCw className="w-4 h-4 mt-0.5 shrink-0 text-zinc-400" />
+                      <div className="pt-4 border-t border-white/5">
+                        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em] mb-3">Swap Out</p>
+                        <div className="flex items-start gap-3 text-xs text-zinc-400 font-bold">
+                          <RefreshCw className="w-4 h-4 mt-0.5 shrink-0 text-neon" />
                           <span>{meal.alternatives}</span>
                         </div>
                       </div>
@@ -281,28 +546,33 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
                 </div>
 
                 {/* Desktop View: Table */}
-                <table className="hidden md:table w-full text-left text-sm">
+                <table className="hidden md:table w-full text-left">
                   <thead>
-                    <tr className="text-zinc-500 border-b border-zinc-200">
-                      <th className="pb-3 font-medium w-1/4">Meal</th>
-                      <th className="pb-3 font-medium w-1/2">Options</th>
-                      <th className="pb-3 font-medium w-1/4">Alternative</th>
+                    <tr className="text-zinc-500 border-b border-white/5">
+                      <th className="pb-4 font-black uppercase text-[10px] tracking-[0.2em] w-1/4">Meal</th>
+                      <th className="pb-4 font-black uppercase text-[10px] tracking-[0.2em] w-1/2">Menu Options</th>
+                      <th className="pb-4 font-black uppercase text-[10px] tracking-[0.2em] w-1/4">Swap Out</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200">
+                  <tbody className="divide-y divide-white/5">
                     {plan.diet.meals.map((meal, i) => (
-                      <tr key={i}>
-                        <td className="py-4 pr-4 align-top">
-                          <h4 className="font-semibold text-emerald-600">{meal.name}</h4>
+                      <tr key={i} className="group/meal hover:bg-white/[0.02] transition-colors">
+                        <td className="py-6 pr-6 align-top">
+                          <h4 className="font-black text-neon uppercase italic tracking-tight">{meal.name}</h4>
                         </td>
-                        <td className="py-4 pr-4 align-top">
-                          <ul className="list-disc list-inside text-zinc-700 space-y-1">
-                            {meal.options.map((opt, j) => <li key={j}>{opt}</li>)}
+                        <td className="py-6 pr-6 align-top">
+                          <ul className="space-y-2">
+                            {meal.options.map((opt, j) => (
+                              <li key={j} className="flex items-start gap-3 text-sm text-zinc-300 font-bold">
+                                <span className="w-1.5 h-1.5 rounded-full bg-neon mt-1.5 shrink-0" />
+                                {opt}
+                              </li>
+                            ))}
                           </ul>
                         </td>
-                        <td className="py-4 align-top text-zinc-600">
-                          <div className="flex items-start gap-2">
-                            <RefreshCw className="w-4 h-4 mt-0.5 shrink-0" />
+                        <td className="py-6 align-top text-zinc-500 text-xs font-bold italic">
+                          <div className="flex items-start gap-3">
+                            <RefreshCw className="w-4 h-4 mt-0.5 shrink-0 text-neon" />
                             <span>{meal.alternatives}</span>
                           </div>
                         </td>
@@ -316,36 +586,57 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
         </div>
 
         {/* Safety Notes */}
-        <div className="bg-[#f59e0b1a] border border-[#f59e0b33] rounded-2xl p-6 break-inside-avoid">
-          <h3 className="text-amber-500 font-semibold flex items-center gap-2 mb-4">
-            <AlertTriangle className="w-5 h-5" />
-            Safety & Disclaimer
-          </h3>
-          <ul className="space-y-2 text-[#f59e0bcc] text-sm list-disc list-inside">
+        <div className="bg-neon/10 border-2 border-neon/30 rounded-[2rem] p-8 md:p-12 relative z-10 shadow-[0_0_50px_rgba(204,255,0,0.1)]">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 bg-neon rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(204,255,0,0.4)]">
+              <AlertTriangle className="w-6 h-6 text-black" />
+            </div>
+            <div>
+              <h3 className="text-neon font-black uppercase italic tracking-tight text-2xl md:text-3xl">Safety Protocol</h3>
+              <p className="text-zinc-500 text-[10px] uppercase font-black tracking-widest">Critical Guidelines for Your Protection</p>
+            </div>
+          </div>
+          <ul className="grid md:grid-cols-2 gap-6 text-zinc-300 text-sm font-bold list-none">
             {plan.safetyNotes.map((note, i) => (
-              <li key={i}>{note}</li>
+              <li key={i} className="flex items-start gap-4 p-4 bg-zinc-950/40 rounded-2xl border border-white/5">
+                <span className="w-2 h-2 rounded-full bg-neon mt-1.5 shrink-0 shadow-[0_0_10px_rgba(204,255,0,0.5)]" />
+                <span className="leading-relaxed">{note}</span>
+              </li>
             ))}
           </ul>
         </div>
-      </div>
 
-      {/* Floating Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-white md:bg-gradient-to-t md:from-white md:via-white/90 md:to-transparent border-t border-zinc-200 md:border-none shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none z-20">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-end gap-3 md:gap-4">
-          <button
+        {/* Medical Disclaimer */}
+        <div className="bg-zinc-900/40 border border-white/5 rounded-[2rem] p-8 md:p-10 text-center space-y-4 relative z-10 mb-12">
+          <p className="text-zinc-500 text-[10px] uppercase font-black tracking-[0.3em]">Medical Disclaimer</p>
+          <p className="text-zinc-400 text-xs leading-relaxed max-w-2xl mx-auto">
+            This plan is generated by an Artificial Intelligence and is intended for informational and educational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition or before starting a new fitness or nutrition program.
+          </p>
+        </div>
+      </div>
+    </div>
+
+      {/* Floating Action Bar - Native Mobile Style */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-zinc-950 via-zinc-950/95 to-transparent z-40 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+        <div className="max-w-4xl mx-auto flex gap-4">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
             onClick={onRegenerate}
-            className="w-full sm:w-auto px-6 py-4 rounded-2xl md:rounded-full bg-zinc-100 md:bg-white border border-transparent md:border-zinc-200 text-zinc-700 font-semibold md:font-medium hover:bg-zinc-200 md:hover:bg-zinc-100 transition-colors flex items-center justify-center gap-2"
+            className="flex-1 py-5 rounded-2xl bg-zinc-900 border border-white/5 text-zinc-400 font-black uppercase italic tracking-widest text-[10px] flex items-center justify-center gap-2"
           >
-            <RefreshCw className="w-5 h-5" />
-            Regenerate Plan
-          </button>
-          <button
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
             onClick={onExport}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl md:rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#10b98133]"
+            className="flex-[2] py-5 rounded-2xl bg-neon text-black font-black uppercase italic tracking-widest text-[10px] shadow-[0_0_30px_rgba(204,255,0,0.3)] flex items-center justify-center gap-2"
           >
-            <Download className="w-5 h-5" />
-            Export PDF
-          </button>
+            <Download className="w-4 h-4" />
+            Export Protocol
+          </motion.button>
         </div>
       </div>
     </div>
