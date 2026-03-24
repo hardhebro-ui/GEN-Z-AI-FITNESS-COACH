@@ -163,24 +163,42 @@ export default function App() {
           useCORS: true,
           windowWidth: 800,
           onclone: (clonedDoc: Document) => {
+            // 1. Process style tags
             const styleTags = clonedDoc.querySelectorAll('style');
             styleTags.forEach(style => {
               if (style.innerHTML) {
                 // Replace unsupported color functions with a fallback to prevent html2canvas from crashing
                 style.innerHTML = style.innerHTML
-                  .replace(/oklch\([^)]+\)/g, 'rgb(0,0,0)')
-                  .replace(/oklab\([^)]+\)/g, 'rgb(0,0,0)')
-                  .replace(/color-mix\([^)]+\)/g, 'rgb(0,0,0)');
+                  .replace(/oklch\([^)]+\)/g, '#000000')
+                  .replace(/oklab\([^)]+\)/g, '#000000')
+                  .replace(/color-mix\([^)]+\)/g, '#000000');
               }
             });
-            // Make the hidden element visible in the cloned document for rendering
+
+            // 2. Process all elements for inline styles
+            const allElements = clonedDoc.querySelectorAll('*');
+            allElements.forEach(el => {
+              if (el instanceof HTMLElement) {
+                const styleStr = el.getAttribute('style');
+                if (styleStr && (styleStr.includes('oklch') || styleStr.includes('oklab') || styleStr.includes('color-mix'))) {
+                  el.setAttribute('style', styleStr
+                    .replace(/oklch\([^)]+\)/g, '#000000')
+                    .replace(/oklab\([^)]+\)/g, '#000000')
+                    .replace(/color-mix\([^)]+\)/g, '#000000')
+                  );
+                }
+              }
+            });
+
+            // 3. Make the hidden element visible in the cloned document for rendering
             const clonedElement = clonedDoc.getElementById('pdf-content-light');
             if (clonedElement) {
-              clonedElement.style.position = 'static';
-              clonedElement.style.opacity = '1';
-              clonedElement.style.width = '800px';
-              clonedElement.style.height = 'auto';
-              clonedElement.style.overflow = 'visible';
+              clonedElement.style.setProperty('position', 'static', 'important');
+              clonedElement.style.setProperty('opacity', '1', 'important');
+              clonedElement.style.setProperty('width', '800px', 'important');
+              clonedElement.style.setProperty('height', 'auto', 'important');
+              clonedElement.style.setProperty('overflow', 'visible', 'important');
+              clonedElement.style.setProperty('display', 'block', 'important');
             }
           }
         },
