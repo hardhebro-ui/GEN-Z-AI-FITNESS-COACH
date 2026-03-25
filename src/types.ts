@@ -74,8 +74,10 @@ export interface GeneratedPlan {
 export interface Review {
   id: string | number;
   rating: number;
-  text: string;
-  name: string;
+  text: string | null;
+  name: string | null;
   date: string;
   tags?: string[];
+  label?: string;
+  verified?: boolean;
 }

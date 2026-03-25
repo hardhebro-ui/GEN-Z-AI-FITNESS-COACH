@@ -110,8 +110,9 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
     };
   }, []);
 
-  const getInitials = (name: string) => {
-    return (name || 'Anonymous').substring(0, 2).toUpperCase();
+  const getInitials = (name: string | null) => {
+    if (!name || name.trim() === '') return 'AN';
+    return name.trim().substring(0, 2).toUpperCase();
   };
 
   return (
@@ -412,9 +413,15 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
                     </div>
                   )}
                   
-                  <p className="text-zinc-300 mb-10 flex-grow text-xl md:text-2xl leading-snug italic font-medium relative z-10">
-                    "{review.text}"
-                  </p>
+                  {review.text && review.text.trim() !== "" ? (
+                    <p className="text-zinc-300 mb-10 flex-grow text-xl md:text-2xl leading-snug italic font-medium relative z-10">
+                      "{review.text}"
+                    </p>
+                  ) : (
+                    <p className="text-zinc-500 mb-10 flex-grow text-base italic font-medium relative z-10 opacity-50">
+                      No written review provided
+                    </p>
+                  )}
                   
                   <div className="flex items-center gap-5 mt-auto relative z-10">
                     <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-neon flex items-center justify-center text-black font-black text-xl md:text-2xl shadow-[0_0_20px_rgba(204,255,0,0.3)] group-hover:scale-110 transition-transform font-display italic">
@@ -422,7 +429,9 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
                     </div>
                     <div className="min-w-0">
                       <p className="text-white font-black text-lg md:text-xl truncate font-display uppercase italic">{review.name || 'Anonymous'}</p>
-                      <p className="text-[10px] md:text-xs text-zinc-500 font-black uppercase tracking-[0.2em]">Verified Athlete</p>
+                      <p className="text-[10px] md:text-xs text-zinc-500 font-black uppercase tracking-[0.2em]">
+                        {review.label || (review.verified ? 'Verified Athlete' : 'User')}
+                      </p>
                     </div>
                   </div>
                 </motion.div>
@@ -458,12 +467,20 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
                             />
                           ))}
                         </div>
-                        <span className="text-[10px] font-black text-zinc-700 uppercase tracking-widest">Verified</span>
+                        <span className="text-[10px] font-black text-zinc-700 uppercase tracking-widest">
+                          {review.label || (review.verified ? 'Verified' : 'User')}
+                        </span>
                       </div>
-
-                      <p className="text-zinc-300 text-base md:text-lg italic font-medium leading-relaxed">
-                        "{review.text}"
-                      </p>
+                      
+                      {review.text && review.text.trim() !== "" ? (
+                        <p className="text-zinc-300 text-base md:text-lg italic font-medium leading-relaxed">
+                          "{review.text}"
+                        </p>
+                      ) : (
+                        <p className="text-zinc-500 text-sm italic font-medium leading-relaxed opacity-50">
+                          No written review provided
+                        </p>
+                      )}
 
                       {review.tags && review.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">

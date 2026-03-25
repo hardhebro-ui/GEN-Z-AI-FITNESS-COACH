@@ -65,8 +65,8 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPrompt
         
         transaction.set(newReviewRef, {
           rating,
-          text: text ? text.substring(0, 200) : null,
-          name: name || 'Anonymous',
+          text: text.trim() || null,
+          name: name.trim() || 'Anonymous',
           tags: selectedTags,
           createdAt: serverTimestamp()
         });
