@@ -67,4 +67,18 @@
   .card-premium {
     @apply bg-zinc-900/40 border border-white/5 rounded-3xl p-6 backdrop-blur-sm shadow-2xl;
   }
+
+  /* Screenshot & Print Protection */
+  @media print {
+    body {
+      display: none !important;
+    }
+  }
+
+  .protect-content {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
 }

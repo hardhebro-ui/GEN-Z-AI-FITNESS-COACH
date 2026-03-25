@@ -19,10 +19,12 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showUpi, setShowUpi] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [transactionId, setTransactionId] = useState('');
+  const [isVerifyingShare, setIsVerifyingShare] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const upiId = "sarjil1432-1@okhdfcbank"; // Replace with your actual UPI ID
-  const upiName = "Fitness AI";
+  const upiName = "fitin60.ai";
   const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`;
 
   const handleDonate = () => {
@@ -30,10 +32,19 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
   };
 
   const handleVerifyPayment = () => {
+    if (!transactionId.trim()) return;
     setIsVerifying(true);
     // Simulate payment verification
     setTimeout(() => {
       setIsVerifying(false);
+      onUnlock();
+    }, 2500);
+  };
+
+  const handleVerifyShare = () => {
+    setIsVerifyingShare(true);
+    setTimeout(() => {
+      setIsVerifyingShare(false);
       onUnlock();
     }, 2000);
   };
@@ -51,7 +62,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
           height: 1080
         });
         const link = document.createElement('a');
-        link.download = `elite-protocol-${userName.toLowerCase()}.png`;
+        link.download = `fitin60-ai-${userName.toLowerCase()}.png`;
         link.href = dataUrl;
         link.click();
         setHasShared(true);
@@ -79,7 +90,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
         
         const res = await fetch(dataUrl);
         const blob = await res.blob();
-        const file = new File([blob], 'elite-protocol.png', { type: 'image/png' });
+        const file = new File([blob], 'fitin60-ai.png', { type: 'image/png' });
         
         const shareText = `I just generated my personalized AI Fitness & Diet plan! 💪 Get yours for free in 60 seconds at: ${window.location.origin}`;
 
@@ -87,7 +98,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
           try {
             await navigator.share({
               files: [file],
-              title: 'Elite Protocol AI',
+              title: 'fitin60.ai',
               text: shareText,
             });
             setHasShared(true);
@@ -220,21 +231,63 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                       </button>
                     </div>
 
-                    <div className="space-y-4">
-                      <a
-                        href={upiUrl}
-                        className="w-full py-5 bg-neon text-black font-black uppercase italic tracking-widest text-xs rounded-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.3)] transition-all flex items-center justify-center gap-3 active:scale-95"
-                      >
-                        Open UPI App
-                        <Smartphone className="w-5 h-5" />
-                      </a>
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 gap-3">
+                        <a
+                          href={`intent://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`}
+                          className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-white/5 rounded-2xl hover:border-neon/30 transition-all active:scale-95"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-2">
+                            <img src="https://www.gstatic.com/images/branding/product/2x/gpay_64dp.png" alt="GPay" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Google Pay</span>
+                        </a>
+                        <a
+                          href={`phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`}
+                          className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-white/5 rounded-2xl hover:border-neon/30 transition-all active:scale-95"
+                        >
+                          <div className="w-10 h-10 bg-[#5f259f] rounded-full flex items-center justify-center p-2">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/1200px-PhonePe_Logo.svg.png" alt="PhonePe" className="w-full h-full object-contain brightness-0 invert" referrerPolicy="no-referrer" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">PhonePe</span>
+                        </a>
+                        <a
+                          href={`paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`}
+                          className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-white/5 rounded-2xl hover:border-neon/30 transition-all active:scale-95"
+                        >
+                          <div className="w-10 h-10 bg-[#00baf2] rounded-full flex items-center justify-center p-2">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/1200px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" className="w-full h-full object-contain brightness-0 invert" referrerPolicy="no-referrer" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Paytm</span>
+                        </a>
+                        <a
+                          href={upiUrl}
+                          className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-white/5 rounded-2xl hover:border-neon/30 transition-all active:scale-95"
+                        >
+                          <div className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center">
+                            <Smartphone className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Other Apps</span>
+                        </a>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] text-left">Transaction ID / Ref No.</label>
+                        <input
+                          type="text"
+                          placeholder="Enter last 4 digits or full ID"
+                          value={transactionId}
+                          onChange={(e) => setTransactionId(e.target.value)}
+                          className="w-full bg-zinc-900/60 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-zinc-600 focus:border-neon outline-none transition-all font-bold"
+                        />
+                      </div>
                       
                       <button
                         onClick={handleVerifyPayment}
-                        disabled={isVerifying}
-                        className="w-full py-5 bg-zinc-900 border border-white/5 text-white font-black uppercase italic tracking-widest text-xs rounded-2xl hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-3 active:scale-95"
+                        disabled={isVerifying || !transactionId.trim()}
+                        className="w-full py-5 bg-neon text-black font-black uppercase italic tracking-widest text-xs rounded-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.3)] transition-all disabled:opacity-50 flex items-center justify-center gap-3 active:scale-95"
                       >
-                        {isVerifying ? 'Verifying...' : 'I have completed the payment'}
+                        {isVerifying ? 'Verifying Transaction...' : 'Verify & Unlock PDF'}
                         {!isVerifying && <CheckCircle2 className="w-5 h-5" />}
                       </button>
                       
@@ -285,7 +338,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <Dumbbell className="w-12 h-12 text-black" />
                         </div>
                         <div>
-                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">Elite Protocol</h2>
+                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">fitin60.ai</h2>
                           <p className="text-neon font-bold text-lg uppercase tracking-[0.3em] mt-1">AI Fitness Engine</p>
                         </div>
                       </div>
@@ -301,7 +354,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                       </div>
                       <h1 className="text-[140px] font-black tracking-tighter leading-[0.85] uppercase italic text-white">
                         I GOT MY<br />
-                        <span className="text-neon">ELITE</span><br />
+                        <span className="text-neon">FITIN60.AI</span><br />
                         PLAN
                       </h1>
                       <div className="flex items-center justify-center gap-8 pt-8">
@@ -321,7 +374,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <p className="text-3xl font-black text-white">{window.location.origin.replace('https://', '')}</p>
                         </div>
                         <div className="flex gap-4">
-                          <div className="px-6 py-3 bg-zinc-900 rounded-xl border border-white/5 text-xs font-black uppercase tracking-widest text-zinc-400">#EliteProtocol</div>
+                          <div className="px-6 py-3 bg-zinc-900 rounded-xl border border-white/5 text-xs font-black uppercase tracking-widest text-zinc-400">#fitin60ai</div>
                           <div className="px-6 py-3 bg-zinc-900 rounded-xl border border-white/5 text-xs font-black uppercase tracking-widest text-zinc-400">#AIFitness</div>
                         </div>
                       </div>
@@ -351,26 +404,26 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                   </button>
                 </div>
 
-                  <label className="flex items-start gap-4 p-5 border border-white/5 rounded-2xl cursor-pointer hover:bg-white/5 transition-all bg-zinc-900/40 backdrop-blur-sm">
-                    <input
-                      type="checkbox"
-                      checked={hasShared}
-                      onChange={(e) => setHasShared(e.target.checked)}
-                      className="mt-1 w-6 h-6 rounded border-white/10 text-neon focus:ring-neon bg-zinc-950 shrink-0"
-                    />
-                    <span className="text-xs text-zinc-400 font-bold leading-relaxed">
-                      I have shared this card on WhatsApp, Instagram, or X to help my friends get fit.
-                    </span>
-                  </label>
+                <div className="space-y-6">
+                  <div className="p-5 border border-white/5 rounded-2xl bg-zinc-900/40 backdrop-blur-sm flex items-start gap-4">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors ${hasShared ? 'bg-neon text-black' : 'bg-zinc-800 text-zinc-600'}`}>
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-white font-bold">Step 1: Download or Share</p>
+                      <p className="text-[10px] text-zinc-500 font-medium">Click the buttons above to generate your card.</p>
+                    </div>
+                  </div>
 
                   <button
-                    onClick={onUnlock}
-                    disabled={!hasShared}
+                    onClick={handleVerifyShare}
+                    disabled={!hasShared || isVerifyingShare}
                     className="w-full py-5 bg-neon text-black font-black uppercase italic tracking-widest text-xs rounded-2xl hover:shadow-[0_0_30px_rgba(204,255,0,0.3)] transition-all disabled:opacity-50 flex items-center justify-center gap-3 active:scale-95"
                   >
-                    2. Unlock My PDF
-                    <CheckCircle2 className="w-5 h-5" />
+                    {isVerifyingShare ? 'Verifying Share Status...' : 'Step 2: Verify & Unlock PDF'}
+                    {!isVerifyingShare && <CheckCircle2 className="w-5 h-5" />}
                   </button>
+                </div>
                 </div>
             )}
           </div>

@@ -6,7 +6,7 @@ import ExportModal from './components/ExportModal';
 import ReviewPrompt from './components/ReviewPrompt';
 import { UserInputs, GeneratedPlan } from './types';
 import { generatePlan } from './services/geminiService';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import html2pdf from 'html2pdf.js';
 
@@ -22,6 +22,33 @@ export default function App() {
   const [loadingMessage, setLoadingMessage] = useState('Initializing AI Engine...');
   const [error, setError] = useState<string | null>(null);
   const [isCached, setIsCached] = useState(false);
+  const [isBlurred, setIsBlurred] = useState(false);
+
+  useEffect(() => {
+    // Screenshot Deterrents
+    const handleBlur = () => setIsBlurred(true);
+    const handleFocus = () => setIsBlurred(false);
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p')) {
+        e.preventDefault();
+        setIsBlurred(true);
+        setTimeout(() => setIsBlurred(false), 2000);
+      }
+    };
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const loadingMessages = [
     { threshold: 0, message: 'Initializing AI Engine...' },
@@ -227,7 +254,19 @@ export default function App() {
   };
 
   return (
-    <div className="bg-zinc-950 min-h-[100dvh] text-zinc-100 font-sans selection:bg-neon selection:text-black overflow-x-hidden">
+    <div className={`bg-zinc-950 min-h-[100dvh] text-zinc-100 font-sans selection:bg-neon selection:text-black overflow-x-hidden transition-all duration-500 protect-content ${isBlurred ? 'blur-2xl grayscale' : ''}`}>
+      {isBlurred && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-3xl p-6 text-center">
+          <div className="space-y-4 max-w-md">
+            <div className="w-20 h-20 bg-neon/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ShieldAlert className="w-10 h-10 text-neon" />
+            </div>
+            <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">Content Protected</h2>
+            <p className="text-zinc-400 font-bold">Screenshots and external capture are restricted to protect your personalized protocol.</p>
+            <p className="text-neon text-[10px] uppercase font-black tracking-widest pt-4">Return to app to resume</p>
+          </div>
+        </div>
+      )}
       <AnimatePresence mode="wait">
         {appState === 'landing' && (
           <motion.div
