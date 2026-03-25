@@ -8,9 +8,11 @@ import { db } from '../firebase';
 
 interface LandingPageProps {
   onStart: () => void;
+  onShowTerms: () => void;
+  onShowPrivacy: () => void;
 }
 
-export default function LandingPage({ onStart }: LandingPageProps) {
+export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: LandingPageProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState({ totalCount: 0, averageRating: 0 });
   const [totalPlans, setTotalPlans] = useState<number>(0);
@@ -599,6 +601,20 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             <p className="text-zinc-700 text-xs font-black uppercase tracking-[0.2em]">
               © 2026 fitin60.ai. Engineered for Excellence.
             </p>
+            <div className="flex gap-4">
+              <button 
+                onClick={onShowTerms}
+                className="text-zinc-800 hover:text-neon text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
+              >
+                Terms & Conditions
+              </button>
+              <button 
+                onClick={onShowPrivacy}
+                className="text-zinc-800 hover:text-neon text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
+              >
+                Privacy Policy
+              </button>
+            </div>
           </div>
         </footer>
       </div>

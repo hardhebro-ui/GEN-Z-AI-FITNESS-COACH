@@ -4,13 +4,16 @@ import MultiStepForm from './components/MultiStepForm';
 import PlanPreview from './components/PlanPreview';
 import ExportModal from './components/ExportModal';
 import ReviewPrompt from './components/ReviewPrompt';
+import TermsPage from './components/TermsPage';
+import PrivacyPage from './components/PrivacyPage';
+import CookieConsent from './components/CookieConsent';
 import { UserInputs, GeneratedPlan } from './types';
 import { generatePlan } from './services/geminiService';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import html2pdf from 'html2pdf.js';
 
-type AppState = 'landing' | 'form' | 'generating' | 'preview';
+type AppState = 'landing' | 'form' | 'generating' | 'preview' | 'terms' | 'privacy';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('landing');
@@ -23,6 +26,10 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [isCached, setIsCached] = useState(false);
   const [isBlurred, setIsBlurred] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [appState]);
 
   useEffect(() => {
     // Screenshot Deterrents
@@ -276,7 +283,35 @@ export default function App() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <LandingPage onStart={handleStart} />
+            <LandingPage 
+              onStart={handleStart} 
+              onShowTerms={() => setAppState('terms')} 
+              onShowPrivacy={() => setAppState('privacy')}
+            />
+          </motion.div>
+        )}
+
+        {appState === 'terms' && (
+          <motion.div
+            key="terms"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <TermsPage onBack={() => setAppState('landing')} />
+          </motion.div>
+        )}
+
+        {appState === 'privacy' && (
+          <motion.div
+            key="privacy"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <PrivacyPage onBack={() => setAppState('landing')} />
           </motion.div>
         )}
         
@@ -294,7 +329,10 @@ export default function App() {
                 {error}
               </div>
             )}
-            <MultiStepForm onSubmit={handleFormSubmit} />
+            <MultiStepForm 
+              onSubmit={handleFormSubmit} 
+              onShowTerms={() => setAppState('terms')}
+            />
           </motion.div>
         )}
         
@@ -372,6 +410,8 @@ export default function App() {
         onClose={() => setIsReviewPromptOpen(false)} 
         onSubmit={handleReviewSubmit} 
       />
+
+      <CookieConsent onShowPolicy={() => setAppState('cookies')} />
     </div>
   );
 }

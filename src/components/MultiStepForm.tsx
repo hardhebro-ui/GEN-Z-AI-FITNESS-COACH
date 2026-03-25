@@ -5,6 +5,7 @@ import { ArrowRight, ArrowLeft, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 interface MultiStepFormProps {
   onSubmit: (data: UserInputs) => void;
+  onShowTerms: () => void;
 }
 
 const initialData: UserInputs = {
@@ -45,10 +46,11 @@ const initialData: UserInputs = {
   pastInjuries: ''
 };
 
-export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
+export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormProps) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(0);
   const [data, setData] = useState<UserInputs>(initialData);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -899,10 +901,28 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
               </div>
             </div>
 
-            <div className="p-6 rounded-3xl bg-neon/5 border border-neon/20">
+            <div className="p-6 rounded-3xl bg-neon/5 border border-neon/20 space-y-4">
               <p className="text-xs text-zinc-400 font-medium leading-relaxed">
                 By clicking <span className="text-neon font-bold">Generate My Plan</span>, our AI will analyze your profile and create a personalized workout and nutrition strategy tailored specifically for your goals and lifestyle.
               </p>
+              
+              <label className="flex items-start gap-4 cursor-pointer group">
+                <div className="relative flex items-center mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <div className="w-6 h-6 border-2 border-white/10 rounded-lg bg-zinc-900 transition-all peer-checked:border-neon peer-checked:bg-neon group-hover:border-white/20" />
+                  <CheckCircle2 
+                    className={`absolute inset-0 w-6 h-6 text-black transition-all scale-50 opacity-0 ${termsAccepted ? 'scale-75 opacity-100' : ''}`}
+                  />
+                </div>
+                <span className="text-[11px] text-zinc-500 font-bold leading-relaxed select-none">
+                  I agree to the <button onClick={onShowTerms} className="text-neon hover:underline">Terms & Conditions</button> and acknowledge that this plan is for informational purposes only and <span className="text-white">not medical advice</span>.
+                </span>
+              </label>
             </div>
           </div>
         );
@@ -978,7 +998,8 @@ export default function MultiStepForm({ onSubmit }: MultiStepFormProps) {
           ) : (
             <button
               onClick={() => onSubmit({ ...data, bmi: calculateBMI() ? parseFloat(calculateBMI()!.value) : undefined })}
-              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-neon text-black font-black text-xl rounded-2xl md:rounded-3xl hover:shadow-[0_0_40px_rgba(204,255,0,0.4)] transition-all active:scale-[0.95] shadow-lg font-display uppercase italic"
+              disabled={!termsAccepted}
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-neon text-black font-black text-xl rounded-2xl md:rounded-3xl hover:shadow-[0_0_40px_rgba(204,255,0,0.4)] transition-all active:scale-[0.95] shadow-lg font-display uppercase italic disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Generate Plan
               <CheckCircle2 className="w-6 h-6" />
