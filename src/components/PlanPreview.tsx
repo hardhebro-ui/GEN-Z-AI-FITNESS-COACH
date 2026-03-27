@@ -18,7 +18,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
   return (
     <div className="min-h-[100dvh] bg-zinc-950 text-white flex flex-col font-sans overflow-hidden">
       {/* Hidden Printable A4 Layout for PDF Export */}
-      <div className="overflow-hidden h-0 w-0 absolute opacity-0 pointer-events-none">
+      <div className="absolute left-[-9999px] top-0 pointer-events-none">
         <div id="pdf-content-light" className="w-[800px] bg-white text-zinc-900 p-0 font-sans relative">
           
           {/* PAGE 1: COVER PAGE */}
