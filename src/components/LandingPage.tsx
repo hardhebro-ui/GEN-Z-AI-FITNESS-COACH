@@ -22,7 +22,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
   const [scrolled, setScrolled] = useState(false);
 
   const upiId = "sarjil1432-1@okhdfcbank"; // Replace with actual UPI ID
-  const payeeName = "fitin60.ai";
+  const payeeName = "fitin60ai.in";
 
   const finalAmount = donationAmount || (customAmount ? parseFloat(customAmount) : 0);
   const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${finalAmount}&cu=INR`;
@@ -130,7 +130,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
               <div className="w-8 h-8 bg-neon rounded-lg flex items-center justify-center">
                 <Activity className="w-5 h-5 text-black" />
               </div>
-              <span className="font-black uppercase italic tracking-tighter text-sm">fitin60<span className="text-neon">.ai</span></span>
+              <span className="font-black uppercase italic tracking-tighter text-sm">fitin60ai<span className="text-neon">.in</span></span>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
@@ -179,7 +179,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
           <p className="text-neon text-[10px] md:text-xs font-black uppercase tracking-[0.4em] mb-4 font-display italic">Your AI Fitness Coach</p>
           <h1 className="text-5xl md:text-9xl font-black tracking-tighter leading-[0.9] mb-6 font-display uppercase italic">
             <span className="text-neon drop-shadow-[0_0_30px_rgba(204,255,0,0.4)]">
-              fitin60.ai
+              fitin60ai.in
             </span>
           </h1>
           
@@ -608,7 +608,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
               </div>
             </div>
             <div className="flex gap-6">
-              <a href="https://instagram.com/fitin60.ai" target="_blank" rel="noopener noreferrer" className="text-zinc-800 hover:text-neon transition-colors">
+              <a href="https://instagram.com/fitin60ai.in" target="_blank" rel="noopener noreferrer" className="text-zinc-800 hover:text-neon transition-colors">
                 <Instagram className="w-6 h-6" />
               </a>
               <Activity className="w-6 h-6 text-zinc-800" />
@@ -616,7 +616,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
               <Flame className="w-6 h-6 text-zinc-800" />
             </div>
             <p className="text-zinc-700 text-xs font-black uppercase tracking-[0.2em]">
-              © 2026 fitin60.ai. Engineered for Excellence.
+              © 2026 fitin60ai.in. Engineered for Excellence.
             </p>
             <div className="flex gap-4">
               <button 

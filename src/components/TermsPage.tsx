@@ -72,7 +72,7 @@ export default function TermsPage({ onBack }: TermsPageProps) {
                 <span className="text-neon">01.</span> Introduction
               </h2>
               <p className="text-zinc-400 leading-relaxed font-medium">
-                fitin60.ai is an AI-powered fitness plan generator designed to provide educational workout and diet templates. By using this service, you agree to these terms in full.
+                fitin60ai.in is an AI-powered fitness plan generator designed to provide educational workout and diet templates. By using this service, you agree to these terms in full.
               </p>
             </section>
 
@@ -82,7 +82,7 @@ export default function TermsPage({ onBack }: TermsPageProps) {
               </h2>
               <div className="p-8 bg-red-500/5 rounded-3xl border border-red-500/10 space-y-6">
                 <p className="text-zinc-300 leading-relaxed font-bold text-lg italic">
-                  "fitin60.ai does not provide medical advice. We are not a substitute for professional consultation with a doctor or certified trainer."
+                  "fitin60ai.in does not provide medical advice. We are not a substitute for professional consultation with a doctor or certified trainer."
                 </p>
                 <ul className="space-y-4">
                   <li className="flex gap-4 text-zinc-400 font-medium">
@@ -111,7 +111,7 @@ export default function TermsPage({ onBack }: TermsPageProps) {
                 <span className="text-neon">03.</span> Limitation of Liability
               </h2>
               <p className="text-zinc-400 leading-relaxed font-medium">
-                fitin60.ai and its creators are not responsible or liable for any injuries, health complications, or diet-related issues (including allergies or intolerances) resulting from the use or misuse of our generated plans.
+                fitin60ai.in and its creators are not responsible or liable for any injuries, health complications, or diet-related issues (including allergies or intolerances) resulting from the use or misuse of our generated plans.
               </p>
             </section>
 
@@ -129,7 +129,7 @@ export default function TermsPage({ onBack }: TermsPageProps) {
                 <span className="text-neon">05.</span> Acceptable Use
               </h2>
               <p className="text-zinc-400 leading-relaxed font-medium">
-                You agree to use fitin60.ai for personal, non-commercial purposes only. You may not attempt to scrape our data or reverse-engineer our AI engine.
+                You agree to use fitin60ai.in for personal, non-commercial purposes only. You may not attempt to scrape our data or reverse-engineer our AI engine.
               </p>
             </section>
 
@@ -146,7 +146,7 @@ export default function TermsPage({ onBack }: TermsPageProps) {
               <div className="flex items-center gap-4 p-6 bg-zinc-900/30 rounded-3xl border border-white/5">
                 <Info className="w-6 h-6 text-neon shrink-0" />
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 leading-relaxed">
-                  By using fitin60.ai, you confirm that you have read, understood, and agreed to these terms. Your safety is your responsibility.
+                  By using fitin60ai.in, you confirm that you have read, understood, and agreed to these terms. Your safety is your responsibility.
                 </p>
               </div>
             </div>

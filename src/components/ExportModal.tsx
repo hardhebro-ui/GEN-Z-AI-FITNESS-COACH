@@ -24,8 +24,8 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const upiId = "sarjil1432-1@okhdfcbank"; // Replace with your actual UPI ID
-  const upiName = "fitin60.ai";
-  const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`;
+  const upiName = "fitin60ai.in";
+  const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`;
 
   const handleDonate = () => {
     setShowUpi(true);
@@ -62,7 +62,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
           height: 1080
         });
         const link = document.createElement('a');
-        link.download = `fitin60-ai-${userName.toLowerCase()}.png`;
+        link.download = `fitin60ai-in-${userName.toLowerCase()}.png`;
         link.href = dataUrl;
         link.click();
         setHasShared(true);
@@ -90,7 +90,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
         
         const res = await fetch(dataUrl);
         const blob = await res.blob();
-        const file = new File([blob], 'fitin60-ai.png', { type: 'image/png' });
+        const file = new File([blob], 'fitin60ai-in.png', { type: 'image/png' });
         
         const shareText = `I just generated my personalized AI Fitness & Diet plan! 💪 Get yours for free in 60 seconds at: ${window.location.origin}`;
 
@@ -98,7 +98,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
           try {
             await navigator.share({
               files: [file],
-              title: 'fitin60.ai',
+              title: 'fitin60ai.in',
               text: shareText,
             });
             setHasShared(true);
@@ -234,7 +234,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                     <div className="space-y-6">
                       <div className="grid grid-cols-2 gap-3">
                         <a
-                          href={`intent://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`}
+                          href={`tez://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`}
                           className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-white/5 rounded-2xl hover:border-neon/30 transition-all active:scale-95"
                         >
                           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-2">
@@ -243,7 +243,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Google Pay</span>
                         </a>
                         <a
-                          href={`phonepe://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`}
+                          href={`phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`}
                           className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-white/5 rounded-2xl hover:border-neon/30 transition-all active:scale-95"
                         >
                           <div className="w-10 h-10 bg-[#5f259f] rounded-full flex items-center justify-center p-2">
@@ -252,7 +252,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">PhonePe</span>
                         </a>
                         <a
-                          href={`paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`}
+                          href={`paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`}
                           className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-white/5 rounded-2xl hover:border-neon/30 transition-all active:scale-95"
                         >
                           <div className="w-10 h-10 bg-[#00baf2] rounded-full flex items-center justify-center p-2">
@@ -338,7 +338,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <Dumbbell className="w-12 h-12 text-black" />
                         </div>
                         <div>
-                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">fitin60.ai</h2>
+                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">fitin60ai.in</h2>
                           <p className="text-neon font-bold text-lg uppercase tracking-[0.3em] mt-1">AI Fitness Engine</p>
                         </div>
                       </div>
@@ -354,7 +354,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                       </div>
                       <h1 className="text-[140px] font-black tracking-tighter leading-[0.85] uppercase italic text-white">
                         I GOT MY<br />
-                        <span className="text-neon">FITIN60.AI</span><br />
+                        <span className="text-neon">FITIN60AI.IN</span><br />
                         PLAN
                       </h1>
                       <div className="flex items-center justify-center gap-8 pt-8">
@@ -374,7 +374,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <p className="text-3xl font-black text-white">{window.location.origin.replace('https://', '')}</p>
                         </div>
                         <div className="flex gap-4">
-                          <div className="px-6 py-3 bg-zinc-900 rounded-xl border border-white/5 text-xs font-black uppercase tracking-widest text-zinc-400">#fitin60ai</div>
+                          <div className="px-6 py-3 bg-zinc-900 rounded-xl border border-white/5 text-xs font-black uppercase tracking-widest text-zinc-400">#fitin60aiin</div>
                           <div className="px-6 py-3 bg-zinc-900 rounded-xl border border-white/5 text-xs font-black uppercase tracking-widest text-zinc-400">#AIFitness</div>
                         </div>
                       </div>
