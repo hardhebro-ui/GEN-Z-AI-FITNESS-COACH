@@ -68,17 +68,12 @@
     @apply bg-zinc-900/40 border border-white/5 rounded-3xl p-6 backdrop-blur-sm shadow-2xl;
   }
 
-  /* Screenshot & Print Protection */
-  @media print {
-    body {
-      display: none !important;
-    }
-  }
-
-  .protect-content {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+  .bg-carbon {
+    background-color: #09090b;
+    background-image: 
+      linear-gradient(45deg, #18181b 25%, transparent 25%, transparent 75%, #18181b 75%, #18181b), 
+      linear-gradient(45deg, #18181b 25%, transparent 25%, transparent 75%, #18181b 75%, #18181b);
+    background-size: 10px 10px;
+    background-position: 0 0, 5px 5px;
   }
 }

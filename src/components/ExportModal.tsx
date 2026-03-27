@@ -327,7 +327,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                   <div ref={shareCardRef} className="w-[1080px] h-[1080px] bg-zinc-950 text-white flex flex-col items-center justify-between p-24 relative font-sans overflow-hidden">
                     {/* Background Elements */}
                     <div className="absolute inset-0 bg-gradient-to-br from-neon/10 via-zinc-950 to-zinc-950" />
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+                    <div className="absolute inset-0 bg-carbon opacity-20" />
                     <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-neon/10 blur-[150px] rounded-full" />
                     <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-neon/5 blur-[150px] rounded-full" />
                     

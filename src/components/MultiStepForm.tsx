@@ -952,7 +952,7 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
       {/* Main Content Area - Scrollable */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-10 md:px-8 md:py-12 pb-48 custom-scrollbar"
+        className="flex-1 overflow-y-auto px-4 pt-10 pb-72 md:px-8 md:pt-12 md:pb-96 custom-scrollbar"
       >
         <div className="max-w-2xl mx-auto">
           <AnimatePresence mode="wait" custom={direction}>

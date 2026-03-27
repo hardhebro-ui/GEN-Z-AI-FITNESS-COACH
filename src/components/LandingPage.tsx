@@ -116,7 +116,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
   };
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 text-white relative overflow-x-hidden font-sans flex flex-col custom-scrollbar">
+    <div className="min-h-[100dvh] bg-zinc-950 text-white relative overflow-x-hidden font-sans flex flex-col custom-scrollbar pb-48 md:pb-0">
       {/* Sticky Top Header (Appears on Scroll) */}
       <AnimatePresence>
         {scrolled && (

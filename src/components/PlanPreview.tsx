@@ -23,7 +23,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
           
           {/* PAGE 1: COVER PAGE */}
           <div className="h-[1120px] flex flex-col items-center justify-center relative overflow-hidden bg-zinc-950 text-white p-20 text-center">
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+            <div className="absolute inset-0 bg-carbon opacity-20" />
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon/20 blur-[120px] rounded-full" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-neon/10 blur-[120px] rounded-full" />
             
@@ -320,7 +320,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
 
           {/* PAGE 5: FOOTER & QR */}
           <div className="h-[1120px] p-20 bg-zinc-950 text-white flex flex-col items-center justify-center text-center break-before-page relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+            <div className="absolute inset-0 bg-carbon opacity-10" />
             
             <div className="relative z-10 space-y-12">
               <div className="space-y-4">
@@ -345,7 +345,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-12 pb-48 md:px-12 md:pt-20 custom-scrollbar relative">
+      <div className="flex-1 overflow-y-auto px-6 pt-12 pb-72 md:px-12 md:pt-20 md:pb-96 custom-scrollbar relative">
         <div className="max-w-4xl mx-auto space-y-12 relative" ref={contentRef} id="pdf-content">
         {/* Watermark */}
         <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-[0.02] z-0 overflow-hidden">
