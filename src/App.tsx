@@ -167,7 +167,7 @@ export default function App() {
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
 
       html2canvas: {
-        scale: window.innerWidth < 768 ? 1.5 : 2,
+        scale: 2,
         useCORS: true,
         windowWidth: 800,
         logging: true,
@@ -176,14 +176,13 @@ export default function App() {
           const isUnsupported = (val: string) =>
             val && /(oklch|oklab|color-mix)/i.test(val);
 
-          const target = clonedDoc.getElementById('pdf-content-light');
-          if (!target) return;
-
           // ✅ FIX 1: Clean all <style> tags in the cloned document aggressively
           clonedDoc.querySelectorAll('style').forEach((style) => {
             if (style.textContent) {
+              // More aggressive replacement for style tags to handle nested functions
               let content = style.textContent;
               let prevContent;
+              // Loop to handle nested color-mix or other functions
               do {
                 prevContent = content;
                 content = content
@@ -199,15 +198,29 @@ export default function App() {
           // ✅ FIX 2: Force override ONLY unsupported computed styles safely in the cloned document
           const view = clonedDoc.defaultView!;
           const colorProps = [
-            'color', 'background-color', 'border-top-color', 'border-right-color',
-            'border-bottom-color', 'border-left-color', 'fill', 'stroke',
-            'stop-color', 'flood-color', 'lighting-color', 'outline-color',
-            'text-decoration-color', 'box-shadow', 'background-image', 'caret-color',
-            'column-rule-color', 'border-color', 'outline', 'text-shadow'
+            'color',
+            'background-color',
+            'border-top-color',
+            'border-right-color',
+            'border-bottom-color',
+            'border-left-color',
+            'fill',
+            'stroke',
+            'stop-color',
+            'flood-color',
+            'lighting-color',
+            'outline-color',
+            'text-decoration-color',
+            'box-shadow',
+            'background-image',
+            'caret-color',
+            'column-rule-color',
+            'border-color',
+            'outline',
+            'text-shadow'
           ];
 
-          // Only iterate over elements within the target to save performance on mobile
-          target.querySelectorAll('*').forEach((node) => {
+          clonedDoc.querySelectorAll('*').forEach((node) => {
             if (!(node instanceof HTMLElement || node instanceof SVGElement)) return;
 
             const style = view.getComputedStyle(node);
@@ -218,7 +231,8 @@ export default function App() {
                 if (prop === 'background-image' || prop === 'box-shadow' || prop === 'text-shadow') {
                   node.style.setProperty(prop, 'none', 'important');
                 } else {
-                  let fallback = '#111111';
+                  // Fallback colors based on property type
+                  let fallback = '#111111'; // Default dark for text/icons
                   if (prop === 'background-color') fallback = '#ffffff';
                   if (prop.includes('border') || prop === 'outline-color' || prop === 'column-rule-color' || prop === 'outline') fallback = '#cccccc';
                   if (prop === 'stop-color' || prop === 'flood-color' || prop === 'lighting-color') fallback = '#111111';
@@ -228,6 +242,7 @@ export default function App() {
               }
             });
 
+            // Handle SVG attributes directly if they are not caught by computed style
             if (node instanceof SVGElement) {
               ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color'].forEach(attr => {
                 const val = node.getAttribute(attr);
@@ -237,6 +252,7 @@ export default function App() {
               });
             }
 
+            // Also check inline styles specifically
             const inlineStyle = (node as any).style;
             if (inlineStyle) {
               for (let i = 0; i < inlineStyle.length; i++) {
@@ -246,9 +262,11 @@ export default function App() {
                   if (propName === 'background-image' || propName === 'box-shadow' || propName === 'text-shadow') {
                     inlineStyle.setProperty(propName, 'none', 'important');
                   } else {
+                    // Use same fallback logic for inline styles
                     let fallback = '#111111';
                     if (propName === 'background-color') fallback = '#ffffff';
                     if (propName.includes('border') || propName === 'outline-color' || propName === 'column-rule-color') fallback = '#cccccc';
+                    
                     inlineStyle.setProperty(propName, fallback, 'important');
                   }
                 }
@@ -257,21 +275,14 @@ export default function App() {
           });
 
           // ✅ FIX 3: Ensure element is visible for rendering
-          target.style.setProperty('position', 'static', 'important');
-          target.style.setProperty('opacity', '1', 'important');
-          target.style.setProperty('width', '800px', 'important');
-          target.style.setProperty('height', 'auto', 'important');
-          target.style.setProperty('overflow', 'visible', 'important');
-          target.style.setProperty('display', 'block', 'important');
-          
-          // Also ensure parent is visible in the clone
-          if (target.parentElement) {
-            target.parentElement.style.setProperty('position', 'static', 'important');
-            target.parentElement.style.setProperty('opacity', '1', 'important');
-            target.parentElement.style.setProperty('width', '800px', 'important');
-            target.parentElement.style.setProperty('height', 'auto', 'important');
-            target.parentElement.style.setProperty('display', 'block', 'important');
-            target.parentElement.style.setProperty('left', '0', 'important');
+          const clonedElement = clonedDoc.getElementById('pdf-content-light');
+          if (clonedElement) {
+            clonedElement.style.setProperty('position', 'static', 'important');
+            clonedElement.style.setProperty('opacity', '1', 'important');
+            clonedElement.style.setProperty('width', '800px', 'important');
+            clonedElement.style.setProperty('height', 'auto', 'important');
+            clonedElement.style.setProperty('overflow', 'visible', 'important');
+            clonedElement.style.setProperty('display', 'block', 'important');
           }
         },
       },
