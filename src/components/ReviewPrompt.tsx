@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, CheckCircle2, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -10,15 +10,26 @@ interface ReviewPromptProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (rating: number, text: string, name: string) => void;
+  initialName?: string;
 }
 
-export default function ReviewPrompt({ isOpen, onClose, onSubmit }: ReviewPromptProps) {
+export default function ReviewPrompt({ isOpen, onClose, onSubmit, initialName = '' }: ReviewPromptProps) {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [text, setText] = useState('');
-  const [name, setName] = useState('');
+  const [name, setName] = useState(initialName);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setName(initialName);
+      setRating(0);
+      setText('');
+      setSelectedTags([]);
+      setSubmitted(false);
+    }
+  }, [isOpen, initialName]);
 
   const availableTags = [
     "Great for beginners",

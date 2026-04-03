@@ -16,8 +16,8 @@ export default defineConfig(({mode}) => {
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB
         },
         manifest: {
-          name: 'fitin60ai.in',
-          short_name: 'fitin60ai.in',
+          name: 'fitin60.ai',
+          short_name: 'fitin60.ai',
           description: 'Generate a highly personalized workout and diet plan in 60 seconds.',
           theme_color: '#10b981',
           background_color: '#09090b',

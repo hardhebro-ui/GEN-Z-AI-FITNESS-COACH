@@ -9,9 +9,9 @@ import PrivacyPage from './components/PrivacyPage';
 import CookieConsent from './components/CookieConsent';
 import { UserInputs, GeneratedPlan } from './types';
 import { generatePlan } from './services/geminiService';
+import { generateProgrammaticPDF } from './services/pdfService';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import html2pdf from 'html2pdf.js';
 
 type AppState = 'landing' | 'form' | 'generating' | 'preview' | 'terms' | 'privacy';
 
@@ -25,6 +25,7 @@ export default function App() {
   const [loadingMessage, setLoadingMessage] = useState('Initializing AI Engine...');
   const [error, setError] = useState<string | null>(null);
   const [isCached, setIsCached] = useState(false);
+  const [exportUserName, setExportUserName] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -154,155 +155,24 @@ export default function App() {
     setIsExportModalOpen(true);
   };
 
-  const handleUnlock = async () => {
+  const handleUnlock = async (name: string) => {
+    setExportUserName(name);
     setIsExportModalOpen(false);
+    generatePDF();
+  };
 
-    const element = document.getElementById('pdf-content-light');
-    if (!element) return;
-
-    const opt = {
-      margin: 0,
-      filename: 'my-fitness-plan.pdf',
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        windowWidth: 800,
-        logging: true,
-
-        onclone: (clonedDoc: Document) => {
-          const isUnsupported = (val: string) =>
-            val && /(oklch|oklab|color-mix)/i.test(val);
-
-          // ✅ FIX 1: Clean all <style> tags in the cloned document aggressively
-          clonedDoc.querySelectorAll('style').forEach((style) => {
-            if (style.textContent) {
-              // More aggressive replacement for style tags to handle nested functions
-              let content = style.textContent;
-              let prevContent;
-              // Loop to handle nested color-mix or other functions
-              do {
-                prevContent = content;
-                content = content
-                  .replace(/oklch\([^)]+\)/gi, '#111')
-                  .replace(/oklab\([^)]+\)/gi, '#111')
-                  .replace(/color-mix\([^)]+\)/gi, '#111')
-                  .replace(/in\s+(oklch|oklab|srgb|xyz|xyz-d50|xyz-d65)/gi, '');
-              } while (content !== prevContent);
-              style.textContent = content;
-            }
-          });
-
-          // ✅ FIX 2: Force override ONLY unsupported computed styles safely in the cloned document
-          const view = clonedDoc.defaultView!;
-          const colorProps = [
-            'color',
-            'background-color',
-            'border-top-color',
-            'border-right-color',
-            'border-bottom-color',
-            'border-left-color',
-            'fill',
-            'stroke',
-            'stop-color',
-            'flood-color',
-            'lighting-color',
-            'outline-color',
-            'text-decoration-color',
-            'box-shadow',
-            'background-image',
-            'caret-color',
-            'column-rule-color',
-            'border-color',
-            'outline',
-            'text-shadow'
-          ];
-
-          clonedDoc.querySelectorAll('*').forEach((node) => {
-            if (!(node instanceof HTMLElement || node instanceof SVGElement)) return;
-
-            const style = view.getComputedStyle(node);
-            
-            colorProps.forEach(prop => {
-              const val = style.getPropertyValue(prop);
-              if (isUnsupported(val)) {
-                if (prop === 'background-image' || prop === 'box-shadow' || prop === 'text-shadow') {
-                  node.style.setProperty(prop, 'none', 'important');
-                } else {
-                  // Fallback colors based on property type
-                  let fallback = '#111111'; // Default dark for text/icons
-                  if (prop === 'background-color') fallback = '#ffffff';
-                  if (prop.includes('border') || prop === 'outline-color' || prop === 'column-rule-color' || prop === 'outline') fallback = '#cccccc';
-                  if (prop === 'stop-color' || prop === 'flood-color' || prop === 'lighting-color') fallback = '#111111';
-                  
-                  node.style.setProperty(prop, fallback, 'important');
-                }
-              }
-            });
-
-            // Handle SVG attributes directly if they are not caught by computed style
-            if (node instanceof SVGElement) {
-              ['fill', 'stroke', 'stop-color', 'flood-color', 'lighting-color'].forEach(attr => {
-                const val = node.getAttribute(attr);
-                if (isUnsupported(val || '')) {
-                  node.setAttribute(attr, '#111111');
-                }
-              });
-            }
-
-            // Also check inline styles specifically
-            const inlineStyle = (node as any).style;
-            if (inlineStyle) {
-              for (let i = 0; i < inlineStyle.length; i++) {
-                const propName = inlineStyle[i];
-                const propValue = inlineStyle.getPropertyValue(propName);
-                if (isUnsupported(propValue)) {
-                  if (propName === 'background-image' || propName === 'box-shadow' || propName === 'text-shadow') {
-                    inlineStyle.setProperty(propName, 'none', 'important');
-                  } else {
-                    // Use same fallback logic for inline styles
-                    let fallback = '#111111';
-                    if (propName === 'background-color') fallback = '#ffffff';
-                    if (propName.includes('border') || propName === 'outline-color' || propName === 'column-rule-color') fallback = '#cccccc';
-                    
-                    inlineStyle.setProperty(propName, fallback, 'important');
-                  }
-                }
-              }
-            }
-          });
-
-          // ✅ FIX 3: Ensure element is visible for rendering
-          const clonedElement = clonedDoc.getElementById('pdf-content-light');
-          if (clonedElement) {
-            clonedElement.style.setProperty('position', 'static', 'important');
-            clonedElement.style.setProperty('opacity', '1', 'important');
-            clonedElement.style.setProperty('width', '800px', 'important');
-            clonedElement.style.setProperty('height', 'auto', 'important');
-            clonedElement.style.setProperty('overflow', 'visible', 'important');
-            clonedElement.style.setProperty('display', 'block', 'important');
-          }
-        },
-      },
-
-      jsPDF: {
-        unit: 'mm' as const,
-        format: 'a4',
-        orientation: 'portrait' as const,
-      },
-    };
+  const generatePDF = async () => {
+    if (!plan || !userInputs) return;
 
     try {
-      await html2pdf().set(opt).from(element).save();
+      await generateProgrammaticPDF(plan, userInputs, exportUserName);
 
       setTimeout(() => {
         setIsReviewPromptOpen(true);
       }, 1000);
     } catch (err) {
       console.error('PDF generation failed:', err);
-      alert('Failed to generate PDF. Please try again.');
+      setError('Failed to generate PDF. Please try again.');
     }
   };
 
@@ -427,8 +297,25 @@ export default function App() {
             className="bg-zinc-950 min-h-[100dvh]"
           >
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 m-6 rounded-2xl text-center font-medium fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
-                {error}
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 m-6 rounded-2xl text-center font-medium fixed top-0 left-0 right-0 z-50 backdrop-blur-md flex flex-col items-center gap-3">
+                <p>{error}</p>
+                <div className="flex gap-4">
+                  <button 
+                    onClick={() => {
+                      setError(null);
+                      generatePDF();
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-all"
+                  >
+                    Retry Generation
+                  </button>
+                  <button 
+                    onClick={() => setError(null)}
+                    className="px-4 py-2 bg-zinc-800 text-zinc-400 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-zinc-700 transition-all"
+                  >
+                    Dismiss
+                  </button>
+                </div>
               </div>
             )}
             <PlanPreview 
@@ -451,6 +338,7 @@ export default function App() {
         isOpen={isReviewPromptOpen} 
         onClose={() => setIsReviewPromptOpen(false)} 
         onSubmit={handleReviewSubmit} 
+        initialName={exportUserName}
       />
 
       <CookieConsent onShowPolicy={() => setAppState('cookies')} />

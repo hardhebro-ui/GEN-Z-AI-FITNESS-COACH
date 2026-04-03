@@ -41,6 +41,7 @@ export interface WorkoutPlan {
   weeklySplit: {
     day: string;
     focus: string;
+    dayPurpose: string;
     exercises: {
       name: string;
       setsReps: string;
@@ -58,17 +59,23 @@ export interface DietPlan {
     carbs: string;
     fats: string;
   };
-  meals: {
-    name: string;
-    options: string[];
-    alternatives: string;
+  weeklySchedule: {
+    day: string;
+    meals: {
+      name: string;
+      options: string[];
+      alternatives: string;
+    }[];
   }[];
 }
 
 export interface GeneratedPlan {
+  personalizedSummary: string;
   workout: WorkoutPlan;
   diet: DietPlan;
   safetyNotes: string[];
+  coachingTips: string[];
+  dietStrategyTips: string[];
 }
 
 export interface Review {

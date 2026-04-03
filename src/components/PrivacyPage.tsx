@@ -100,7 +100,7 @@ export default function PrivacyPage({ onBack }: PrivacyPageProps) {
                 <Cookie className="w-6 h-6 text-neon" /> Cookies & Local Storage
               </h2>
               <p className="text-zinc-400 leading-relaxed font-medium">
-                fitin60ai.in uses cookies and Local Storage strictly to enhance your experience. These technologies allow us to remember your preferences and your generated plans so you don't have to re-enter details on every visit.
+                fitin60.ai uses cookies and Local Storage strictly to enhance your experience. These technologies allow us to remember your preferences and your generated plans so you don't have to re-enter details on every visit.
               </p>
               <ul className="space-y-3 pl-4">
                 <li className="flex items-start gap-3 text-sm text-zinc-400 font-bold">

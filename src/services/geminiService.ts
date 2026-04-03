@@ -125,51 +125,51 @@ export async function generatePlan(inputs: UserInputs): Promise<{ plan: Generate
   // 2. Generate new plan if not found
   const ai = getAiInstance();
   const prompt = `
-    You are an elite AI Fitness & Nutrition Coach. Your goal is to generate a highly personalized, realistic, and SAFE workout and diet plan based on the following user details:
+    You are a professional, motivating, and practical AI Fitness & Nutrition Coach. Your goal is to generate a clean, highly personalized fitness and nutrition plan that feels like a premium report created by a human expert.
+
+    USER PROFILE:
     - Age: ${inputs.age}
     - Gender: ${inputs.gender}
     - Height: ${inputs.height} ${inputs.heightUnit}
     - Weight: ${inputs.weight} ${inputs.weightUnit}
     - Goal Weight: ${inputs.goalWeight ? `${inputs.goalWeight} ${inputs.weightUnit}` : 'Not specified'}
-    - Body Fat Estimate: ${inputs.bodyFatEstimate || 'Not specified'}
-    - BMI: ${inputs.bmi || 'Not calculated'}
     - Body Type: ${inputs.bodyType}
     - Fitness Level: ${inputs.fitnessLevel}
-    - Workout Experience: ${inputs.workoutExperience || 'Not specified'}
     - Primary Goal: ${inputs.primaryGoal}
-    - Goal Priority: ${inputs.goalPriority || 'Not specified'}
     - Target Areas: ${inputs.targetAreas?.join(', ') || 'Full Body'}
     - Plan Duration: ${inputs.planDuration}
     - Workout Location: ${inputs.workoutLocation}
     - Equipment: ${inputs.equipment?.join(', ') || 'None'}
     - Days per week: ${inputs.daysPerWeek}
-    - Time per session: ${inputs.timePerSession}
-    - Preferred Workout Style: ${inputs.preferredWorkoutStyle || 'Not specified'}
-    - Workout Time Preference: ${inputs.workoutTimePreference || 'Not specified'}
     - Diet Type: ${inputs.dietType}
-    - Food Preference Style: ${inputs.foodPreferenceStyle || 'Not specified'}
-    - Protein Preference: ${inputs.proteinPreference || 'Not specified'}
-    - Meals per day: ${inputs.mealsPerDay}
-    - Allergies: ${inputs.allergies || 'None'}
-    - Budget: ${inputs.budget}
     - Activity Level: ${inputs.activityLevel}
-    - Daily Steps: ${inputs.dailySteps || 'Not specified'}
-    - Stress Level: ${inputs.stressLevel || 'Not specified'}
-    - Sleep Hours: ${inputs.sleepHours || 'Not specified'}
-    - Hydration: ${inputs.hydration || 'Not specified'}
-    - Willingness for Rest Days: ${inputs.willingnessForRestDays || 'Not specified'}
     - Medical Conditions: ${inputs.medicalConditions || 'None'}
     - Past Injuries: ${inputs.pastInjuries || 'None'}
 
-    CRITICAL SAFETY & REALISM GUIDELINES:
-    1. If the user has medical conditions or injuries, adapt the plan to be low-impact or avoid affected areas.
-    2. Ensure calorie targets are realistic (not dangerously low).
-    3. Recommendations must be practical for the user's equipment and location.
-    4. Emphasize that this is an AI-generated plan and NOT professional medical advice.
-    5. All exercises must include clear notes on form and safety.
-    6. Include budget-friendly Indian food options if applicable.
+    INSTRUCTIONS:
+    1. **Coach's Insight**: Start with a strong, natural summary (not robotic). Explain exactly why this plan is designed for the user based on their goal, body type, and lifestyle. Avoid generic placeholders.
+    2. **Tone**: Use a real coach's tone—clear, motivating, and practical. Relatable, not robotic.
+    3. **Workout Section**: 
+       - Clean weekly format with clear day names and focus areas.
+       - Each day must have a short one-line "dayPurpose" (e.g., "Focus: Build strength while improving fat burn").
+       - Exercise instructions must be concise (MAX 1 line per note).
+       - Ensure sets, reps, and rest are cleanly specified and aligned.
+       - Prioritize quality over quantity—don't overload exercises.
+       - Provide 1 realistic alternative for each exercise.
+    4. **Diet Plan**:
+       - Generate a **7-day weekly meal schedule** (Monday to Sunday).
+       - For each day, include Breakfast, Lunch, Dinner, and 1–2 Snacks.
+       - Provide 2–3 alternative options per meal to maintain variety.
+       - Use realistic Indian food options tailored to the user's goal, diet type, and budget.
+       - Ensure meals are practical, affordable, and easy to prepare.
+       - Maintain consistency in calorie and macro targets across all days while rotating ingredients to avoid monotony.
+       - Balance protein sources (eggs, chicken, paneer, dal, soy, etc.).
+    5. **Diet Strategy Tips**: Include 2–3 short tips on swapping meals, managing cravings, and staying consistent.
+    6. **Coaching Tips**: Include 2–3 personalized coaching tips specific to the user (e.g., for beginners, ectomorphs, or fat loss cases).
+    7. **Safety**: Include only ONE short, clean safety note at the end. No repetition.
+    8. **Readability**: The output must feel like a premium, easy-to-follow fitness plan that is motivating and actionable.
 
-    Output the response strictly as a JSON object matching the provided schema. No markdown, no extra text.
+    Output the response strictly as a JSON object matching the provided schema.
   `;
 
   let response;
@@ -186,6 +186,7 @@ export async function generatePlan(inputs: UserInputs): Promise<{ plan: Generate
           responseSchema: {
             type: Type.OBJECT,
             properties: {
+              personalizedSummary: { type: Type.STRING, description: "A strong, natural Coach's Insight summary." },
               workout: {
                 type: Type.OBJECT,
                 properties: {
@@ -194,8 +195,9 @@ export async function generatePlan(inputs: UserInputs): Promise<{ plan: Generate
                     items: {
                       type: Type.OBJECT,
                       properties: {
-                        day: { type: Type.STRING, description: "Day number or name (e.g., Day 1, Monday)" },
-                        focus: { type: Type.STRING, description: "Focus of the day (e.g., Upper Body, Rest)" },
+                        day: { type: Type.STRING, description: "Day name (e.g., Monday)" },
+                        focus: { type: Type.STRING, description: "Focus of the day (e.g., Push Day)" },
+                        dayPurpose: { type: Type.STRING, description: "One-line purpose of the day." },
                         exercises: {
                           type: Type.ARRAY,
                           items: {
@@ -205,13 +207,13 @@ export async function generatePlan(inputs: UserInputs): Promise<{ plan: Generate
                               setsReps: { type: Type.STRING },
                               rest: { type: Type.STRING },
                               alternative: { type: Type.STRING },
-                              notes: { type: Type.STRING }
+                              notes: { type: Type.STRING, description: "Max 1 line instruction." }
                             },
                             required: ["name", "setsReps", "rest", "alternative", "notes"]
                           }
                         }
                       },
-                      required: ["day", "focus", "exercises"]
+                      required: ["day", "focus", "dayPurpose", "exercises"]
                     }
                   }
                 },
@@ -230,27 +232,48 @@ export async function generatePlan(inputs: UserInputs): Promise<{ plan: Generate
                     },
                     required: ["protein", "carbs", "fats"]
                   },
-                  meals: {
+                  weeklySchedule: {
                     type: Type.ARRAY,
                     items: {
                       type: Type.OBJECT,
                       properties: {
-                        name: { type: Type.STRING, description: "Meal name (e.g., Breakfast)" },
-                        options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                        alternatives: { type: Type.STRING }
+                        day: { type: Type.STRING, description: "Day name (e.g., Monday)" },
+                        meals: {
+                          type: Type.ARRAY,
+                          items: {
+                            type: Type.OBJECT,
+                            properties: {
+                              name: { type: Type.STRING, description: "Meal name (e.g., Breakfast)" },
+                              options: { type: Type.ARRAY, items: { type: Type.STRING }, description: "2-3 variety options." },
+                              alternatives: { type: Type.STRING, description: "Quick swap tip." }
+                            },
+                            required: ["name", "options", "alternatives"]
+                          }
+                        }
                       },
-                      required: ["name", "options", "alternatives"]
+                      required: ["day", "meals"]
                     }
                   }
                 },
-                required: ["dailyCalories", "macros", "meals"]
+                required: ["dailyCalories", "macros", "weeklySchedule"]
+              },
+              dietStrategyTips: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "2-3 diet strategy tips."
+              },
+              coachingTips: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "2-3 personalized coaching tips."
               },
               safetyNotes: {
                 type: Type.ARRAY,
-                items: { type: Type.STRING }
+                items: { type: Type.STRING },
+                description: "One short, clean safety note."
               }
             },
-            required: ["workout", "diet", "safetyNotes"]
+            required: ["personalizedSummary", "workout", "diet", "dietStrategyTips", "coachingTips", "safetyNotes"]
           }
         }
       });

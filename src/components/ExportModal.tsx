@@ -7,7 +7,7 @@ import { QRCodeSVG } from 'qrcode.react';
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUnlock: () => void;
+  onUnlock: (name: string) => void;
 }
 
 export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalProps) {
@@ -24,7 +24,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const upiId = "sarjil1432-1@okhdfcbank"; // Replace with your actual UPI ID
-  const upiName = "fitin60ai.in";
+  const upiName = "fitin60.ai";
   const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${donationAmount}&cu=INR`;
 
   const handleDonate = () => {
@@ -37,7 +37,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
     // Simulate payment verification
     setTimeout(() => {
       setIsVerifying(false);
-      onUnlock();
+      onUnlock(userName);
     }, 2500);
   };
 
@@ -45,7 +45,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
     setIsVerifyingShare(true);
     setTimeout(() => {
       setIsVerifyingShare(false);
-      onUnlock();
+      onUnlock(userName);
     }, 2000);
   };
 
@@ -62,7 +62,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
           height: 1080
         });
         const link = document.createElement('a');
-        link.download = `fitin60ai-in-${userName.toLowerCase()}.png`;
+        link.download = `fitin60.ai-${userName.toLowerCase()}.png`;
         link.href = dataUrl;
         link.click();
         setHasShared(true);
@@ -90,7 +90,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
         
         const res = await fetch(dataUrl);
         const blob = await res.blob();
-        const file = new File([blob], 'fitin60ai-in.png', { type: 'image/png' });
+        const file = new File([blob], 'fitin60.ai.png', { type: 'image/png' });
         
         const shareText = `I just generated my personalized AI Fitness & Diet plan! 💪 Get yours for free in 60 seconds at: ${window.location.origin}`;
 
@@ -98,7 +98,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
           try {
             await navigator.share({
               files: [file],
-              title: 'fitin60ai.in',
+              title: 'fitin60.ai',
               text: shareText,
             });
             setHasShared(true);
@@ -338,7 +338,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <Dumbbell className="w-12 h-12 text-black" />
                         </div>
                         <div>
-                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">fitin60ai.in</h2>
+                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">fitin60.ai</h2>
                           <p className="text-neon font-bold text-lg uppercase tracking-[0.3em] mt-1">AI Fitness Engine</p>
                         </div>
                       </div>
