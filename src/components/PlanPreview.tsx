@@ -47,7 +47,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-8xl font-black tracking-tighter text-white uppercase italic font-display leading-none"
           >
-            Your <span className="text-neon">fitin60.ai</span> Plan
+            Your <span className="text-neon">Fitin60ai.in</span> Plan
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -60,7 +60,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
         </div>
 
         {/* Personalized Summary */}
-        {plan.personalizedSummary && (
+        {plan?.personalizedSummary && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
               <h2 className="text-xl md:text-2xl font-black uppercase italic tracking-tight">Coach's Brief</h2>
             </div>
             <p className="text-zinc-300 text-lg md:text-xl leading-relaxed font-medium italic">
-              "{plan.personalizedSummary}"
+              "{plan?.personalizedSummary}"
             </p>
           </motion.div>
         )}
@@ -104,7 +104,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
         </div>
 
         {/* Coaching Tips */}
-        {plan.coachingTips && plan.coachingTips.length > 0 && (
+        {plan?.coachingTips && plan.coachingTips.length > 0 && (
           <div className="space-y-8 relative z-10">
             <h2 className="text-2xl md:text-4xl font-black flex items-center gap-4 uppercase italic tracking-tight">
               <span className="w-12 h-12 rounded-full bg-neon/10 text-neon flex items-center justify-center text-lg font-black shrink-0">02</span>
@@ -137,7 +137,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
             Training Protocol
           </h2>
           <div className="space-y-6">
-            {plan.workout?.weeklySplit?.map((day, i) => (
+            {plan?.workout?.weeklySplit?.map((day, i) => (
               <motion.details 
                 key={i} 
                 initial={{ opacity: 0, x: -20 }}
@@ -225,26 +225,26 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
             <div className="p-6 md:p-10 border-b border-white/5 bg-zinc-950/40 flex flex-col md:flex-row md:items-center justify-between gap-8">
               <div>
                 <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-3">Daily Energy Target</p>
-                <p className="text-5xl font-black text-neon italic tracking-tighter">{plan.diet?.dailyCalories} <span className="text-xl text-zinc-500 font-bold uppercase tracking-widest not-italic">kcal</span></p>
+                <p className="text-5xl font-black text-neon italic tracking-tighter">{plan?.diet?.dailyCalories} <span className="text-xl text-zinc-500 font-bold uppercase tracking-widest not-italic">kcal</span></p>
               </div>
               <div className="grid grid-cols-3 gap-3 md:gap-6 w-full md:w-auto">
                 <div className="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 text-center">
                   <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Protein</p>
-                  <p className="font-black text-white text-sm tracking-widest">{plan.diet?.macros?.protein}</p>
+                  <p className="font-black text-white text-sm tracking-widest">{plan?.diet?.macros?.protein}</p>
                 </div>
                 <div className="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 text-center">
                   <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Carbs</p>
-                  <p className="font-black text-white text-sm tracking-widest">{plan.diet?.macros?.carbs}</p>
+                  <p className="font-black text-white text-sm tracking-widest">{plan?.diet?.macros?.carbs}</p>
                 </div>
                 <div className="bg-zinc-900/60 p-4 rounded-2xl border border-white/5 text-center">
                   <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-2">Fats</p>
-                  <p className="font-black text-white text-sm tracking-widest">{plan.diet?.macros?.fats}</p>
+                  <p className="font-black text-white text-sm tracking-widest">{plan?.diet?.macros?.fats}</p>
                 </div>
               </div>
             </div>
 
             {/* Diet Strategy Tips */}
-            {plan.dietStrategyTips && plan.dietStrategyTips.length > 0 && (
+            {plan?.dietStrategyTips && plan.dietStrategyTips.length > 0 && (
               <div className="p-6 md:p-10 border-b border-white/5 bg-zinc-900/20">
                 <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-4">Diet Strategy Tips</p>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -259,7 +259,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
             )}
 
             <div className="p-6 md:p-10 space-y-6">
-              {plan.diet?.weeklySchedule?.map((day, i) => (
+              {plan?.diet?.weeklySchedule?.map((day, i) => (
                 <motion.details 
                   key={i} 
                   initial={{ opacity: 0, y: 10 }}
@@ -316,7 +316,7 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
             </div>
           </div>
           <ul className="grid md:grid-cols-2 gap-6 text-zinc-300 text-sm font-bold list-none">
-            {plan.safetyNotes?.map((note, i) => (
+            {plan?.safetyNotes?.map((note, i) => (
               <li key={i} className="flex items-start gap-4 p-4 bg-zinc-950/40 rounded-2xl border border-white/5">
                 <span className="w-2 h-2 rounded-full bg-neon mt-1.5 shrink-0 shadow-[0_0_10px_rgba(204,255,0,0.5)]" />
                 <span className="leading-relaxed">{note}</span>
@@ -328,13 +328,13 @@ export default function PlanPreview({ plan, inputs, onRegenerate, onExport }: Pl
         {/* Social & Footer */}
         <div className="flex flex-col items-center gap-6 mb-12">
           <a 
-            href="https://www.instagram.com/fitin60.ai" 
+            href="https://www.instagram.com/fitin60ai.in" 
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 rounded-full border border-white/5 text-zinc-400 hover:text-neon transition-colors"
           >
             <Instagram className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-widest">fitin60.ai</span>
+            <span className="text-xs font-black uppercase tracking-widest">Fitin60ai.in</span>
           </a>
         </div>
 

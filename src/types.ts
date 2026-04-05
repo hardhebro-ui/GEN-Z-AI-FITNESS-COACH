@@ -78,6 +78,26 @@ export interface GeneratedPlan {
   dietStrategyTips: string[];
 }
 
+export interface ExplorePlan {
+  id: string;
+  title: string;
+  goal: string;
+  level: string;
+  duration: string;
+  location: string;
+  dietType: string;
+  tags: string[];
+  rating: number;
+  downloads: number;
+  createdAt: any;
+  preview: {
+    summary: string;
+    calories: string;
+  };
+  planData?: GeneratedPlan;
+  inputsHash?: string;
+}
+
 export interface Review {
   id: string | number;
   rating: number;

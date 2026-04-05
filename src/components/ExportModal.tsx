@@ -338,7 +338,7 @@ export default function ExportModal({ isOpen, onClose, onUnlock }: ExportModalPr
                           <Dumbbell className="w-12 h-12 text-black" />
                         </div>
                         <div>
-                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">fitin60.ai</h2>
+                          <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none">Fitin60ai.in</h2>
                           <p className="text-neon font-bold text-lg uppercase tracking-[0.3em] mt-1">AI Fitness Engine</p>
                         </div>
                       </div>

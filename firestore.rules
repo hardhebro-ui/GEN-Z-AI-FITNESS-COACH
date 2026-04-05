@@ -38,8 +38,36 @@ service cloud.firestore {
       // Anyone can create a plan
       allow create: if isValidPlan(request.resource.data);
       
-      // Plans are immutable once created
-      allow update, delete: if false;
+      // Allow incrementing the download count
+      allow update: if 
+        // Ensure only 'downloads' is modified
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads']) &&
+        // Ensure it's a valid increment
+        (
+          (resource.data.get('downloads', null) == null && request.resource.data.downloads == 1) ||
+          (request.resource.data.downloads == resource.data.downloads + 1)
+        );
+      
+      allow delete: if false;
+    }
+
+    // Curated protocols for the explore page
+    match /explorePlans/{planId} {
+      // Anyone can read curated protocols
+      allow read: if true;
+      
+      // Allow incrementing the download count
+      allow update: if 
+        // Ensure only 'downloads' is modified
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads']) &&
+        // Ensure it's a valid increment
+        (
+          (resource.data.get('downloads', null) == null && request.resource.data.downloads == 1) ||
+          (request.resource.data.downloads == resource.data.downloads + 1)
+        );
+      
+      // Protocols are curated (admin only - not yet implemented)
+      allow create, delete: if false;
     }
 
     // Reviews collection: Used for community feedback

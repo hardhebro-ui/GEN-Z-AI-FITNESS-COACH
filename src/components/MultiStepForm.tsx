@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserInputs } from '../types';
-import { ArrowRight, ArrowLeft, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle2, ShieldAlert, X } from 'lucide-react';
 
 interface MultiStepFormProps {
   onSubmit: (data: UserInputs) => void;
   onShowTerms: () => void;
+  onCancel: () => void;
 }
 
 const initialData: UserInputs = {
@@ -46,7 +47,7 @@ const initialData: UserInputs = {
   pastInjuries: ''
 };
 
-export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormProps) {
+export default function MultiStepForm({ onSubmit, onShowTerms, onCancel }: MultiStepFormProps) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(0);
   const [data, setData] = useState<UserInputs>(initialData);
@@ -153,8 +154,9 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Age (13-80)</label>
+                  <label htmlFor="age" className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Age (13-80)</label>
                   <input
+                    id="age"
                     type="number"
                     min="13"
                     max="80"
@@ -166,8 +168,9 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Gender</label>
+                  <label htmlFor="gender" className="block text-[10px] font-black text-zinc-500 mb-2 uppercase tracking-[0.2em]">Gender</label>
                   <select
+                    id="gender"
                     value={data.gender}
                     onChange={e => updateData({ gender: e.target.value })}
                     className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-neon outline-none text-white font-bold transition-all appearance-none"
@@ -182,7 +185,7 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Height</label>
+                    <label htmlFor="height" className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Height</label>
                     <div className="flex bg-zinc-900 rounded-xl p-1 border border-white/5">
                       <button
                         onClick={() => updateData({ heightUnit: 'cm' })}
@@ -199,6 +202,7 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
                     </div>
                   </div>
                   <input
+                    id="height"
                     type="text"
                     value={data.height}
                     onChange={e => updateData({ height: e.target.value })}
@@ -208,7 +212,7 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Weight</label>
+                    <label htmlFor="weight" className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Weight</label>
                     <div className="flex bg-zinc-900 rounded-xl p-1 border border-white/5">
                       <button
                         onClick={() => updateData({ weightUnit: 'kg' })}
@@ -225,6 +229,7 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
                     </div>
                   </div>
                   <input
+                    id="weight"
                     type="number"
                     value={data.weight}
                     onChange={e => updateData({ weight: e.target.value })}
@@ -955,7 +960,7 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
         className="flex-1 overflow-y-auto px-4 pt-10 pb-72 md:px-8 md:pt-12 md:pb-96 custom-scrollbar"
       >
         <div className="max-w-2xl mx-auto">
-          <AnimatePresence mode="wait" custom={direction}>
+          <AnimatePresence custom={direction}>
             <motion.div
               key={step}
               custom={direction}
@@ -977,14 +982,24 @@ export default function MultiStepForm({ onSubmit, onShowTerms }: MultiStepFormPr
       {/* Bottom Navigation - Sticky */}
       <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent z-20 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
-          <button
-            onClick={prevStep}
-            disabled={step === 1}
-            className="p-5 rounded-2xl bg-zinc-900/50 backdrop-blur-xl text-zinc-400 border border-white/5 hover:bg-zinc-800 disabled:opacity-20 disabled:cursor-not-allowed transition-all shrink-0 active:scale-90"
-            aria-label="Previous step"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onCancel}
+              className="p-5 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-all shrink-0 active:scale-90"
+              aria-label="Cancel"
+              title="Cancel and return to home"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <button
+              onClick={prevStep}
+              disabled={step === 1}
+              className="p-5 rounded-2xl bg-zinc-900/50 backdrop-blur-xl text-zinc-400 border border-white/5 hover:bg-zinc-800 disabled:opacity-20 disabled:cursor-not-allowed transition-all shrink-0 active:scale-90"
+              aria-label="Previous step"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+          </div>
           
           {step < 8 ? (
             <button

@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Dumbbell, Star, ArrowRight, Zap, Flame, FileText, Activity, Coffee, IndianRupee, QrCode, Users, ShieldAlert, AlertTriangle, ShieldCheck, Lock, Stethoscope, Instagram } from 'lucide-react';
+import { Dumbbell, Star, ArrowRight, Zap, Flame, FileText, Activity, Coffee, IndianRupee, QrCode, Users, ShieldAlert, AlertTriangle, ShieldCheck, Lock, Stethoscope, Instagram, LayoutGrid, ChevronDown, ChevronUp } from 'lucide-react';
 import { Review } from '../types';
 import { collection, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../utils/firestoreErrorHandler';
 import { db } from '../firebase';
+import SEO from './SEO';
 
 interface LandingPageProps {
   onStart: () => void;
+  onExplore: () => void;
   onShowTerms: () => void;
   onShowPrivacy: () => void;
+  onShowGuide: (id: string) => void;
 }
 
-export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: LandingPageProps) {
+export default function LandingPage({ onStart, onExplore, onShowTerms, onShowPrivacy, onShowGuide }: LandingPageProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState({ totalCount: 0, averageRating: 0 });
   const [totalPlans, setTotalPlans] = useState<number>(0);
@@ -22,7 +25,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
   const [scrolled, setScrolled] = useState(false);
 
   const upiId = "sarjil1432-1@okhdfcbank"; // Replace with actual UPI ID
-  const payeeName = "fitin60.ai";
+  const payeeName = "Fitin60ai.in";
 
   const finalAmount = donationAmount || (customAmount ? parseFloat(customAmount) : 0);
   const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${finalAmount}&cu=INR`;
@@ -115,8 +118,63 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
     return name.trim().substring(0, 2).toUpperCase();
   };
 
+  const faqs = [
+    {
+      question: "How does the AI workout plan generator work?",
+      answer: "Our AI analyzes your body metrics, fitness goals, available equipment, and experience level to craft a scientifically-backed workout split. It uses advanced algorithms to ensure progressive overload and balanced muscle development."
+    },
+    {
+      question: "Is the diet plan really personalized?",
+      answer: "Yes! The AI calculates your TDEE (Total Daily Energy Expenditure) and macros based on your specific inputs. It then generates a meal plan that fits your dietary preferences, budget, and fitness objectives."
+    },
+    {
+      question: "Can I download my fitness plan as a PDF?",
+      answer: "Absolutely. Once your plan is generated, you can unlock a high-quality, programmatic PDF version that you can keep on your phone or print for the gym."
+    },
+    {
+      question: "Is Fitin60ai.in free to use?",
+      answer: "Generating and viewing your plan is completely free. We offer a 'Support Us' or 'Share to Unlock' model for the PDF download to keep our AI servers running and the tool accessible to everyone."
+    },
+    {
+      question: "Do I need a gym membership for these plans?",
+      answer: "No. You can specify your workout location (Gym, Home, or Outdoors) and available equipment. The AI will adapt the exercises accordingly, providing effective bodyweight alternatives if needed."
+    }
+  ];
+
+  const webAppSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Fitin60ai.in",
+    "url": "https://fitin60ai.in",
+    "description": "AI-powered personalized workout and diet plan generator.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    }
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   return (
     <div className="min-h-[100dvh] bg-zinc-950 text-white relative overflow-x-hidden font-sans flex flex-col custom-scrollbar pb-48 md:pb-0">
+      <SEO schema={webAppSchema} />
+      <SEO schema={faqSchema} />
       {/* Sticky Top Header (Appears on Scroll) */}
       <AnimatePresence>
         {scrolled && (
@@ -130,7 +188,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
               <div className="w-8 h-8 bg-neon rounded-lg flex items-center justify-center">
                 <Activity className="w-5 h-5 text-black" />
               </div>
-              <span className="font-black uppercase italic tracking-tighter text-sm">fitin60<span className="text-neon">.ai</span></span>
+              <span className="font-black uppercase italic tracking-tighter text-sm">Fitin60ai<span className="text-neon">.in</span></span>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
@@ -179,12 +237,12 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
           <p className="text-neon text-[10px] md:text-xs font-black uppercase tracking-[0.4em] mb-4 font-display italic">Your AI Fitness Coach</p>
           <h1 className="text-5xl md:text-9xl font-black tracking-tighter leading-[0.9] mb-6 font-display uppercase italic">
             <span className="text-neon drop-shadow-[0_0_30px_rgba(204,255,0,0.4)]">
-              fitin60.ai
+              AI Workout Plan Generator
             </span>
           </h1>
           
           <p className="text-lg md:text-3xl text-zinc-400 max-w-2xl mx-auto font-medium leading-tight mb-8 px-4">
-            Personalized workout & diet plans tailored to your body in 60 seconds.
+            Get your personalized fitness plan and free diet plan PDF in 60 seconds. Optimized for your body and goals.
           </p>
 
           {/* Trust Badges */}
@@ -219,8 +277,8 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
             </div>
           </div>
 
-          {/* CTA Button */}
-          <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent z-50 md:relative md:bg-none md:p-0">
+          {/* CTA Buttons */}
+          <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent z-50 md:relative md:bg-none md:p-0 flex flex-col md:flex-row items-center justify-center gap-4">
             <motion.button
               whileHover={{ scale: 1.05, rotate: -1 }}
               whileTap={{ scale: 0.95 }}
@@ -230,8 +288,163 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
               Start Your Transformation
               <ArrowRight className="w-6 h-6 md:w-8 md:h-8" />
             </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05, rotate: 1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onExplore}
+              className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-5 md:px-12 md:py-6 text-xl md:text-2xl font-black text-white bg-zinc-900 border border-white/10 rounded-2xl md:rounded-3xl transition-all hover:bg-zinc-800 font-display uppercase italic"
+            >
+              Explore Protocols
+              <LayoutGrid className="w-6 h-6 md:w-8 md:h-8" />
+            </motion.button>
           </div>
         </motion.div>
+
+        {/* How It Works Section */}
+        <section className="w-full max-w-6xl mt-24 md:mt-40 px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 font-display">
+              How It <span className="text-neon">Works</span>
+            </h2>
+            <p className="text-zinc-500 font-bold max-w-2xl mx-auto leading-relaxed text-lg md:text-xl">
+              Three simple steps to your elite fitness protocol. No complex signups, just results.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              { step: "01", title: "Input Data", desc: "Enter your body metrics, goals, and available equipment in our smart form." },
+              { step: "02", title: "AI Analysis", desc: "Our AI engine processes your profile to create a custom workout and diet split." },
+              { step: "03", title: "Get Protocol", desc: "View your plan instantly and download your free diet plan PDF." }
+            ].map((item, i) => (
+              <div key={i} className="relative group">
+                <div className="text-8xl md:text-9xl font-black text-white/5 absolute -top-10 -left-4 group-hover:text-neon/10 transition-colors">{item.step}</div>
+                <div className="relative z-10 space-y-4">
+                  <h3 className="text-2xl font-black uppercase italic tracking-tight text-white">{item.title}</h3>
+                  <p className="text-zinc-500 font-bold leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section className="w-full max-w-6xl mt-24 md:mt-40 px-4 bg-zinc-900/20 rounded-[4rem] border border-white/5 p-12 md:p-24">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter font-display leading-none">
+                Why Choose <span className="text-neon">AI Fitness</span> Plans?
+              </h2>
+              <p className="text-zinc-400 font-bold text-lg leading-relaxed">
+                Traditional generic plans don't account for your unique biology. Our AI-driven approach ensures every set, rep, and calorie is optimized for your specific transformation.
+              </p>
+              <ul className="space-y-6">
+                {[
+                  "Scientifically-backed workout splits",
+                  "Macro-balanced personalized diet plans",
+                  "Adaptive to your home or gym equipment",
+                  "Instant generation - no waiting for coaches",
+                  "Free PDF export for easy tracking"
+                ].map((benefit, i) => (
+                  <li key={i} className="flex items-center gap-4 text-white font-black uppercase italic tracking-tight text-sm">
+                    <div className="w-6 h-6 rounded-full bg-neon flex items-center justify-center shrink-0">
+                      <Zap className="w-3 h-3 text-black" />
+                    </div>
+                    {benefit}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-neon/20 blur-[100px] rounded-full" />
+              <div className="relative bg-zinc-950 border border-white/10 rounded-[3rem] p-8 shadow-2xl rotate-3">
+                <div className="space-y-6">
+                  <div className="h-4 w-2/3 bg-zinc-900 rounded-full" />
+                  <div className="h-4 w-full bg-zinc-900 rounded-full" />
+                  <div className="h-4 w-1/2 bg-neon/20 rounded-full" />
+                  <div className="grid grid-cols-2 gap-4 pt-4">
+                    <div className="h-24 bg-zinc-900 rounded-2xl" />
+                    <div className="h-24 bg-zinc-900 rounded-2xl" />
+                  </div>
+                  <div className="h-12 w-full bg-neon rounded-2xl" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="w-full max-w-4xl mt-24 md:mt-40 px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-8 font-display">
+              Frequently Asked <span className="text-neon">Questions</span>
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <div key={i} className="bg-zinc-900/30 border border-white/5 rounded-3xl overflow-hidden transition-all hover:border-white/10">
+                <button 
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full p-6 md:p-8 flex items-center justify-between text-left"
+                >
+                  <span className="text-lg md:text-xl font-black uppercase italic tracking-tight text-white">{faq.question}</span>
+                  {openFaq === i ? <ChevronUp className="w-6 h-6 text-neon" /> : <ChevronDown className="w-6 h-6 text-zinc-500" />}
+                </button>
+                <AnimatePresence>
+                  {openFaq === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="px-6 md:px-8 pb-8"
+                    >
+                      <p className="text-zinc-400 font-bold leading-relaxed">{faq.answer}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Fitness Knowledge Base Section */}
+        <section className="w-full max-w-6xl mt-24 md:mt-40 px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 font-display">
+              Fitness <span className="text-neon">Knowledge Base</span>
+            </h2>
+            <p className="text-zinc-500 font-bold max-w-2xl mx-auto leading-relaxed text-lg md:text-xl">
+              Master your transformation with our AI-curated fitness guides.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { id: "build-muscle-ai", title: "How to Build Muscle with AI", desc: "Learn how artificial intelligence is revolutionizing hypertrophy and strength training." },
+              { id: "fat-loss-protocol", title: "The Ultimate Fat Loss Protocol", desc: "A deep dive into calorie deficits, macros, and metabolic optimization." },
+              { id: "home-vs-gym", title: "Home vs Gym: Which is Better?", desc: "Comparing the effectiveness of bodyweight training versus heavy iron." },
+              { id: "mastering-macros", title: "Mastering Your Macros", desc: "Everything you need to know about proteins, fats, and carbohydrates for your body type." },
+              { id: "progressive-overload", title: "Progressive Overload 101", desc: "The fundamental principle of muscle growth explained for beginners." },
+              { id: "supplements-guide", title: "Supplements That Actually Work", desc: "Cutting through the noise to find the scientifically-backed performance enhancers." }
+            ].map((article, i) => (
+              <div 
+                key={i} 
+                onClick={() => onShowGuide(article.id)}
+                className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-neon/30 transition-all group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-xl bg-neon/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <FileText className="w-6 h-6 text-neon" />
+                </div>
+                <h3 className="text-xl font-black uppercase italic tracking-tight text-white mb-4 group-hover:text-neon transition-colors">{article.title}</h3>
+                <p className="text-zinc-500 font-bold leading-relaxed text-sm">{article.desc}</p>
+                <div className="mt-6 flex items-center gap-2 text-neon text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read Guide <ArrowRight className="w-3 h-3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Safety & Trust Section */}
         <section className="w-full max-w-6xl mt-24 md:mt-40 px-4 relative overflow-hidden">
@@ -608,7 +821,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
               </div>
             </div>
             <div className="flex gap-6">
-              <a href="https://www.instagram.com/fitin60.ai" target="_blank" rel="noopener noreferrer" className="text-zinc-800 hover:text-neon transition-colors">
+              <a href="https://www.instagram.com/fitin60ai.in" target="_blank" rel="noopener noreferrer" className="text-zinc-800 hover:text-neon transition-colors">
                 <Instagram className="w-6 h-6" />
               </a>
               <Activity className="w-6 h-6 text-zinc-800" />
@@ -616,7 +829,7 @@ export default function LandingPage({ onStart, onShowTerms, onShowPrivacy }: Lan
               <Flame className="w-6 h-6 text-zinc-800" />
             </div>
             <p className="text-zinc-700 text-xs font-black uppercase tracking-[0.2em]">
-              © 2026 fitin60.ai. Engineered for Excellence.
+              © 2026 Fitin60ai.in. Engineered for Excellence.
             </p>
             <div className="flex gap-4">
               <button 

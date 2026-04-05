@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import LandingPage from './components/LandingPage';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import MultiStepForm from './components/MultiStepForm';
 import PlanPreview from './components/PlanPreview';
 import ExportModal from './components/ExportModal';
@@ -12,11 +14,30 @@ import { generatePlan } from './services/geminiService';
 import { generateProgrammaticPDF } from './services/pdfService';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { guides } from './data/guides';
 
-type AppState = 'landing' | 'form' | 'generating' | 'preview' | 'terms' | 'privacy';
+// Lazy loaded pages
+const HomePage = lazy(() => import('./pages/HomePage'));
+const HowItWorksPage = lazy(() => import('./pages/HowItWorksPage'));
+const BenefitsPage = lazy(() => import('./pages/BenefitsPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const GuidesPage = lazy(() => import('./pages/GuidesPage'));
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
+const SupportPage = lazy(() => import('./pages/SupportPage'));
+const ExplorePage = lazy(() => import('./pages/ExplorePage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const GuidePage = lazy(() => import('./components/GuidePage'));
 
-export default function App() {
-  const [appState, setAppState] = useState<AppState>('landing');
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+    <Loader2 className="w-12 h-12 text-neon animate-spin" />
+  </div>
+);
+
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [userInputs, setUserInputs] = useState<UserInputs | null>(null);
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -26,10 +47,11 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [isCached, setIsCached] = useState(false);
   const [exportUserName, setExportUserName] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [appState]);
+  }, [location.pathname]);
 
   const loadingMessages = [
     { threshold: 0, message: 'Initializing AI Engine...' },
@@ -44,7 +66,7 @@ export default function App() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (appState === 'generating') {
+    if (isGenerating) {
       setProgress(0);
       setLoadingMessage(loadingMessages[0].message);
       interval = setInterval(() => {
@@ -53,7 +75,6 @@ export default function App() {
           const increment = prev < 50 ? 5 : prev < 80 ? 2 : 1;
           const nextProgress = prev + increment;
           
-          // Update message based on threshold
           const currentMsg = [...loadingMessages].reverse().find(m => nextProgress >= m.threshold);
           if (currentMsg && currentMsg.message !== loadingMessage) {
             setLoadingMessage(currentMsg.message);
@@ -64,14 +85,13 @@ export default function App() {
       }, 500);
     }
     return () => clearInterval(interval);
-  }, [appState]);
+  }, [isGenerating]);
 
   const handleStart = () => {
-    setAppState('form');
+    navigate('/generate');
   };
 
   const getCacheKey = (inputs: UserInputs) => {
-    // Normalize height to CM
     let h = parseFloat(inputs.height);
     if (inputs.heightUnit === 'ft/in') {
       if (inputs.height.includes("'")) {
@@ -84,13 +104,11 @@ export default function App() {
       }
     }
 
-    // Normalize weight to KG
     let w = parseFloat(inputs.weight);
     if (inputs.weightUnit === 'lbs') {
       w = w * 0.453592;
     }
 
-    // Grouping into ranges for fuzzy matching
     const ageRange = Math.floor(parseInt(inputs.age) / 5) * 5;
     const weightRange = Math.floor(w / 5) * 5;
     const heightRange = Math.floor(h / 5) * 5;
@@ -100,7 +118,7 @@ export default function App() {
 
   const handleFormSubmit = async (inputs: UserInputs) => {
     setUserInputs(inputs);
-    setAppState('generating');
+    setIsGenerating(true);
     setError(null);
     setIsCached(false);
     
@@ -109,10 +127,10 @@ export default function App() {
 
     if (localCachedPlan) {
       setIsCached(true);
-      // Simulate a quick "finding" process for UX
       setTimeout(() => {
         setPlan(JSON.parse(localCachedPlan));
-        setAppState('preview');
+        setIsGenerating(false);
+        navigate('/plan');
       }, 1500);
       return;
     }
@@ -121,33 +139,31 @@ export default function App() {
       const { plan: generatedPlan, fromCache } = await generatePlan(inputs);
       setPlan(generatedPlan);
       setIsCached(fromCache);
-      
-      // Save to local cache for next time
       localStorage.setItem(cacheKey, JSON.stringify(generatedPlan));
-      
-      // If it was from global cache, we might want to skip the "generating" delay
-      // but the service already returns quickly. The UI will transition when state updates.
-      setAppState('preview');
+      setIsGenerating(false);
+      navigate('/plan');
     } catch (err) {
       console.error(err);
       setError('Failed to generate plan. Please try again.');
-      setAppState('form');
+      setIsGenerating(false);
+      navigate('/generate');
     }
   };
 
   const handleRegenerate = async () => {
     if (!userInputs) return;
-    setAppState('generating');
+    setIsGenerating(true);
     setError(null);
     
     try {
       const { plan: generatedPlan } = await generatePlan(userInputs);
       setPlan(generatedPlan);
-      setAppState('preview');
+      setIsGenerating(false);
+      navigate('/plan');
     } catch (err) {
       console.error(err);
       setError('Failed to regenerate plan. Please try again.');
-      setAppState('preview');
+      setIsGenerating(false);
     }
   };
 
@@ -166,7 +182,6 @@ export default function App() {
 
     try {
       await generateProgrammaticPDF(plan, userInputs, exportUserName);
-
       setTimeout(() => {
         setIsReviewPromptOpen(true);
       }, 1000);
@@ -178,84 +193,28 @@ export default function App() {
 
   const handleReviewSubmit = () => {
     setIsReviewPromptOpen(false);
-    // Optionally return to landing page or stay on preview
-    setAppState('landing');
+    navigate('/');
     setPlan(null);
     setUserInputs(null);
   };
 
+  const handleShowGuide = (id: string) => {
+    navigate(`/guide/${id}`);
+  };
+
   return (
     <div className="bg-zinc-950 min-h-[100dvh] text-zinc-100 font-sans selection:bg-neon selection:text-black overflow-x-hidden transition-all duration-500">
+      <Navbar onNavigate={(path) => navigate(path)} currentState={location.pathname} />
+
       <AnimatePresence mode="wait">
-        {appState === 'landing' && (
-          <motion.div
-            key="landing"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <LandingPage 
-              onStart={handleStart} 
-              onShowTerms={() => setAppState('terms')} 
-              onShowPrivacy={() => setAppState('privacy')}
-            />
-          </motion.div>
-        )}
-
-        {appState === 'terms' && (
-          <motion.div
-            key="terms"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          >
-            <TermsPage onBack={() => setAppState('landing')} />
-          </motion.div>
-        )}
-
-        {appState === 'privacy' && (
-          <motion.div
-            key="privacy"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          >
-            <PrivacyPage onBack={() => setAppState('landing')} />
-          </motion.div>
-        )}
-        
-        {appState === 'form' && (
-          <motion.div
-            key="form"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="min-h-[100dvh] bg-zinc-950"
-          >
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 m-6 rounded-2xl text-center font-medium">
-                {error}
-              </div>
-            )}
-            <MultiStepForm 
-              onSubmit={handleFormSubmit} 
-              onShowTerms={() => setAppState('terms')}
-            />
-          </motion.div>
-        )}
-        
-        {appState === 'generating' && (
+        {isGenerating ? (
           <motion.div
             key="generating"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.4 }}
-            className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-12 bg-zinc-950"
+            className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-12 bg-zinc-950 fixed inset-0 z-[100]"
           >
             <div className="relative flex items-center justify-center">
               <div className="absolute inset-0 bg-neon/20 blur-3xl rounded-full animate-pulse" />
@@ -285,46 +244,54 @@ export default function App() {
               </div>
             </div>
           </motion.div>
-        )}
-        
-        {appState === 'preview' && plan && userInputs && (
-          <motion.div
-            key="preview"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="bg-zinc-950 min-h-[100dvh]"
-          >
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 m-6 rounded-2xl text-center font-medium fixed top-0 left-0 right-0 z-50 backdrop-blur-md flex flex-col items-center gap-3">
-                <p>{error}</p>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => {
-                      setError(null);
-                      generatePDF();
-                    }}
-                    className="px-4 py-2 bg-red-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-all"
-                  >
-                    Retry Generation
-                  </button>
-                  <button 
-                    onClick={() => setError(null)}
-                    className="px-4 py-2 bg-zinc-800 text-zinc-400 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-zinc-700 transition-all"
-                  >
-                    Dismiss
-                  </button>
+        ) : (
+          <Suspense fallback={<PageLoader />}>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<HomePage onStart={handleStart} />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/ai-fitness-benefits" element={<BenefitsPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/blog" element={<GuidesPage onShowGuide={handleShowGuide} />} />
+              <Route path="/reviews" element={<ReviewsPage />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/explore-plans" element={<ExplorePage onBack={() => navigate('/')} lastInputs={userInputs} />} />
+              <Route path="/terms" element={<TermsPage onBack={() => navigate(-1)} />} />
+              <Route path="/privacy" element={<PrivacyPage onBack={() => navigate(-1)} />} />
+              <Route path="/generate" element={
+                <div className="min-h-[100dvh] bg-zinc-950 pt-20">
+                  {error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 m-6 rounded-2xl text-center font-medium">
+                      {error}
+                    </div>
+                  )}
+                  <MultiStepForm 
+                    onSubmit={handleFormSubmit} 
+                    onShowTerms={() => navigate('/terms')}
+                    onCancel={() => navigate('/')}
+                  />
                 </div>
-              </div>
-            )}
-            <PlanPreview 
-              plan={plan} 
-              inputs={userInputs} 
-              onRegenerate={handleRegenerate}
-              onExport={handleExportClick}
-            />
-          </motion.div>
+              } />
+              <Route path="/plan" element={
+                plan && userInputs ? (
+                  <div className="bg-zinc-950 min-h-[100dvh] pt-20">
+                    <PlanPreview 
+                      plan={plan} 
+                      inputs={userInputs} 
+                      onRegenerate={handleRegenerate}
+                      onExport={handleExportClick}
+                    />
+                  </div>
+                ) : (
+                  <HomePage onStart={handleStart} />
+                )
+              } />
+              <Route path="/guide/:id" element={
+                <GuideWrapper onBack={() => navigate('/blog')} />
+              } />
+            </Routes>
+          </Suspense>
         )}
       </AnimatePresence>
 
@@ -341,7 +308,28 @@ export default function App() {
         initialName={exportUserName}
       />
 
-      <CookieConsent onShowPolicy={() => setAppState('cookies')} />
+      <CookieConsent onShowPolicy={() => navigate('/privacy')} />
     </div>
+  );
+}
+
+// Helper component to handle guide ID from URL
+import { useParams } from 'react-router-dom';
+function GuideWrapper({ onBack }: { onBack: () => void }) {
+  const { id } = useParams<{ id: string }>();
+  const guide = guides.find(g => g.id === id);
+  
+  if (!guide) return <HomePage onStart={() => {}} />;
+  
+  return <GuidePage guide={guide} onBack={onBack} />;
+}
+
+export default function App() {
+  return (
+    <HelmetProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }

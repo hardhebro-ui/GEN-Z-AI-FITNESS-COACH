@@ -304,10 +304,30 @@ export async function generatePlan(inputs: UserInputs): Promise<{ plan: Generate
   // 3. Save new plan to Firestore and increment count
   const savePath = "plans";
   try {
+    // Derive fields for Explore feature
+    const title = `${inputs.primaryGoal} Protocol: ${inputs.fitnessLevel} ${inputs.workoutLocation}`;
+    const tags = [
+      inputs.primaryGoal,
+      inputs.fitnessLevel,
+      inputs.workoutLocation,
+      inputs.dietType,
+      ...(inputs.targetAreas || [])
+    ].filter(Boolean);
+
     await addDoc(collection(db, "plans"), {
+      title,
+      goal: inputs.primaryGoal,
+      level: inputs.fitnessLevel,
+      duration: inputs.planDuration,
+      location: inputs.workoutLocation,
+      dietType: inputs.dietType,
+      tags,
+      rating: 0, // No rating yet
+      downloads: 0,
       inputs,
       inputsHash,
       plan,
+      planData: plan, // For consistency with ExplorePlan interface
       createdAt: serverTimestamp()
     });
     await incrementTotalPlans();

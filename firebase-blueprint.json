@@ -17,6 +17,10 @@
           "type": "string",
           "format": "date-time",
           "description": "When the plan was generated."
+        },
+        "downloads": {
+          "type": "integer",
+          "description": "Number of times the plan has been downloaded."
         }
       },
       "required": ["inputs", "plan", "createdAt"]
@@ -64,12 +68,36 @@
         }
       },
       "required": ["rating", "name", "createdAt"]
+    },
+    "ExplorePlan": {
+      "title": "ExplorePlan",
+      "description": "A curated fitness protocol for the explore page.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "goal": { "type": "string" },
+        "level": { "type": "string" },
+        "duration": { "type": "string" },
+        "location": { "type": "string" },
+        "dietType": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "rating": { "type": "number" },
+        "downloads": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "preview": { "type": "object" },
+        "planData": { "type": "object" }
+      },
+      "required": ["title", "goal", "level", "duration", "location", "createdAt"]
     }
   },
   "firestore": {
     "/plans/{planId}": {
       "schema": "Plan",
       "description": "Collection of generated fitness plans."
+    },
+    "/explorePlans/{planId}": {
+      "schema": "ExplorePlan",
+      "description": "Curated protocols for the explore page."
     },
     "/reviews/{reviewId}": {
       "schema": "Review",
