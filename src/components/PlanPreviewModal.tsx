@@ -159,17 +159,7 @@ const PlanPreviewModal: React.FC<PlanPreviewModalProps> = ({ plan, onClose, onDo
         </div>
 
         {/* Footer */}
-        <div className="p-8 md:p-10 bg-zinc-900/60 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-2">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="w-8 h-8 rounded-full border-2 border-zinc-900 bg-zinc-800 flex items-center justify-center overflow-hidden">
-                  <img src={`https://i.pravatar.cc/100?u=${plan.id}${i}`} alt="User" className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-            <p className="text-xs font-bold text-zinc-400 italic">Join {plan.downloads || 0}+ athletes using this protocol</p>
-          </div>
+        <div className="p-8 md:p-10 bg-zinc-900/60 border-t border-white/5 flex flex-col md:flex-row items-center justify-center gap-6 shrink-0">
           <button 
             onClick={onDownload}
             className="w-full md:w-auto flex items-center justify-center gap-3 px-10 py-4 bg-neon text-black rounded-2xl text-sm font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_30px_rgba(204,255,0,0.3)]"

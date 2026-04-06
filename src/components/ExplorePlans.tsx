@@ -614,7 +614,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, onPreview, onDownload, layout
             <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Downloads</p>
             <p className="text-sm font-bold text-zinc-200 italic flex items-center gap-2">
               <Download className="w-3.5 h-3.5 text-neon" />
-              {plan.downloads !== undefined && plan.downloads !== null ? `${plan.downloads}+` : '—'}
+              {plan.downloads !== undefined && plan.downloads !== null ? plan.downloads : '—'}
             </p>
           </div>
         </div>
