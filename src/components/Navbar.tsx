@@ -67,21 +67,24 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
 
   const primaryLinks = [
     { path: '/', label: 'Home', icon: <Home className="w-4 h-4" /> },
+    { path: '/how-it-works', label: 'Process', icon: <Info className="w-4 h-4" /> },
     { path: '/explore-plans', label: 'Explore', icon: <LayoutGrid className="w-4 h-4" /> },
     { path: '/blog', label: 'Guides', icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   const secondaryLinks = [
-    { path: '/how-it-works', label: 'Process', icon: <Info className="w-4 h-4" /> },
     { path: '/ai-fitness-benefits', label: 'Why AI?', icon: <ShieldCheck className="w-4 h-4" /> },
     { path: '/faq', label: 'FAQ', icon: <HelpCircle className="w-4 h-4" /> },
     { path: '/reviews', label: 'Reviews', icon: <UsersIcon className="w-4 h-4" /> },
-    { path: '/about', label: 'About Us', icon: <User className="w-4 h-4" /> },
-    { path: '/contact', label: 'Contact', icon: <MessageSquare className="w-4 h-4" /> },
     { path: '/support', label: 'Support', icon: <Coffee className="w-4 h-4" /> },
+    { path: '/about', label: 'About Us', icon: <User className="w-4 h-4" /> },
+    { path: '/contact', label: 'Contact Us', icon: <MessageSquare className="w-4 h-4" /> },
+    { path: '/terms', label: 'Terms', icon: <ShieldCheck className="w-4 h-4" /> },
+    { path: '/privacy', label: 'Privacy', icon: <ShieldCheck className="w-4 h-4" /> },
   ];
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
 
   return (
     <>
@@ -224,7 +227,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
               </div>
 
               <div className="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                {[...primaryLinks, ...secondaryLinks].map((link) => (
+                {primaryLinks.map((link) => (
                   <NavLink
                     key={link.path}
                     to={link.path}
@@ -244,6 +247,56 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
                     <ChevronRight className={`w-4 h-4 ${location.pathname === link.path ? 'text-neon' : 'text-zinc-700'}`} />
                   </NavLink>
                 ))}
+
+                {/* Mobile More Collapsible */}
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setIsMobileMoreOpen(!isMobileMoreOpen)}
+                    className={`
+                      w-full flex items-center justify-between p-4 rounded-2xl border transition-all
+                      ${isMobileMoreOpen || secondaryLinks.some(l => location.pathname === l.path)
+                        ? 'bg-zinc-900/50 border-white/10 text-white' 
+                        : 'bg-zinc-900/30 border-white/5 text-zinc-400'}
+                    `}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 rounded-xl bg-zinc-800">
+                        <LayoutGrid className="w-4 h-4" />
+                      </div>
+                      <span className="font-black uppercase italic tracking-tight text-sm">More</span>
+                    </div>
+                    <ChevronRight className={`w-4 h-4 transition-transform ${isMobileMoreOpen ? 'rotate-90' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {isMobileMoreOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden pl-4 space-y-2"
+                      >
+                        {secondaryLinks.map((link) => (
+                          <NavLink
+                            key={link.path}
+                            to={link.path}
+                            className={({ isActive }) => `
+                              w-full flex items-center gap-4 p-3 rounded-xl transition-all
+                              ${isActive 
+                                ? 'text-neon' 
+                                : 'text-zinc-500 hover:text-zinc-300'}
+                            `}
+                          >
+                            <div className={`p-1.5 rounded-lg ${location.pathname === link.path ? 'bg-neon text-black' : 'bg-zinc-900'}`}>
+                              {React.cloneElement(link.icon as React.ReactElement<{ className?: string }>, { className: 'w-3.5 h-3.5' })}
+                            </div>
+                            <span className="font-black uppercase italic tracking-tight text-xs">{link.label}</span>
+                          </NavLink>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               <div className="space-y-4 mt-auto pt-8 border-t border-white/5">

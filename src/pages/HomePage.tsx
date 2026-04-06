@@ -126,16 +126,6 @@ const HomePage: React.FC<HomePageProps> = ({ onStart }) => {
           </Link>
         </div>
       </section>
-
-      {/* Footer Links */}
-      <footer className="w-full max-w-6xl mx-auto py-12 px-4 border-t border-white/5 flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-widest text-zinc-600">
-        <Link to="/how-it-works" className="hover:text-neon transition-colors">How It Works</Link>
-        <Link to="/ai-fitness-benefits" className="hover:text-neon transition-colors">Benefits</Link>
-        <Link to="/faq" className="hover:text-neon transition-colors">FAQ</Link>
-        <Link to="/reviews" className="hover:text-neon transition-colors">Reviews</Link>
-        <Link to="/blog" className="hover:text-neon transition-colors">Knowledge Base</Link>
-        <Link to="/support" className="hover:text-neon transition-colors">Support Us</Link>
-      </footer>
     </div>
   );
 };

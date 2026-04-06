@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import MultiStepForm from './components/MultiStepForm';
 import PlanPreview from './components/PlanPreview';
 import ExportModal from './components/ExportModal';
@@ -294,6 +295,8 @@ function AppContent() {
           </Suspense>
         )}
       </AnimatePresence>
+
+      <Footer />
 
       <ExportModal 
         isOpen={isExportModalOpen} 

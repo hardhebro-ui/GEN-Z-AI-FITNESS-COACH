@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Block unnecessary paths (optional future use)
+# Disallow: /admin/
+# Disallow: /api/
+
 Sitemap: https://fitin60ai.in/sitemap.xml
