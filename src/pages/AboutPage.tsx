@@ -36,7 +36,7 @@ const AboutPage: React.FC = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           {[
-            { icon: <Users className="w-6 h-6 text-neon" />, label: '10k+ Users' },
+            { icon: <Users className="w-6 h-6 text-neon" />, label: 'Growing Community' },
             { icon: <Target className="w-6 h-6 text-neon" />, label: 'Precision AI' },
             { icon: <Award className="w-6 h-6 text-neon" />, label: 'Elite Results' },
             { icon: <ShieldCheck className="w-6 h-6 text-neon" />, label: 'Science Backed' },

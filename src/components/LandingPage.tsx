@@ -273,7 +273,7 @@ export default function LandingPage({ onStart, onExplore, onShowTerms, onShowPri
             </div>
             <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 backdrop-blur-xl rounded-2xl border border-white/10 text-sm md:text-base font-bold text-zinc-300">
               <Users className="w-4 h-4 md:w-5 md:h-5 text-neon" />
-              {totalPlans > 0 ? `${totalPlans}+ Plans` : 'Join Us'}
+              {totalPlans > 0 ? `${totalPlans}+ Plans Generated` : 'Join Our Community'}
             </div>
           </div>
 

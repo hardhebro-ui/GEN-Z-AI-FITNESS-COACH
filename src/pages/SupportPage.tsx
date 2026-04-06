@@ -9,7 +9,7 @@ const SupportPage: React.FC = () => {
   const [showQR, setShowQR] = useState(false);
 
   const upiId = "sarjil1432-1@okhdfcbank"; 
-  const payeeName = "fitin60.ai";
+  const payeeName = "Fitin60ai.in";
 
   const finalAmount = donationAmount || (customAmount ? parseFloat(customAmount) : 0);
   const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${finalAmount}&cu=INR`;
@@ -72,7 +72,7 @@ const SupportPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-white font-black uppercase italic tracking-tight">Fitin60ai.in</p>
-                <p className="text-zinc-500 text-xs font-black uppercase tracking-widest">Empowering 10,000+ Athletes</p>
+                <p className="text-zinc-500 text-xs font-black uppercase tracking-widest">Empowering Athletes Worldwide</p>
               </div>
             </div>
           </motion.div>
