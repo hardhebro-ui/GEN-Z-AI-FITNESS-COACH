@@ -31,6 +31,7 @@ const Footer: React.FC = () => {
         { label: "Support Us", path: "/support" },
         { label: "Terms of Service", path: "/terms" },
         { label: "Privacy Policy", path: "/privacy" },
+        { label: "Disclaimer", path: "/disclaimer" },
       ]
     }
   ];

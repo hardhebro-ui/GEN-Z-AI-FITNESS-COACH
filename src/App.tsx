@@ -260,6 +260,7 @@ function AppContent() {
               <Route path="/explore-plans" element={<ExplorePage onBack={() => navigate('/')} lastInputs={userInputs} />} />
               <Route path="/terms" element={<TermsPage onBack={() => navigate(-1)} />} />
               <Route path="/privacy" element={<PrivacyPage onBack={() => navigate(-1)} />} />
+              <Route path="/disclaimer" element={<DisclaimerPage />} />
               <Route path="/generate" element={
                 <div className="min-h-[100dvh] bg-zinc-950 pt-20">
                   {error && (
@@ -326,6 +327,8 @@ function GuideWrapper({ onBack }: { onBack: () => void }) {
   
   return <GuidePage guide={guide} onBack={onBack} />;
 }
+
+const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
 
 export default function App() {
   return (

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Mail, MessageSquare, MapPin, Send } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 
 const ContactPage: React.FC = () => {
   return (
@@ -106,6 +107,23 @@ const ContactPage: React.FC = () => {
           </form>
         </div>
       </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="max-w-4xl mx-auto"
+      >
+        <div className="bg-zinc-900/30 border border-white/5 p-8 md:p-12 rounded-[3rem] text-center">
+          <h2 className="text-2xl font-black uppercase italic tracking-tight mb-4">Medical Disclaimer</h2>
+          <p className="text-zinc-500 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+            Fitin60ai.in provides AI-generated fitness and nutrition guidance for informational purposes only. Our plans are not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a healthcare professional before starting any new exercise or diet program. Use of our services is at your own risk.
+          </p>
+          <Link to="/disclaimer" className="inline-block mt-6 text-neon text-[10px] font-black uppercase tracking-widest hover:underline">
+            Read Full Disclaimer
+          </Link>
+        </div>
+      </motion.div>
     </div>
   );
 };

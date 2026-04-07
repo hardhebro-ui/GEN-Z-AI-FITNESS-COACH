@@ -31,7 +31,7 @@ const AboutPage: React.FC = () => {
             We believe that everyone deserves access to professional, science-backed fitness and nutrition plans, regardless of their budget or location. Fitin60ai.in was born from the intersection of sports science and cutting-edge machine learning.
           </p>
           <p className="text-zinc-400 leading-relaxed">
-            By analyzing thousands of data points and elite training protocols, our AI engine crafts plans that were previously only available to professional athletes.
+            By analyzing thousands of data points and elite training protocols, our AI engine crafts plans that were previously only available to professional athletes. Our goal is to empower individuals to take control of their health with precision and efficiency.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -44,6 +44,37 @@ const AboutPage: React.FC = () => {
             <div key={i} className="bg-zinc-900/50 border border-white/5 p-6 rounded-3xl flex flex-col items-center justify-center text-center">
               {stat.icon}
               <span className="mt-4 font-black uppercase italic tracking-tight text-sm">{stat.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-12 mb-32">
+        <div className="text-center">
+          <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tight mb-6">Why We Built This</h2>
+          <p className="text-zinc-400 max-w-3xl mx-auto leading-relaxed">
+            The fitness industry is filled with generic advice and expensive coaching that many cannot afford. We saw an opportunity to use Artificial Intelligence to bridge this gap, providing high-quality, personalized guidance that adapts to your specific needs.
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "Data-Driven",
+              desc: "Our algorithms are trained on peer-reviewed sports science and successful training methodologies."
+            },
+            {
+              title: "User-Centric",
+              desc: "We prioritize your goals and constraints, ensuring every plan is realistic and sustainable."
+            },
+            {
+              title: "Always Free",
+              desc: "We are committed to keeping our core plan generation free to ensure accessibility for all."
+            }
+          ].map((item, i) => (
+            <div key={i} className="p-8 bg-zinc-900/30 border border-white/5 rounded-3xl">
+              <h3 className="text-xl font-black uppercase italic tracking-tight text-white mb-4">{item.title}</h3>
+              <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>

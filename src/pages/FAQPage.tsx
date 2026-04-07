@@ -24,6 +24,18 @@ const FAQPage: React.FC = () => {
     {
       question: "Do I need a gym membership for these plans?",
       answer: "No. You can specify your workout location (Gym, Home, or Outdoors) and available equipment. The AI will adapt the exercises accordingly, providing effective bodyweight alternatives if needed."
+    },
+    {
+      question: "How often should I update my plan?",
+      answer: "We recommend updating your plan every 4-6 weeks or whenever you hit a plateau. As you get stronger or your body weight changes, the AI can recalibrate your macros and training intensity to keep you progressing."
+    },
+    {
+      question: "Can I use this if I'm a complete beginner?",
+      answer: "Yes! Fitin60ai.in is designed for all levels. You can select 'Beginner' in the experience level, and the AI will prioritize foundational movements and safe progression schemes to help you build a solid base."
+    },
+    {
+      question: "What if I have specific dietary restrictions?",
+      answer: "Our diet generator allows you to specify preferences like Vegetarian, Vegan, Keto, or Paleo. The AI ensures your macros are met while respecting your chosen dietary lifestyle."
     }
   ];
 
