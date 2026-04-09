@@ -261,7 +261,9 @@ function AppContent() {
 
   return (
     <div className="bg-zinc-950 min-h-[100dvh] text-zinc-100 font-sans selection:bg-neon selection:text-black overflow-x-hidden transition-all duration-500">
-      <Navbar onNavigate={(path) => navigate(path)} currentState={location.pathname} />
+      {!location.pathname.startsWith('/admin') && (
+        <Navbar onNavigate={(path) => navigate(path)} currentState={location.pathname} />
+      )}
 
       <AnimatePresence mode="wait">
         {isGenerating ? (
@@ -373,7 +375,7 @@ function AppContent() {
         )}
       </AnimatePresence>
 
-      <Footer />
+      {!location.pathname.startsWith('/admin') && <Footer />}
 
       <ExportModal 
         isOpen={isExportModalOpen} 

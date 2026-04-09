@@ -13,8 +13,7 @@ service cloud.firestore {
     // Check if the user is the admin (hardhebro@gmail.com)
     function isAdmin() {
       return isAuthenticated() && 
-             request.auth.token.email == "hardhebro@gmail.com" && 
-             request.auth.token.email_verified == true;
+             request.auth.token.email == "hardhebro@gmail.com";
     }
 
     // Check if the document contains only the allowed fields
@@ -42,8 +41,7 @@ service cloud.firestore {
     function isValidBlogPost(data) {
       return data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
              data.content is string && data.content.size() > 0 &&
-             data.published is bool &&
-             data.createdAt is timestamp;
+             data.published is bool;
     }
 
     // Validate a contact submission
@@ -61,7 +59,9 @@ service cloud.firestore {
     // Blog posts collection
     match /blogPosts/{postId} {
       allow read: if resource.data.published == true || isAdmin();
-      allow write: if isAdmin() && isValidBlogPost(request.resource.data);
+      allow create: if isAdmin() && isValidBlogPost(request.resource.data);
+      allow update: if isAdmin() && isValidBlogPost(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     // Contact submissions collection
