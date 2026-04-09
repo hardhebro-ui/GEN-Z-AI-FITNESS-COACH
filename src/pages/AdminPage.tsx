@@ -38,6 +38,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { Helmet } from 'react-helmet-async';
+import { guides } from '../data/guides';
 
 const ADMIN_EMAIL = "hardhebro@gmail.com";
 
@@ -65,6 +66,7 @@ const AdminPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'blog' | 'contact'>('blog');
+  const [isMigrating, setIsMigrating] = useState(false);
   
   // Blog State
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -117,6 +119,38 @@ const AdminPage: React.FC = () => {
   };
 
   const handleLogout = () => signOut(auth);
+
+  const migrateGuides = async () => {
+    if (posts.length > 0) {
+      alert("Firestore already has posts. Migration skipped to avoid duplicates.");
+      return;
+    }
+    
+    if (!window.confirm("This will upload all static guides from guides.ts to Firestore. Continue?")) return;
+    
+    setIsMigrating(true);
+    try {
+      for (const guide of guides) {
+        await addDoc(collection(db, 'blogPosts'), {
+          title: guide.title,
+          content: guide.content,
+          excerpt: guide.description,
+          category: guide.category,
+          published: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          author: "Admin",
+          image: ""
+        });
+      }
+      alert("Migration successful!");
+    } catch (error) {
+      console.error("Migration failed", error);
+      alert("Migration failed. Check console.");
+    } finally {
+      setIsMigrating(false);
+    }
+  };
 
   const savePost = async () => {
     if (!currentPost.title || !currentPost.content) return;
@@ -262,16 +296,28 @@ const AdminPage: React.FC = () => {
             <p className="text-zinc-500 font-medium">Manage your site content and user inquiries.</p>
           </div>
           {activeTab === 'blog' && (
-            <button 
-              onClick={() => {
-                setCurrentPost({ published: true });
-                setIsEditingPost(true);
-              }}
-              className="px-8 py-4 bg-neon text-black font-black uppercase italic tracking-widest rounded-2xl flex items-center gap-3 hover:scale-105 transition-transform shadow-[0_0_30px_rgba(204,255,0,0.2)]"
-            >
-              <Plus className="w-5 h-5" />
-              New Article
-            </button>
+            <div className="flex gap-4">
+              {posts.length === 0 && (
+                <button 
+                  onClick={migrateGuides}
+                  disabled={isMigrating}
+                  className="px-8 py-4 bg-zinc-800 text-white font-black uppercase italic tracking-widest rounded-2xl flex items-center gap-3 hover:bg-zinc-700 transition-all disabled:opacity-50"
+                >
+                  {isMigrating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                  Migrate Static Guides
+                </button>
+              )}
+              <button 
+                onClick={() => {
+                  setCurrentPost({ published: true });
+                  setIsEditingPost(true);
+                }}
+                className="px-8 py-4 bg-neon text-black font-black uppercase italic tracking-widest rounded-2xl flex items-center gap-3 hover:scale-105 transition-transform shadow-[0_0_30px_rgba(204,255,0,0.2)]"
+              >
+                <Plus className="w-5 h-5" />
+                New Article
+              </button>
+            </div>
           )}
         </header>
 

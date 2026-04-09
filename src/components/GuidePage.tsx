@@ -6,7 +6,16 @@ import { Guide } from '../data/guides';
 import SEO from './SEO';
 
 interface GuidePageProps {
-  guide: Guide;
+  guide: {
+    id: string;
+    title: string;
+    content: string;
+    excerpt?: string;
+    description?: string;
+    category: string;
+    readTime?: string;
+    icon?: string;
+  };
   onBack: () => void;
 }
 
@@ -15,7 +24,8 @@ const GuidePage: React.FC<GuidePageProps> = ({ guide, onBack }) => {
     window.scrollTo(0, 0);
   }, [guide.id]);
 
-  const getIcon = (iconName: string) => {
+  const getIcon = (iconName?: string) => {
+    if (!iconName) return <Activity className="w-6 h-6" />;
     switch (iconName) {
       case 'Dumbbell': return <Dumbbell className="w-6 h-6" />;
       case 'Flame': return <Flame className="w-6 h-6" />;
@@ -27,11 +37,14 @@ const GuidePage: React.FC<GuidePageProps> = ({ guide, onBack }) => {
     }
   };
 
+  const description = guide.excerpt || guide.description || "";
+  const readTime = guide.readTime || `${Math.ceil(guide.content.split(' ').length / 200)} min`;
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": guide.title,
-    "description": guide.description,
+    "description": description,
     "author": {
       "@type": "Organization",
       "name": "Fitin60ai.in"
@@ -55,7 +68,7 @@ const GuidePage: React.FC<GuidePageProps> = ({ guide, onBack }) => {
     <div className="min-h-screen bg-zinc-950 text-white pb-20 pt-24 selection:bg-neon selection:text-black">
       <SEO 
         title={`${guide.title} | Fitin60ai.in Fitness Knowledge Base`}
-        description={guide.description}
+        description={description}
         canonical={`https://fitin60ai.in/guides/${guide.id}`}
         ogType="article"
         schema={articleSchema}
@@ -112,7 +125,7 @@ const GuidePage: React.FC<GuidePageProps> = ({ guide, onBack }) => {
           >
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-neon" />
-              {guide.readTime} Read
+              {readTime} Read
             </div>
             <div className="flex items-center gap-2">
               <Tag className="w-4 h-4 text-neon" />

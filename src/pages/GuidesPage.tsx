@@ -1,21 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { FileText, ArrowRight, Activity } from 'lucide-react';
+import { FileText, ArrowRight, Activity, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
+import { db } from '../firebase';
+import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 
 interface GuidesPageProps {
   onShowGuide: (id: string) => void;
 }
 
+interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: string;
+}
+
 const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
-  const guides = [
-    { id: "build-muscle-ai", title: "How to Build Muscle with AI", desc: "Learn how artificial intelligence is revolutionizing hypertrophy and strength training." },
-    { id: "fat-loss-protocol", title: "The Ultimate Fat Loss Protocol", desc: "A deep dive into calorie deficits, macros, and metabolic optimization." },
-    { id: "home-vs-gym", title: "Home vs Gym: Which is Better?", desc: "Comparing the effectiveness of bodyweight training versus heavy iron." },
-    { id: "mastering-macros", title: "Mastering Your Macros", desc: "Everything you need to know about proteins, fats, and carbohydrates for your body type." },
-    { id: "progressive-overload", title: "Progressive Overload 101", desc: "The fundamental principle of muscle growth explained for beginners." },
-    { id: "supplements-guide", title: "Supplements That Actually Work", desc: "Cutting through the noise to find the scientifically-backed performance enhancers." }
-  ];
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const q = query(
+          collection(db, 'blogPosts'),
+          where('published', '==', true),
+          orderBy('createdAt', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        const fetchedArticles = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          title: doc.data().title,
+          excerpt: doc.data().excerpt,
+          category: doc.data().category
+        }));
+        setArticles(fetchedArticles);
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white pt-32 pb-20 px-4">
@@ -43,27 +72,43 @@ const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {guides.map((article, i) => (
-            <motion.div 
-              key={i} 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              onClick={() => onShowGuide(article.id)}
-              className="p-10 rounded-[3rem] bg-zinc-900/30 border border-white/5 hover:border-neon/30 transition-all group cursor-pointer shadow-2xl"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-neon/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                <FileText className="w-8 h-8 text-neon" />
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <Loader2 className="w-12 h-12 text-neon animate-spin" />
+            <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Loading Knowledge Base...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {articles.map((article, i) => (
+              <motion.div 
+                key={article.id} 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                onClick={() => onShowGuide(article.id)}
+                className="p-10 rounded-[3rem] bg-zinc-900/30 border border-white/5 hover:border-neon/30 transition-all group cursor-pointer shadow-2xl"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-neon/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                  <FileText className="w-8 h-8 text-neon" />
+                </div>
+                <div className="space-y-4">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-neon/60">{article.category}</span>
+                  <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tight text-white group-hover:text-neon transition-colors leading-tight">{article.title}</h3>
+                  <p className="text-zinc-500 font-bold leading-relaxed text-lg line-clamp-3">{article.excerpt}</p>
+                </div>
+                <div className="mt-8 flex items-center gap-3 text-neon text-xs font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read Full Guide <ArrowRight className="w-4 h-4" />
+                </div>
+              </motion.div>
+            ))}
+            {!loading && articles.length === 0 && (
+              <div className="col-span-full text-center py-20 bg-zinc-900/20 rounded-[3rem] border border-dashed border-white/5">
+                <FileText className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
+                <p className="text-zinc-500 font-bold">No articles found. Check back soon!</p>
               </div>
-              <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tight text-white mb-6 group-hover:text-neon transition-colors leading-tight">{article.title}</h3>
-              <p className="text-zinc-500 font-bold leading-relaxed text-lg">{article.desc}</p>
-              <div className="mt-8 flex items-center gap-3 text-neon text-xs font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                Read Full Guide <ArrowRight className="w-4 h-4" />
-              </div>
-            </motion.div>
-          ))}
-        </div>
+            )}
+          </div>
+        )}
 
         <div className="mt-32 text-center">
           <button 

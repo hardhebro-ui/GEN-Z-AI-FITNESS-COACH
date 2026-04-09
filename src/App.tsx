@@ -395,10 +395,33 @@ function AppContent() {
 
 // Helper component to handle guide ID from URL
 import { useParams } from 'react-router-dom';
+import { db } from './firebase';
+import { doc, getDoc } from 'firebase/firestore';
+
 function GuideWrapper({ onBack }: { onBack: () => void }) {
   const { id } = useParams<{ id: string }>();
-  const guide = guides.find(g => g.id === id);
+  const [guide, setGuide] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   
+  useEffect(() => {
+    const fetchGuide = async () => {
+      if (!id) return;
+      try {
+        const docRef = doc(db, 'blogPosts', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setGuide({ id: docSnap.id, ...docSnap.data() });
+        }
+      } catch (error) {
+        console.error("Error fetching guide:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGuide();
+  }, [id]);
+  
+  if (loading) return <PageLoader />;
   if (!guide) return <HomePage onStart={() => {}} />;
   
   return <GuidePage guide={guide} onBack={onBack} />;
