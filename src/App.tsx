@@ -28,13 +28,57 @@ const SupportPage = lazy(() => import('./pages/SupportPage'));
 const ExplorePage = lazy(() => import('./pages/ExplorePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
 const GuidePage = lazy(() => import('./components/GuidePage'));
 
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-    <Loader2 className="w-12 h-12 text-neon animate-spin" />
-  </div>
-);
+const PageLoader = () => {
+  const [factIndex, setFactIndex] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFactIndex(prev => (prev + 1) % fitnessFacts.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 p-6 text-center space-y-8" data-google-adsense-ignore="true">
+      <div className="relative">
+        <div className="absolute inset-0 bg-neon/20 blur-2xl rounded-full animate-pulse" />
+        <Loader2 className="w-16 h-16 text-neon animate-spin relative z-10" />
+      </div>
+      <div className="max-w-md space-y-4">
+        <p className="text-neon text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">Loading Protocol...</p>
+        <div className="h-20 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={factIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-zinc-400 text-sm font-medium leading-relaxed italic"
+            >
+              "{fitnessFacts[factIndex]}"
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const fitnessFacts = [
+  "Consistency is the key to any successful fitness transformation.",
+  "Muscle tissue burns more calories at rest than fat tissue.",
+  "Proper hydration can significantly improve your workout performance.",
+  "Rest days are when your muscles actually grow and recover.",
+  "A balanced diet is 70% of the fitness equation.",
+  "Compound movements like squats and deadlifts engage multiple muscle groups.",
+  "Sleep is the most underrated performance enhancer.",
+  "Artificial Intelligence can help optimize your training volume for better results.",
+  "Progressive overload is essential for continuous muscle growth.",
+  "Your fitness journey is a marathon, not a sprint."
+];
 
 function AppContent() {
   const navigate = useNavigate();
@@ -64,6 +108,18 @@ function AppContent() {
     { threshold: 85, message: 'Finalizing elite protocol...' },
     { threshold: 95, message: 'Securing your data...' },
   ];
+
+  const [currentFactIndex, setCurrentFactIndex] = useState(0);
+
+  useEffect(() => {
+    let factInterval: NodeJS.Timeout;
+    if (isGenerating) {
+      factInterval = setInterval(() => {
+        setCurrentFactIndex(prev => (prev + 1) % fitnessFacts.length);
+      }, 4000);
+    }
+    return () => clearInterval(factInterval);
+  }, [isGenerating]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -216,6 +272,7 @@ function AppContent() {
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.4 }}
             className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-12 bg-zinc-950 fixed inset-0 z-[100]"
+            data-google-adsense-ignore="true"
           >
             <div className="relative flex items-center justify-center">
               <div className="absolute inset-0 bg-neon/20 blur-3xl rounded-full animate-pulse" />
@@ -244,6 +301,24 @@ function AppContent() {
                 </AnimatePresence>
               </div>
             </div>
+
+            {/* Added Publisher Content: Fitness Facts */}
+            <div className="max-w-md w-full p-8 bg-zinc-900/50 rounded-3xl border border-white/5 space-y-4 relative z-10">
+              <p className="text-neon text-[10px] font-black uppercase tracking-[0.3em]">Did You Know?</p>
+              <div className="h-24 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={currentFactIndex}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="text-zinc-300 text-base md:text-lg font-medium italic leading-relaxed"
+                  >
+                    "{fitnessFacts[currentFactIndex]}"
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+            </div>
           </motion.div>
         ) : (
           <Suspense fallback={<PageLoader />}>
@@ -257,6 +332,7 @@ function AppContent() {
               <Route path="/support" element={<SupportPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/admin" element={<AdminPage />} />
               <Route path="/explore-plans" element={<ExplorePage onBack={() => navigate('/')} lastInputs={userInputs} />} />
               <Route path="/terms" element={<TermsPage onBack={() => navigate(-1)} />} />
               <Route path="/privacy" element={<PrivacyPage onBack={() => navigate(-1)} />} />

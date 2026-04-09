@@ -1,10 +1,42 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import { Mail, MessageSquare, MapPin, Send } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Mail, MessageSquare, MapPin, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 
+import { db } from '../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 const ContactPage: React.FC = () => {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStatus('loading');
+    
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      await addDoc(collection(db, 'contactSubmissions'), {
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+        createdAt: serverTimestamp(),
+        status: 'new'
+      });
+
+      setStatus('success');
+      (e.target as HTMLFormElement).reset();
+    } catch (err) {
+      console.error('Contact form error:', err);
+      setStatus('error');
+      setErrorMessage('Failed to send message. Please try again later.');
+    }
+  };
+
   return (
     <div className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
       <Helmet>
@@ -33,8 +65,7 @@ const ContactPage: React.FC = () => {
             </div>
             <div>
               <h3 className="font-black uppercase italic tracking-tight text-lg mb-2">Email Us</h3>
-              <p className="text-zinc-400 text-sm">support@fitin60.ai</p>
-              <p className="text-zinc-400 text-sm">hello@fitin60.ai</p>
+              <p className="text-zinc-400 text-sm">Hardhebro@gmail.com</p>
             </div>
           </div>
 
@@ -44,8 +75,15 @@ const ContactPage: React.FC = () => {
             </div>
             <div>
               <h3 className="font-black uppercase italic tracking-tight text-lg mb-2">Live Chat</h3>
-              <p className="text-zinc-400 text-sm">Available 24/7 for premium members</p>
-              <p className="text-zinc-400 text-sm">Average response: 5 mins</p>
+              <a 
+                href="https://wa.me/919712169979" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-neon text-sm font-bold hover:underline"
+              >
+                Chat on WhatsApp
+              </a>
+              <p className="text-zinc-400 text-[10px] mt-1 uppercase tracking-widest">+91 97121 69979</p>
             </div>
           </div>
 
@@ -55,56 +93,110 @@ const ContactPage: React.FC = () => {
             </div>
             <div>
               <h3 className="font-black uppercase italic tracking-tight text-lg mb-2">Location</h3>
-              <p className="text-zinc-400 text-sm">AI Innovation Hub</p>
-              <p className="text-zinc-400 text-sm">Silicon Valley, CA</p>
+              <p className="text-zinc-400 text-sm">106, Navafaliya, Vansda</p>
+              <p className="text-zinc-400 text-sm">396580 Gujarat, India</p>
             </div>
           </div>
         </div>
 
         <div className="lg:col-span-2 bg-zinc-900/30 border border-white/5 rounded-[3rem] p-8 md:p-12">
-          <form className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Full Name</label>
-                <input 
-                  type="text" 
-                  placeholder="Enter your name"
-                  className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Email Address</label>
-                <input 
-                  type="email" 
-                  placeholder="Enter your email"
-                  className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Subject</label>
-              <input 
-                type="text" 
-                placeholder="What can we help you with?"
-                className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Message</label>
-              <textarea 
-                rows={6}
-                placeholder="Tell us more about your inquiry..."
-                className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors resize-none"
-              />
-            </div>
-            <button 
-              type="submit"
-              className="w-full py-5 bg-neon text-black font-black uppercase italic tracking-widest rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform shadow-[0_0_30px_rgba(204,255,0,0.2)]"
-            >
-              <Send className="w-5 h-5" />
-              Send Message
-            </button>
-          </form>
+          <AnimatePresence mode="wait">
+            {status === 'success' ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="h-full flex flex-col items-center justify-center text-center space-y-6 py-12"
+              >
+                <div className="w-20 h-20 bg-neon/20 rounded-full flex items-center justify-center">
+                  <CheckCircle2 className="w-10 h-10 text-neon" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-black uppercase italic tracking-tight">Message Sent!</h3>
+                  <p className="text-zinc-400 font-medium">Thank you for reaching out. We'll get back to you shortly.</p>
+                </div>
+                <button 
+                  onClick={() => setStatus('idle')}
+                  className="px-8 py-3 bg-zinc-900 border border-white/5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors"
+                >
+                  Send Another Message
+                </button>
+              </motion.div>
+            ) : (
+              <motion.form 
+                key="form"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onSubmit={handleSubmit} 
+                className="space-y-6"
+              >
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Full Name</label>
+                    <input 
+                      required
+                      name="name"
+                      type="text" 
+                      placeholder="Enter your name"
+                      className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Email Address</label>
+                    <input 
+                      required
+                      name="email"
+                      type="email" 
+                      placeholder="Enter your email"
+                      className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Subject</label>
+                  <input 
+                    required
+                    name="subject"
+                    type="text" 
+                    placeholder="What can we help you with?"
+                    className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-4">Message</label>
+                  <textarea 
+                    required
+                    name="message"
+                    rows={6}
+                    placeholder="Tell us more about your inquiry..."
+                    className="w-full bg-zinc-950 border border-white/5 rounded-2xl p-4 text-white focus:border-neon outline-none transition-colors resize-none"
+                  />
+                </div>
+
+                {status === 'error' && (
+                  <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-bold">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    {errorMessage}
+                  </div>
+                )}
+
+                <button 
+                  disabled={status === 'loading'}
+                  type="submit"
+                  className="w-full py-5 bg-neon text-black font-black uppercase italic tracking-widest rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform shadow-[0_0_30px_rgba(204,255,0,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {status === 'loading' ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                  {status === 'loading' ? 'Sending...' : 'Send Message'}
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

@@ -143,6 +143,20 @@ export default function MultiStepForm({ onSubmit, onShowTerms, onCancel }: Multi
 
   const bmiData = calculateBMI();
 
+  const getStepInfo = () => {
+    switch (step) {
+      case 1: return "Your age, height, and weight are the primary factors in calculating your Basal Metabolic Rate (BMR), which determines your daily caloric needs.";
+      case 2: return "Identifying your body type and fitness level helps the AI adjust training volume and intensity to prevent overtraining and ensure steady progress.";
+      case 3: return "Setting clear goals and identifying target areas allows the AI to prioritize specific muscle groups and choose the most effective training split for your objective.";
+      case 4: return "Your environment and schedule are crucial. Whether you're at home or the gym, the AI optimizes your plan to fit your available time and equipment.";
+      case 5: return "Nutrition is 70% of the battle. Your dietary preferences and budget help the AI create a sustainable meal plan that you'll actually enjoy following.";
+      case 6: return "Lifestyle factors like sleep and stress levels significantly impact recovery. The AI considers these to suggest optimal rest days and intensity levels.";
+      case 7: return "Safety is our top priority. Disclosing medical conditions and past injuries ensures the AI avoids high-risk movements and suggests safer alternatives.";
+      case 8: return "Finalizing your protocol. Reviewing the terms ensures you understand the guidance is AI-generated and should be followed with awareness.";
+      default: return "";
+    }
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -974,6 +988,17 @@ export default function MultiStepForm({ onSubmit, onShowTerms, onCancel }: Multi
               }}
             >
               {renderStep()}
+
+              {/* Educational Content for AdSense Compliance */}
+              <div className="mt-16 p-8 bg-zinc-900/30 border border-white/5 rounded-3xl space-y-4">
+                <div className="flex items-center gap-2 text-neon">
+                  <ShieldAlert className="w-4 h-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Expert Insight</span>
+                </div>
+                <p className="text-zinc-400 text-sm font-medium leading-relaxed italic">
+                  {getStepInfo()}
+                </p>
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
