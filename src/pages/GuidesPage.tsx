@@ -23,18 +23,26 @@ const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const q = query(
-          collection(db, 'blogPosts'),
-          where('published', '==', true),
-          orderBy('createdAt', 'desc')
-        );
+        // Filter by published=true in the query to satisfy security rules
+        const q = query(collection(db, 'blogPosts'), where('published', '==', true));
         const querySnapshot = await getDocs(q);
-        const fetchedArticles = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          title: doc.data().title,
-          excerpt: doc.data().excerpt,
-          category: doc.data().category
-        }));
+        const fetchedArticles = querySnapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as any))
+          .sort((a, b) => {
+            const dateA = a.createdAt?.seconds || 0;
+            const dateB = b.createdAt?.seconds || 0;
+            return dateB - dateA;
+          })
+          .map(post => ({
+            id: post.id,
+            title: post.title,
+            excerpt: post.excerpt,
+            category: post.category
+          }));
+          
         setArticles(fetchedArticles);
       } catch (error) {
         console.error("Error fetching articles:", error);
