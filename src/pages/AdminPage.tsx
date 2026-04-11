@@ -40,6 +40,9 @@ import {
 import { Helmet } from 'react-helmet-async';
 import { guides } from '../data/guides';
 
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
 const ADMIN_EMAIL = "hardhebro@gmail.com";
 
 enum OperationType {
@@ -96,11 +99,17 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 interface BlogPost {
   id: string;
   title: string;
+  slug: string;
   content: string;
   excerpt: string;
+  metaDescription: string;
   category: string;
+  tags: string[];
   published: boolean;
+  image: string;
+  readingTime: number;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 interface ContactSubmission {
@@ -211,13 +220,36 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  };
+
+  const calculateReadingTime = (text: string) => {
+    const wordsPerMinute = 200;
+    const noOfWords = text.split(/\s/g).length;
+    const minutes = noOfWords / wordsPerMinute;
+    return Math.ceil(minutes);
+  };
+
   const savePost = async () => {
-    if (!currentPost.title || !currentPost.content) return;
+    if (!currentPost.title || !currentPost.content) {
+      alert("Title and Content are required.");
+      return;
+    }
+    
+    const slug = currentPost.slug || generateSlug(currentPost.title);
+    const readingTime = calculateReadingTime(currentPost.content);
     
     const postData = {
       ...currentPost,
+      slug,
+      readingTime,
       updatedAt: serverTimestamp(),
       published: currentPost.published ?? false,
+      tags: currentPost.tags || [],
     };
 
     try {
@@ -526,51 +558,120 @@ const AdminPage: React.FC = () => {
               
               <div className="flex-1 overflow-y-auto p-10 space-y-10">
                 <div className="grid md:grid-cols-3 gap-10">
-                  <div className="md:col-span-2 space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Title</label>
-                    <input 
-                      value={currentPost.title || ''}
-                      onChange={e => setCurrentPost({...currentPost, title: e.target.value})}
-                      placeholder="Enter a compelling title..."
-                      className="w-full bg-transparent border-b border-white/10 py-4 text-2xl md:text-3xl font-black uppercase italic tracking-tight text-white focus:border-neon outline-none transition-colors placeholder:text-zinc-800"
+                  <div className="md:col-span-2 space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Title</label>
+                      <input 
+                        value={currentPost.title || ''}
+                        onChange={e => {
+                          const title = e.target.value;
+                          const updates: Partial<BlogPost> = { title };
+                          if (!currentPost.slug || currentPost.slug === generateSlug(currentPost.title || '')) {
+                            updates.slug = generateSlug(title);
+                          }
+                          setCurrentPost({...currentPost, ...updates});
+                        }}
+                        placeholder="Enter a compelling title..."
+                        className="w-full bg-transparent border-b border-white/10 py-4 text-2xl md:text-3xl font-black uppercase italic tracking-tight text-white focus:border-neon outline-none transition-colors placeholder:text-zinc-800"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">URL Slug</label>
+                      <input 
+                        value={currentPost.slug || ''}
+                        onChange={e => setCurrentPost({...currentPost, slug: e.target.value})}
+                        placeholder="url-friendly-slug"
+                        className="w-full bg-transparent border-b border-white/10 py-2 text-sm font-mono text-zinc-500 focus:border-neon outline-none transition-colors placeholder:text-zinc-800"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Category</label>
+                      <select 
+                        value={currentPost.category || ''}
+                        onChange={e => setCurrentPost({...currentPost, category: e.target.value})}
+                        className="w-full bg-zinc-950 border border-white/5 rounded-xl p-4 text-xs font-black uppercase tracking-widest text-white focus:border-neon outline-none transition-colors appearance-none cursor-pointer"
+                      >
+                        <option value="">Select Category</option>
+                        <option value="Workout">Workout</option>
+                        <option value="Nutrition">Nutrition</option>
+                        <option value="AI Fitness">AI Fitness</option>
+                        <option value="Success Stories">Success Stories</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Tags (Comma separated)</label>
+                      <input 
+                        value={currentPost.tags?.join(', ') || ''}
+                        onChange={e => setCurrentPost({...currentPost, tags: e.target.value.split(',').map(t => t.trim()).filter(t => t !== '')})}
+                        placeholder="fitness, ai, health"
+                        className="w-full bg-zinc-950 border border-white/5 rounded-xl p-4 text-xs font-bold text-white focus:border-neon outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-10">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Excerpt (Card Summary)</label>
+                      <span className="text-[8px] text-zinc-500 font-bold">{(currentPost.excerpt?.length || 0)}/150</span>
+                    </div>
+                    <textarea 
+                      value={currentPost.excerpt || ''}
+                      onChange={e => setCurrentPost({...currentPost, excerpt: e.target.value.slice(0, 150)})}
+                      rows={3}
+                      placeholder="Brief summary for scannability..."
+                      className="w-full bg-zinc-950/50 border border-white/5 rounded-xl p-6 text-zinc-400 font-medium text-sm focus:border-neon outline-none transition-colors resize-none leading-relaxed"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Category</label>
-                    <select 
-                      value={currentPost.category || ''}
-                      onChange={e => setCurrentPost({...currentPost, category: e.target.value})}
-                      className="w-full bg-zinc-950 border border-white/5 rounded-xl p-4 text-xs font-black uppercase tracking-widest text-white focus:border-neon outline-none transition-colors appearance-none cursor-pointer"
-                    >
-                      <option value="">Select Category</option>
-                      <option value="Workout">Workout</option>
-                      <option value="Nutrition">Nutrition</option>
-                      <option value="AI Fitness">AI Fitness</option>
-                      <option value="Success Stories">Success Stories</option>
-                    </select>
+                    <div className="flex justify-between items-center">
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Meta Description (SEO)</label>
+                      <span className={`text-[8px] font-bold ${(currentPost.metaDescription?.length || 0) > 160 ? 'text-red-500' : 'text-zinc-500'}`}>
+                        {(currentPost.metaDescription?.length || 0)}/160
+                      </span>
+                    </div>
+                    <textarea 
+                      value={currentPost.metaDescription || ''}
+                      onChange={e => setCurrentPost({...currentPost, metaDescription: e.target.value})}
+                      rows={3}
+                      placeholder="SEO meta description for search results..."
+                      className="w-full bg-zinc-950/50 border border-white/5 rounded-xl p-6 text-zinc-400 font-medium text-sm focus:border-neon outline-none transition-colors resize-none leading-relaxed"
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Excerpt</label>
-                  <textarea 
-                    value={currentPost.excerpt || ''}
-                    onChange={e => setCurrentPost({...currentPost, excerpt: e.target.value})}
-                    rows={2}
-                    placeholder="Brief summary for scannability..."
-                    className="w-full bg-zinc-950/50 border border-white/5 rounded-xl p-6 text-zinc-400 font-medium text-sm focus:border-neon outline-none transition-colors resize-none leading-relaxed"
+                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Featured Image URL</label>
+                  <input 
+                    value={currentPost.image || ''}
+                    onChange={e => setCurrentPost({...currentPost, image: e.target.value})}
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full bg-zinc-950/50 border border-white/5 rounded-xl p-4 text-xs font-medium text-zinc-400 focus:border-neon outline-none transition-colors"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Content (Markdown)</label>
-                  <textarea 
-                    value={currentPost.content || ''}
-                    onChange={e => setCurrentPost({...currentPost, content: e.target.value})}
-                    rows={15}
-                    placeholder="Start writing your masterpiece..."
-                    className="w-full bg-zinc-950/50 border border-white/5 rounded-xl p-8 text-zinc-300 font-mono text-sm focus:border-neon outline-none transition-colors resize-none leading-relaxed"
-                  />
+                <div className="space-y-2 editor-container">
+                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 ml-1">Content (Rich Text)</label>
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl overflow-hidden min-h-[400px]">
+                    <ReactQuill 
+                      theme="snow"
+                      value={currentPost.content || ''}
+                      onChange={content => setCurrentPost({...currentPost, content})}
+                      className="text-zinc-300"
+                      modules={{
+                        toolbar: [
+                          [{ 'header': [1, 2, 3, false] }],
+                          ['bold', 'italic', 'underline', 'strike'],
+                          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                          ['link', 'image', 'code-block'],
+                          ['clean']
+                        ],
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between p-6 bg-zinc-950/30 rounded-2xl border border-white/5">

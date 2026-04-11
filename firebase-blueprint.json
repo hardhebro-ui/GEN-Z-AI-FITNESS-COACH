@@ -95,16 +95,20 @@
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "content": { "type": "string" },
-        "excerpt": { "type": "string" },
+        "slug": { "type": "string", "description": "URL-friendly version of the title." },
+        "content": { "type": "string", "description": "HTML content from rich text editor." },
+        "excerpt": { "type": "string", "description": "Short summary for cards." },
+        "metaDescription": { "type": "string", "description": "SEO meta description (max 160 chars)." },
         "category": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
         "author": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" },
         "published": { "type": "boolean" },
-        "image": { "type": "string" }
+        "image": { "type": "string" },
+        "readingTime": { "type": "integer", "description": "Estimated reading time in minutes." }
       },
-      "required": ["title", "content", "createdAt", "published"]
+      "required": ["title", "slug", "content", "createdAt", "published"]
     },
     "ContactSubmission": {
       "title": "ContactSubmission",

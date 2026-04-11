@@ -25,6 +25,59 @@
   --color-zinc-950: #09090b;
 }
 
+/* React Quill Dark Theme Overrides */
+.ql-toolbar.ql-snow {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.ql-container.ql-snow {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  font-family: inherit;
+}
+
+.ql-editor {
+  min-height: 350px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.ql-snow .ql-stroke {
+  stroke: #71717a !important;
+}
+
+.ql-snow .ql-fill {
+  fill: #71717a !important;
+}
+
+.ql-snow .ql-picker {
+  color: #71717a !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke {
+  stroke: #ccff00 !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill {
+  fill: #ccff00 !important;
+}
+
+.ql-snow.ql-toolbar button:hover,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow.ql-toolbar .ql-picker-item:hover,
+.ql-snow.ql-toolbar .ql-picker-item.ql-active {
+  color: #ccff00 !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: #3f3f46 !important;
+  font-style: normal !important;
+}
+
 @layer base {
   body {
     @apply bg-zinc-950 text-zinc-100 antialiased overflow-x-hidden;

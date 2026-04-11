@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { FileText, ArrowRight, Activity, Loader2 } from 'lucide-react';
+import { FileText, ArrowRight, Activity, Loader2, Clock } from 'lucide-react';
 import SEO from '../components/SEO';
 import { db } from '../firebase';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
@@ -14,6 +14,8 @@ interface Article {
   title: string;
   excerpt: string;
   category: string;
+  readingTime?: number;
+  tags?: string[];
 }
 
 const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
@@ -40,7 +42,9 @@ const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
             id: post.id,
             title: post.title,
             excerpt: post.excerpt,
-            category: post.category
+            category: post.category,
+            readingTime: post.readingTime,
+            tags: post.tags
           }));
           
         setArticles(fetchedArticles);
@@ -100,7 +104,15 @@ const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
                   <FileText className="w-8 h-8 text-neon" />
                 </div>
                 <div className="space-y-4">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-neon/60">{article.category}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-neon/60">{article.category}</span>
+                    {article.readingTime && (
+                      <div className="flex items-center gap-1.5 text-zinc-600 text-[9px] font-black uppercase tracking-widest">
+                        <Clock className="w-3 h-3" />
+                        {article.readingTime} min
+                      </div>
+                    )}
+                  </div>
                   <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tight text-white group-hover:text-neon transition-colors leading-tight">{article.title}</h3>
                   <p className="text-zinc-500 font-bold leading-relaxed text-lg line-clamp-3">{article.excerpt}</p>
                 </div>

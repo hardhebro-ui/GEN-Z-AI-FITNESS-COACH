@@ -11,9 +11,10 @@ interface GuidePageProps {
     title: string;
     content: string;
     excerpt?: string;
-    description?: string;
+    metaDescription?: string;
     category: string;
-    readTime?: string;
+    readingTime?: number;
+    tags?: string[];
     icon?: string;
   };
   onBack: () => void;
@@ -37,8 +38,8 @@ const GuidePage: React.FC<GuidePageProps> = ({ guide, onBack }) => {
     }
   };
 
-  const description = guide.excerpt || guide.description || "";
-  const readTime = guide.readTime || `${Math.ceil(guide.content.split(' ').length / 200)} min`;
+  const description = guide.metaDescription || guide.excerpt || "";
+  const readTime = guide.readingTime ? `${guide.readingTime} min` : `${Math.ceil(guide.content.replace(/<[^>]*>/g, '').split(' ').length / 200)} min`;
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -121,16 +122,27 @@ const GuidePage: React.FC<GuidePageProps> = ({ guide, onBack }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center gap-6 text-zinc-500 text-xs font-black uppercase tracking-widest"
+            className="flex flex-wrap items-center gap-6 text-zinc-500 text-xs font-black uppercase tracking-widest"
           >
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-neon" />
               {readTime} Read
             </div>
-            <div className="flex items-center gap-2">
-              <Tag className="w-4 h-4 text-neon" />
-              Knowledge Base
-            </div>
+            {guide.tags && guide.tags.length > 0 ? (
+              <div className="flex items-center gap-2">
+                <Tag className="w-4 h-4 text-neon" />
+                <div className="flex gap-2">
+                  {guide.tags.map(tag => (
+                    <span key={tag} className="text-zinc-400 hover:text-neon transition-colors">#{tag}</span>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Tag className="w-4 h-4 text-neon" />
+                Knowledge Base
+              </div>
+            )}
           </motion.div>
         </header>
 
@@ -147,7 +159,7 @@ const GuidePage: React.FC<GuidePageProps> = ({ guide, onBack }) => {
             prose-li:text-zinc-400 prose-li:text-lg prose-strong:text-white prose-strong:font-black
             prose-hr:border-white/5"
         >
-          <ReactMarkdown>{guide.content}</ReactMarkdown>
+          <div dangerouslySetInnerHTML={{ __html: guide.content }} />
         </motion.article>
 
         {/* Footer CTA */}
