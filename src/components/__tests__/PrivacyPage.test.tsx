@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import PrivacyPage from '../PrivacyPage';
+import PrivacyPage from '../../pages/PrivacyPage';
 
 describe('PrivacyPage Component', () => {
   const mockOnBack = vi.fn();

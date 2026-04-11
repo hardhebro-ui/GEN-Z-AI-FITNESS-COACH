@@ -1,15 +1,14 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MultiStepForm from './components/MultiStepForm';
 import PlanPreview from './components/PlanPreview';
 import ExportModal from './components/ExportModal';
 import ReviewPrompt from './components/ReviewPrompt';
-import TermsPage from './components/TermsPage';
-import PrivacyPage from './components/PrivacyPage';
 import CookieConsent from './components/CookieConsent';
+import PageLoader, { fitnessFacts } from './components/PageLoader';
 import { UserInputs, GeneratedPlan } from './types';
 import { generatePlan } from './services/geminiService';
 import { generateProgrammaticPDF } from './services/pdfService';
@@ -29,56 +28,9 @@ const ExplorePage = lazy(() => import('./pages/ExplorePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const GuidePage = lazy(() => import('./components/GuidePage'));
-
-const PageLoader = () => {
-  const [factIndex, setFactIndex] = useState(0);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFactIndex(prev => (prev + 1) % fitnessFacts.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 p-6 text-center space-y-8" data-google-adsense-ignore="true">
-      <div className="relative">
-        <div className="absolute inset-0 bg-neon/20 blur-2xl rounded-full animate-pulse" />
-        <Loader2 className="w-16 h-16 text-neon animate-spin relative z-10" />
-      </div>
-      <div className="max-w-md space-y-4">
-        <p className="text-neon text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">Loading Protocol...</p>
-        <div className="h-20 flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={factIndex}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-zinc-400 text-sm font-medium leading-relaxed italic"
-            >
-              "{fitnessFacts[factIndex]}"
-            </motion.p>
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const fitnessFacts = [
-  "Consistency is the key to any successful fitness transformation.",
-  "Muscle tissue burns more calories at rest than fat tissue.",
-  "Proper hydration can significantly improve your workout performance.",
-  "Rest days are when your muscles actually grow and recover.",
-  "A balanced diet is 70% of the fitness equation.",
-  "Compound movements like squats and deadlifts engage multiple muscle groups.",
-  "Sleep is the most underrated performance enhancer.",
-  "Artificial Intelligence can help optimize your training volume for better results.",
-  "Progressive overload is essential for continuous muscle growth.",
-  "Your fitness journey is a marathon, not a sprint."
-];
 
 function AppContent() {
   const navigate = useNavigate();
@@ -256,7 +208,7 @@ function AppContent() {
   };
 
   const handleShowGuide = (id: string) => {
-    navigate(`/guide/${id}`);
+    navigate(`/guides/${id}`);
   };
 
   return (
@@ -326,19 +278,29 @@ function AppContent() {
           <Suspense fallback={<PageLoader />}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<HomePage onStart={handleStart} />} />
-              <Route path="/how-it-works" element={<HowItWorksPage />} />
-              <Route path="/ai-fitness-benefits" element={<BenefitsPage />} />
+              <Route path="/process" element={<HowItWorksPage />} />
+              <Route path="/why-ai" element={<BenefitsPage />} />
               <Route path="/faq" element={<FAQPage />} />
-              <Route path="/blog" element={<GuidesPage onShowGuide={handleShowGuide} />} />
+              <Route path="/guides" element={<GuidesPage onShowGuide={handleShowGuide} />} />
               <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/support" element={<SupportPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/about-us" element={<AboutPage />} />
+              <Route path="/contact-us" element={<ContactPage />} />
               <Route path="/admin" element={<AdminPage />} />
-              <Route path="/explore-plans" element={<ExplorePage onBack={() => navigate('/')} lastInputs={userInputs} />} />
-              <Route path="/terms" element={<TermsPage onBack={() => navigate(-1)} />} />
-              <Route path="/privacy" element={<PrivacyPage onBack={() => navigate(-1)} />} />
+              <Route path="/explore" element={<ExplorePage onBack={() => navigate('/')} lastInputs={userInputs} />} />
+              <Route path="/terms-conditions" element={<TermsPage onBack={() => navigate(-1)} />} />
+              <Route path="/privacy-policy" element={<PrivacyPage onBack={() => navigate(-1)} />} />
               <Route path="/disclaimer" element={<DisclaimerPage />} />
+              
+              {/* Redirects for backward compatibility */}
+              <Route path="/how-it-works" element={<Navigate to="/process" replace />} />
+              <Route path="/ai-fitness-benefits" element={<Navigate to="/why-ai" replace />} />
+              <Route path="/blog" element={<Navigate to="/guides" replace />} />
+              <Route path="/explore-plans" element={<Navigate to="/explore" replace />} />
+              <Route path="/about" element={<Navigate to="/about-us" replace />} />
+              <Route path="/contact" element={<Navigate to="/contact-us" replace />} />
+              <Route path="/terms" element={<Navigate to="/terms-conditions" replace />} />
+              <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
               <Route path="/generate" element={
                 <div className="min-h-[100dvh] bg-zinc-950 pt-20">
                   {error && (
@@ -367,8 +329,8 @@ function AppContent() {
                   <HomePage onStart={handleStart} />
                 )
               } />
-              <Route path="/guide/:id" element={
-                <GuideWrapper onBack={() => navigate('/blog')} />
+              <Route path="/guides/:id" element={
+                <GuideWrapper onBack={() => navigate('/guides')} />
               } />
             </Routes>
           </Suspense>

@@ -67,20 +67,20 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
 
   const primaryLinks = [
     { path: '/', label: 'Home', icon: <Home className="w-4 h-4" /> },
-    { path: '/how-it-works', label: 'Process', icon: <Info className="w-4 h-4" /> },
-    { path: '/explore-plans', label: 'Explore', icon: <LayoutGrid className="w-4 h-4" /> },
-    { path: '/blog', label: 'Guides', icon: <MessageSquare className="w-4 h-4" /> },
+    { path: '/process', label: 'Process', icon: <Info className="w-4 h-4" /> },
+    { path: '/explore', label: 'Explore', icon: <LayoutGrid className="w-4 h-4" /> },
+    { path: '/guides', label: 'Guides', icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   const secondaryLinks = [
-    { path: '/ai-fitness-benefits', label: 'Why AI?', icon: <ShieldCheck className="w-4 h-4" /> },
+    { path: '/why-ai', label: 'Why AI?', icon: <ShieldCheck className="w-4 h-4" /> },
     { path: '/faq', label: 'FAQ', icon: <HelpCircle className="w-4 h-4" /> },
     { path: '/reviews', label: 'Reviews', icon: <UsersIcon className="w-4 h-4" /> },
     { path: '/support', label: 'Support', icon: <Coffee className="w-4 h-4" /> },
-    { path: '/about', label: 'About Us', icon: <User className="w-4 h-4" /> },
-    { path: '/contact', label: 'Contact Us', icon: <MessageSquare className="w-4 h-4" /> },
-    { path: '/terms', label: 'Terms', icon: <ShieldCheck className="w-4 h-4" /> },
-    { path: '/privacy', label: 'Privacy', icon: <ShieldCheck className="w-4 h-4" /> },
+    { path: '/about-us', label: 'About Us', icon: <User className="w-4 h-4" /> },
+    { path: '/contact-us', label: 'Contact Us', icon: <MessageSquare className="w-4 h-4" /> },
+    { path: '/terms-conditions', label: 'Terms', icon: <ShieldCheck className="w-4 h-4" /> },
+    { path: '/privacy-policy', label: 'Privacy', icon: <ShieldCheck className="w-4 h-4" /> },
   ];
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);

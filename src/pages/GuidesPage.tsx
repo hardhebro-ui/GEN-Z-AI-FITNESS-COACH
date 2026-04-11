@@ -63,7 +63,7 @@ const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
       <SEO 
         title="Fitness Knowledge Base | AI-Curated Guides"
         description="Master your transformation with our AI-curated fitness guides. Learn about muscle building, fat loss, nutrition, and progressive overload."
-        canonical="https://fitin60ai.in/blog"
+        canonical="https://fitin60ai.in/guides"
       />
 
       <div className="max-w-6xl mx-auto">

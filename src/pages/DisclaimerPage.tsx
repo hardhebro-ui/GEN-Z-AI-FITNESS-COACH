@@ -1,15 +1,16 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { AlertTriangle, ShieldAlert, Stethoscope, Info } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 
 const DisclaimerPage: React.FC = () => {
   return (
     <div className="pt-32 pb-20 px-4 md:px-8 max-w-4xl mx-auto">
-      <Helmet>
-        <title>Medical Disclaimer | Fitin60ai.in</title>
-        <meta name="description" content="Important medical disclaimer for Fitin60ai.in. Please read before using our AI-generated fitness and diet plans." />
-      </Helmet>
+      <SEO 
+        title="Medical Disclaimer | Fitin60ai.in Safety Information"
+        description="Important medical disclaimer for Fitin60ai.in. Please read our safety guidelines before using our AI-generated fitness and diet plans."
+        canonical="https://fitin60ai.in/disclaimer"
+      />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

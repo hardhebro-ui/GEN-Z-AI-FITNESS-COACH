@@ -37,7 +37,7 @@ const BenefitsPage: React.FC = () => {
       <SEO 
         title="Why Choose AI Fitness | Fitin60ai.in Benefits"
         description="Discover the advantages of AI-powered fitness plans. Personalized workouts, macro-balanced diets, and instant results tailored to your body and goals."
-        canonical="https://fitin60ai.in/ai-fitness-benefits"
+        canonical="https://fitin60ai.in/why-ai"
       />
 
       <div className="max-w-6xl mx-auto">

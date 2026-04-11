@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, ShieldCheck, Eye, Database, Share2, Lock, Info, Server, Cookie } from 'lucide-react';
+import SEO from '../components/SEO';
 
 interface PrivacyPageProps {
   onBack: () => void;
@@ -8,7 +9,17 @@ interface PrivacyPageProps {
 
 export default function PrivacyPage({ onBack }: PrivacyPageProps) {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-neon selection:text-black p-6 md:p-12">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-neon selection:text-black p-6 md:p-12"
+    >
+      <SEO 
+        title="Privacy Policy | Fitin60ai.in Data Protection"
+        description="Learn how Fitin60ai.in collects, uses, and protects your personal data. Your privacy and security are our top priorities."
+        canonical="https://fitin60ai.in/privacy-policy"
+      />
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
@@ -152,6 +163,6 @@ export default function PrivacyPage({ onBack }: PrivacyPageProps) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

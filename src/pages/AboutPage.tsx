@@ -1,15 +1,16 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Users, Target, Award, ShieldCheck } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 
 const AboutPage: React.FC = () => {
   return (
     <div className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
-      <Helmet>
-        <title>About Us | Fitin60ai.in</title>
-        <meta name="description" content="Learn about the mission and team behind Fitin60ai.in, the world's most advanced AI fitness protocol engine." />
-      </Helmet>
+      <SEO 
+        title="About Us | Fitin60ai.in AI Fitness Mission"
+        description="Learn about the mission and team behind Fitin60ai.in, the world's most advanced AI fitness protocol engine. We're democratizing elite fitness coaching."
+        canonical="https://fitin60ai.in/about-us"
+      />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

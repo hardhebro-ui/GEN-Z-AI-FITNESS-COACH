@@ -30,7 +30,7 @@ const HowItWorksPage: React.FC = () => {
       <SEO 
         title="How It Works | Fitin60ai.in AI Fitness Generator"
         description="Learn how our AI-powered fitness engine generates personalized workout and diet plans in 60 seconds. Three simple steps to your transformation."
-        canonical="https://fitin60ai.in/how-it-works"
+        canonical="https://fitin60ai.in/process"
       />
 
       <div className="max-w-6xl mx-auto">

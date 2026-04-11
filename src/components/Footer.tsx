@@ -10,18 +10,18 @@ const Footer: React.FC = () => {
       title: "Product",
       links: [
         { label: "Home", path: "/" },
-        { label: "Process", path: "/how-it-works" },
-        { label: "Explore Plans", path: "/explore-plans" },
-        { label: "Knowledge Base", path: "/blog" },
+        { label: "Process", path: "/process" },
+        { label: "Explore Plans", path: "/explore" },
+        { label: "Knowledge Base", path: "/guides" },
       ]
     },
     {
       title: "Company",
       links: [
-        { label: "About Us", path: "/about" },
+        { label: "About Us", path: "/about-us" },
         { label: "Reviews", path: "/reviews" },
-        { label: "Why AI?", path: "/ai-fitness-benefits" },
-        { label: "Contact Us", path: "/contact" },
+        { label: "Why AI?", path: "/why-ai" },
+        { label: "Contact Us", path: "/contact-us" },
       ]
     },
     {
@@ -29,8 +29,8 @@ const Footer: React.FC = () => {
       links: [
         { label: "FAQ", path: "/faq" },
         { label: "Support Us", path: "/support" },
-        { label: "Terms of Service", path: "/terms" },
-        { label: "Privacy Policy", path: "/privacy" },
+        { label: "Terms of Service", path: "/terms-conditions" },
+        { label: "Privacy Policy", path: "/privacy-policy" },
         { label: "Disclaimer", path: "/disclaimer" },
       ]
     }
@@ -57,7 +57,7 @@ const Footer: React.FC = () => {
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-zinc-900 rounded-lg text-zinc-400 hover:text-neon transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="/contact" className="p-2 bg-zinc-900 rounded-lg text-zinc-400 hover:text-neon transition-colors">
+              <a href="/contact-us" className="p-2 bg-zinc-900 rounded-lg text-zinc-400 hover:text-neon transition-colors">
                 <Mail className="w-5 h-5" />
               </a>
             </div>

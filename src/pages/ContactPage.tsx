@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, MessageSquare, MapPin, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-
+import SEO from '../components/SEO';
 import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -39,10 +38,11 @@ const ContactPage: React.FC = () => {
 
   return (
     <div className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
-      <Helmet>
-        <title>Contact Us | Fitin60ai.in</title>
-        <meta name="description" content="Get in touch with the Fitin60ai.in team for support, partnerships, or general inquiries." />
-      </Helmet>
+      <SEO 
+        title="Contact Us | Get in Touch with Fitin60ai.in Support"
+        description="Have questions about your AI fitness plan? Contact the Fitin60ai.in team for support, feedback, or business inquiries."
+        canonical="https://fitin60ai.in/contact-us"
+      />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

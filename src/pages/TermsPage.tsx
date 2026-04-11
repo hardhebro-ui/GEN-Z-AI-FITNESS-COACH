@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Shield, AlertTriangle, Scale, Activity, Zap, Info, Stethoscope, HeartPulse } from 'lucide-react';
+import SEO from '../components/SEO';
 
 interface TermsPageProps {
   onBack: () => void;
@@ -8,7 +9,17 @@ interface TermsPageProps {
 
 export default function TermsPage({ onBack }: TermsPageProps) {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-neon selection:text-black p-6 md:p-12">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-neon selection:text-black p-6 md:p-12"
+    >
+      <SEO 
+        title="Terms & Conditions | Fitin60ai.in Service Agreement"
+        description="Read our terms and conditions for using Fitin60ai.in. Understand your rights and responsibilities when using our AI fitness platform."
+        canonical="https://fitin60ai.in/terms-conditions"
+      />
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
@@ -153,6 +164,6 @@ export default function TermsPage({ onBack }: TermsPageProps) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

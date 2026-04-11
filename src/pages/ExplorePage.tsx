@@ -13,7 +13,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({ onBack, lastInputs }) => {
       <SEO 
         title="Explore AI Fitness Protocols | Fitin60ai.in Library"
         description="Browse our library of AI-generated workout and diet plans. Find the perfect protocol for muscle building, fat loss, or strength training."
-        canonical="https://fitin60ai.in/explore-plans"
+        canonical="https://fitin60ai.in/explore"
       />
       <ExplorePlans onBack={onBack} lastInputs={lastInputs} />
     </div>
