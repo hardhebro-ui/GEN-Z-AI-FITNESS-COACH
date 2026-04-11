@@ -25,7 +25,6 @@ const ReviewsPage: React.FC = () => {
           rating: data.rating,
           text: data.text || '',
           name: data.name || 'Anonymous',
-          tags: data.tags || [],
           date: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
         });
       });
@@ -122,7 +121,6 @@ const ReviewsPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-white font-black text-lg font-display uppercase italic">{review.name || 'Anonymous'}</p>
-                  <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Verified Athlete</p>
                 </div>
               </div>
             </motion.div>

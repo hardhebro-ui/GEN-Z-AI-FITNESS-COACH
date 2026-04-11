@@ -34,7 +34,6 @@ const HomePage: React.FC<HomePageProps> = ({ onStart }) => {
           rating: data.rating,
           text: data.text || '',
           name: data.name || 'Anonymous',
-          tags: data.tags || [],
           date: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString()
         });
         totalRating += data.rating;
@@ -446,7 +445,6 @@ const HomePage: React.FC<HomePageProps> = ({ onStart }) => {
                   </div>
                   <div>
                     <p className="text-white font-black text-sm font-display uppercase italic">{review.name || 'Anonymous'}</p>
-                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Verified Athlete</p>
                   </div>
                 </div>
               </motion.div>

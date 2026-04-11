@@ -104,7 +104,4 @@ export interface Review {
   text: string | null;
   name: string | null;
   date: string;
-  tags?: string[];
-  label?: string;
-  verified?: boolean;
 }
