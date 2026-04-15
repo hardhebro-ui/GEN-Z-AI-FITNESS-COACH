@@ -18,7 +18,6 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit, initialName = 
   const [hoveredRating, setHoveredRating] = useState(0);
   const [text, setText] = useState('');
   const [name, setName] = useState(initialName);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -26,25 +25,9 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit, initialName = 
       setName(initialName);
       setRating(0);
       setText('');
-      setSelectedTags([]);
       setSubmitted(false);
     }
   }, [isOpen, initialName]);
-
-  const availableTags = [
-    "Great for beginners",
-    "Helpful diet plan",
-    "Clear instructions",
-    "Effective split",
-    "Easy to follow",
-    "Highly recommended"
-  ];
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-    );
-  };
 
   const handleSubmit = async () => {
     if (rating === 0) return;
@@ -78,7 +61,6 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit, initialName = 
           rating,
           text: text.trim() || null,
           name: name.trim() || 'Anonymous',
-          tags: selectedTags,
           createdAt: serverTimestamp()
         });
       });
@@ -159,25 +141,6 @@ export default function ReviewPrompt({ isOpen, onClose, onSubmit, initialName = 
                 </div>
 
                 <div className="space-y-6">
-                  <div className="space-y-3">
-                    <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Quick Tags</label>
-                    <div className="flex flex-wrap gap-2">
-                      {availableTags.map((tag) => (
-                        <button
-                          key={tag}
-                          onClick={() => toggleTag(tag)}
-                          className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
-                            selectedTags.includes(tag)
-                              ? 'bg-neon border-neon text-black shadow-[0_0_15px_rgba(204,255,0,0.2)]'
-                              : 'bg-zinc-900 border-white/5 text-zinc-500 hover:border-white/20'
-                          }`}
-                        >
-                          {tag}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   <div className="space-y-3">
                     <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Review (Optional)</label>
                     <textarea
