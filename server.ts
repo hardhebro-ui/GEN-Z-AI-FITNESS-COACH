@@ -1,28 +1,22 @@
-import express from "express";
-import path from "path";
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+import express from 'express';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-  // API routes can be added here if needed in the future
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
-  });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  // Production static file serving
-  const distPath = path.join(process.cwd(), 'dist');
-  app.use(express.static(distPath));
-  
-  // The key fix for SPA routing: 
-  // Redirect all non-file requests to index.html
-  app.get('*all', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
+const app = express();
+const port = process.env.PORT || 3000;
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+// Serve static files from the 'dist' directory
+app.use(express.static(path.join(__dirname, '../dist')));
 
-startServer();
+// Send all other requests to the index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist', 'index.html'));
+});
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
