@@ -49,8 +49,8 @@ export const ContactSection: React.FC = () => {
         <div className="grid lg:grid-cols-3 gap-8 mb-16">
           <div className="lg:col-span-1 space-y-6">
             {[
-              { icon: <Mail className="w-6 h-6" />, title: "Email Us", detail: "Hardhebro@gmail.com" },
-              { icon: <MessageSquare className="w-6 h-6" />, title: "Live Chat", detail: "WhatsApp: +91 97121 69979", link: "https://wa.me/919712169979" },
+              { icon: <Mail className="w-6 h-6" />, title: "Email Us", detail: import.meta.env.VITE_CONTACT_EMAIL || "Hardhebro@gmail.com" },
+              { icon: <MessageSquare className="w-6 h-6" />, title: "Live Chat", detail: `WhatsApp: ${import.meta.env.VITE_CONTACT_WHATSAPP || "+91 97121 69979"}`, link: `https://wa.me/${(import.meta.env.VITE_CONTACT_WHATSAPP || "919712169979").replace(/[^0-9]/g, '')}` },
               { icon: <MapPin className="w-6 h-6" />, title: "Location", detail: "Gujarat, India" }
             ].map((item, i) => (
               <div key={i} className="bg-zinc-900/50 border border-white/5 p-8 rounded-[2.5rem] flex items-start gap-6">

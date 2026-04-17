@@ -43,7 +43,7 @@ import { guides } from '../data/guides';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
-const ADMIN_EMAIL = "hardhebro@gmail.com";
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || "hardhebro@gmail.com";
 
 enum OperationType {
   CREATE = 'create',
