@@ -1,9 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Activity, Zap, Flame, LayoutGrid } from 'lucide-react';
-import SEO from '../components/SEO';
+import { ArrowRight, Activity, Zap, LayoutGrid } from 'lucide-react';
 
-const HowItWorksPage: React.FC = () => {
+export const HowItWorksSection: React.FC = () => {
   const steps = [
     { 
       step: "01", 
@@ -26,26 +25,21 @@ const HowItWorksPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white pt-32 pb-20 px-4">
-      <SEO 
-        title="How It Works | Fitin60ai.in AI Fitness Generator"
-        description="Learn how our AI-powered fitness engine generates personalized workout and diet plans in 60 seconds. Three simple steps to your transformation."
-        canonical="https://fitin60ai.in/process"
-      />
-
+    <section id="process" className="py-24 px-4 overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-20">
+        <div className="text-center mb-20 text-balance">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-neon/10 border border-neon/20 rounded-full mb-6"
           >
             <Zap className="w-4 h-4 text-neon" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neon">The Process</span>
           </motion.div>
-          <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter mb-8 font-display leading-none">
+          <h2 className="text-4xl md:text-8xl font-black uppercase italic tracking-tighter mb-8 font-display leading-none">
             How It <span className="text-neon">Works</span>
-          </h1>
+          </h2>
           <p className="text-zinc-500 font-bold max-w-2xl mx-auto leading-relaxed text-xl md:text-2xl">
             Three simple steps to your elite fitness protocol. No complex signups, just results.
           </p>
@@ -57,14 +51,14 @@ const HowItWorksPage: React.FC = () => {
               key={i}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-100px" }}
               transition={{ delay: i * 0.1 }}
               className="flex flex-col md:flex-row gap-12 items-center"
             >
               <div className="md:w-1/2 relative group">
                 <div className="text-[12rem] md:text-[20rem] font-black text-white/5 absolute -top-20 -left-10 group-hover:text-neon/10 transition-colors leading-none">{item.step}</div>
                 <div className="relative z-10 space-y-6">
-                  <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tight text-white">{item.title}</h2>
+                  <h3 className="text-4xl md:text-5xl font-black uppercase italic tracking-tight text-white">{item.title}</h3>
                   <p className="text-zinc-400 font-bold text-xl leading-relaxed">{item.desc}</p>
                   <p className="text-zinc-500 font-medium text-lg leading-relaxed border-l-4 border-neon pl-6">
                     {item.details}
@@ -80,19 +74,7 @@ const HowItWorksPage: React.FC = () => {
             </motion.div>
           ))}
         </div>
-
-        <div className="mt-32 text-center">
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="inline-flex items-center gap-4 px-12 py-6 bg-neon text-black font-black text-2xl rounded-3xl shadow-[0_0_40px_rgba(204,255,0,0.3)] hover:scale-105 transition-all font-display uppercase italic"
-          >
-            Start Your Plan Now
-            <ArrowRight className="w-8 h-8" />
-          </button>
-        </div>
       </div>
-    </div>
+    </section>
   );
 };
-
-export default HowItWorksPage;

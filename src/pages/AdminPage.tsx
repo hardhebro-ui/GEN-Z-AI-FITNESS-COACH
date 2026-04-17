@@ -184,42 +184,6 @@ const AdminPage: React.FC = () => {
 
   const handleLogout = () => signOut(auth);
 
-  const migrateGuides = async () => {
-    if (posts.length > 0) {
-      alert("Firestore already has posts. Migration skipped to avoid duplicates.");
-      return;
-    }
-    
-    if (!window.confirm("This will upload all static guides from guides.ts to Firestore. Continue?")) return;
-    
-    setIsMigrating(true);
-    try {
-      for (const guide of guides) {
-        try {
-          await addDoc(collection(db, 'blogPosts'), {
-            title: guide.title,
-            content: guide.content,
-            excerpt: guide.description,
-            category: guide.category,
-            published: true,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-            author: "Admin",
-            image: ""
-          });
-        } catch (error) {
-          handleFirestoreError(error, OperationType.CREATE, 'blogPosts');
-        }
-      }
-      alert("Migration successful!");
-    } catch (error) {
-      console.error("Migration failed", error);
-      alert("Migration failed. Check console for details.");
-    } finally {
-      setIsMigrating(false);
-    }
-  };
-
   const generateSlug = (title: string) => {
     return title
       .toLowerCase()
@@ -401,16 +365,6 @@ const AdminPage: React.FC = () => {
 
           {activeTab === 'blog' && (
             <div className="flex items-center gap-4">
-              {posts.length === 0 && (
-                <button 
-                  onClick={migrateGuides}
-                  disabled={isMigrating}
-                  className="px-6 py-3 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/5 hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center gap-2"
-                >
-                  {isMigrating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
-                  Migrate
-                </button>
-              )}
               <button 
                 onClick={() => {
                   setCurrentPost({ published: true });

@@ -21,10 +21,7 @@ let aiInstance: GoogleGenAI | null = null;
 
 function getAiInstance() {
   if (!aiInstance) {
-    const apiKey = 
-      process.env.GEMINI_API_KEY || 
-      import.meta.env.VITE_GEMINI_API_KEY || 
-      localStorage.getItem('user_gemini_api_key');
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       throw new Error("MISSING_API_KEY");
@@ -102,24 +99,27 @@ async function incrementTotalPlans() {
   }
 }
 
-export async function generatePlan(inputs: UserInputs): Promise<{ plan: GeneratedPlan; fromCache: boolean }> {
+export async function generatePlan(inputs: UserInputs, force: boolean = false): Promise<{ plan: GeneratedPlan; fromCache: boolean }> {
   // 1. Check for existing related plan (fuzzy match on key fields)
   const inputsHash = getInputsHash(inputs);
   const path = "plans";
-  try {
-    const plansRef = collection(db, "plans");
-    const q = query(plansRef, where("inputsHash", "==", inputsHash), limit(1));
-    const querySnapshot = await getDocs(q);
-    
-    if (!querySnapshot.empty) {
-      console.log("Found existing related plan, reusing...");
-      return { 
-        plan: querySnapshot.docs[0].data().plan as GeneratedPlan,
-        fromCache: true 
-      };
+  
+  if (!force) {
+    try {
+      const plansRef = collection(db, "plans");
+      const q = query(plansRef, where("inputsHash", "==", inputsHash), limit(1));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        console.log("Found existing related plan, reusing...");
+        return { 
+          plan: querySnapshot.docs[0].data().plan as GeneratedPlan,
+          fromCache: true 
+        };
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, path);
     }
-  } catch (error) {
-    handleFirestoreError(error, OperationType.GET, path);
   }
 
   // 2. Generate new plan if not found
@@ -179,7 +179,7 @@ export async function generatePlan(inputs: UserInputs): Promise<{ plan: Generate
   while (retries < maxRetries) {
     try {
       response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-3.1-pro-preview",
         contents: prompt,
         config: {
           responseMimeType: "application/json",

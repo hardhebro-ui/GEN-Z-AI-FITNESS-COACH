@@ -18,18 +18,12 @@ import { guides } from './data/guides';
 
 // Lazy loaded pages
 const HomePage = lazy(() => import('./pages/HomePage'));
-const HowItWorksPage = lazy(() => import('./pages/HowItWorksPage'));
-const BenefitsPage = lazy(() => import('./pages/BenefitsPage'));
-const FAQPage = lazy(() => import('./pages/FAQPage'));
-const GuidesPage = lazy(() => import('./pages/GuidesPage'));
-const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
-const SupportPage = lazy(() => import('./pages/SupportPage'));
 const ExplorePage = lazy(() => import('./pages/ExplorePage'));
-const AboutPage = lazy(() => import('./pages/AboutPage'));
-const ContactPage = lazy(() => import('./pages/ContactPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
+const KnowledgeBasePage = lazy(() => import('./pages/GuidesPage'));
 const GuidePage = lazy(() => import('./components/GuidePage'));
 
 function AppContent() {
@@ -45,10 +39,6 @@ function AppContent() {
   const [isCached, setIsCached] = useState(false);
   const [exportUserName, setExportUserName] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
 
   const loadingMessages = [
     { threshold: 0, message: 'Initializing AI Engine...' },
@@ -96,6 +86,19 @@ function AppContent() {
     return () => clearInterval(interval);
   }, [isGenerating]);
 
+  useEffect(() => {
+    // Scroll to anchor if present in URL
+    if (location.hash) {
+      const id = location.hash.substring(1);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.hash]);
+
   const handleStart = () => {
     navigate('/generate');
   };
@@ -125,7 +128,7 @@ function AppContent() {
     return `plan_fuzzy_${inputs.primaryGoal}_${inputs.fitnessLevel}_${ageRange}_${inputs.gender}_${weightRange}_${heightRange}_${inputs.daysPerWeek}_${inputs.workoutLocation}`;
   };
 
-  const handleFormSubmit = async (inputs: UserInputs) => {
+  const handleFormSubmit = async (inputs: UserInputs, force: boolean = false) => {
     setUserInputs(inputs);
     setIsGenerating(true);
     setError(null);
@@ -134,7 +137,7 @@ function AppContent() {
     const cacheKey = getCacheKey(inputs);
     const localCachedPlan = localStorage.getItem(cacheKey);
 
-    if (localCachedPlan) {
+    if (localCachedPlan && !force) {
       setIsCached(true);
       setTimeout(() => {
         setPlan(JSON.parse(localCachedPlan));
@@ -145,15 +148,19 @@ function AppContent() {
     }
 
     try {
-      const { plan: generatedPlan, fromCache } = await generatePlan(inputs);
+      const { plan: generatedPlan, fromCache } = await generatePlan(inputs, force);
       setPlan(generatedPlan);
       setIsCached(fromCache);
       localStorage.setItem(cacheKey, JSON.stringify(generatedPlan));
       setIsGenerating(false);
       navigate('/plan');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Failed to generate plan. Please try again.');
+      if (err.message === 'MISSING_API_KEY') {
+        setError('Gemini API Key is missing. Please set GEMINI_API_KEY in your environment.');
+      } else {
+        setError(err.message || 'Failed to generate plan. Please try again.');
+      }
       setIsGenerating(false);
       navigate('/generate');
     }
@@ -165,13 +172,17 @@ function AppContent() {
     setError(null);
     
     try {
-      const { plan: generatedPlan } = await generatePlan(userInputs);
+      const { plan: generatedPlan } = await generatePlan(userInputs, true);
       setPlan(generatedPlan);
       setIsGenerating(false);
       navigate('/plan');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Failed to regenerate plan. Please try again.');
+      if (err.message === 'MISSING_API_KEY') {
+        setError('Gemini API Key is missing. Please set GEMINI_API_KEY in your environment.');
+      } else {
+        setError(err.message || 'Failed to regenerate plan. Please try again.');
+      }
       setIsGenerating(false);
     }
   };
@@ -205,10 +216,6 @@ function AppContent() {
     navigate('/');
     setPlan(null);
     setUserInputs(null);
-  };
-
-  const handleShowGuide = (id: string) => {
-    navigate(`/guides/${id}`);
   };
 
   return (
@@ -278,29 +285,31 @@ function AppContent() {
           <Suspense fallback={<PageLoader />}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<HomePage onStart={handleStart} />} />
-              <Route path="/process" element={<HowItWorksPage />} />
-              <Route path="/why-ai" element={<BenefitsPage />} />
-              <Route path="/faq" element={<FAQPage />} />
-              <Route path="/guides" element={<GuidesPage onShowGuide={handleShowGuide} />} />
-              <Route path="/reviews" element={<ReviewsPage />} />
-              <Route path="/support" element={<SupportPage />} />
-              <Route path="/about-us" element={<AboutPage />} />
-              <Route path="/contact-us" element={<ContactPage />} />
-              <Route path="/admin" element={<AdminPage />} />
               <Route path="/explore" element={<ExplorePage onBack={() => navigate('/')} lastInputs={userInputs} />} />
+              <Route path="/guides" element={<KnowledgeBasePage onShowGuide={(id) => navigate(`/guides/${id}`)} />} />
+              <Route path="/admin" element={<AdminPage />} />
               <Route path="/terms-conditions" element={<TermsPage onBack={() => navigate(-1)} />} />
               <Route path="/privacy-policy" element={<PrivacyPage onBack={() => navigate(-1)} />} />
               <Route path="/disclaimer" element={<DisclaimerPage />} />
               
-              {/* Redirects for backward compatibility */}
-              <Route path="/how-it-works" element={<Navigate to="/process" replace />} />
-              <Route path="/ai-fitness-benefits" element={<Navigate to="/why-ai" replace />} />
+              {/* Anchor Redirects */}
+              <Route path="/process" element={<Navigate to="/#process" replace />} />
+              <Route path="/why-ai" element={<Navigate to="/#benefits" replace />} />
+              <Route path="/faq" element={<Navigate to="/#faq" replace />} />
+              <Route path="/reviews" element={<Navigate to="/#reviews" replace />} />
+              <Route path="/about-us" element={<Navigate to="/#about" replace />} />
+              <Route path="/contact-us" element={<Navigate to="/#contact" replace />} />
+              
+              {/* Legacy Redirects */}
+              <Route path="/how-it-works" element={<Navigate to="/#process" replace />} />
+              <Route path="/ai-fitness-benefits" element={<Navigate to="/#benefits" replace />} />
               <Route path="/blog" element={<Navigate to="/guides" replace />} />
               <Route path="/explore-plans" element={<Navigate to="/explore" replace />} />
-              <Route path="/about" element={<Navigate to="/about-us" replace />} />
-              <Route path="/contact" element={<Navigate to="/contact-us" replace />} />
+              <Route path="/about" element={<Navigate to="/#about" replace />} />
+              <Route path="/contact" element={<Navigate to="/#contact" replace />} />
               <Route path="/terms" element={<Navigate to="/terms-conditions" replace />} />
               <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
+              
               <Route path="/generate" element={
                 <div className="min-h-[100dvh] bg-zinc-950 pt-20">
                   {error && (
@@ -310,11 +319,12 @@ function AppContent() {
                   )}
                   <MultiStepForm 
                     onSubmit={handleFormSubmit} 
-                    onShowTerms={() => navigate('/terms')}
+                    onShowTerms={() => navigate('/terms-conditions')}
                     onCancel={() => navigate('/')}
                   />
                 </div>
               } />
+              
               <Route path="/plan" element={
                 plan && userInputs ? (
                   <div className="bg-zinc-950 min-h-[100dvh] pt-20">
@@ -326,12 +336,14 @@ function AppContent() {
                     />
                   </div>
                 ) : (
-                  <HomePage onStart={handleStart} />
+                  <Navigate to="/" replace />
                 )
               } />
-              <Route path="/guides/:id" element={
-                <GuideWrapper onBack={() => navigate('/guides')} />
-              } />
+              
+              <Route path="/guides/:id" element={<GuideWrapper onBack={() => navigate('/guides')} />} />
+              
+              {/* 404 Catch-all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         )}
@@ -339,20 +351,9 @@ function AppContent() {
 
       {!location.pathname.startsWith('/admin') && <Footer />}
 
-      <ExportModal 
-        isOpen={isExportModalOpen} 
-        onClose={() => setIsExportModalOpen(false)} 
-        onUnlock={handleUnlock} 
-      />
-
-      <ReviewPrompt 
-        isOpen={isReviewPromptOpen} 
-        onClose={() => setIsReviewPromptOpen(false)} 
-        onSubmit={handleReviewSubmit} 
-        initialName={exportUserName}
-      />
-
-      <CookieConsent onShowPolicy={() => navigate('/privacy')} />
+      <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} onUnlock={handleUnlock} />
+      <ReviewPrompt isOpen={isReviewPromptOpen} onClose={() => setIsReviewPromptOpen(false)} onSubmit={handleReviewSubmit} initialName={exportUserName} />
+      <CookieConsent onShowPolicy={() => navigate('/privacy-policy')} />
     </div>
   );
 }
@@ -390,8 +391,6 @@ function GuideWrapper({ onBack }: { onBack: () => void }) {
   
   return <GuidePage guide={guide} onBack={onBack} />;
 }
-
-const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
 
 export default function App() {
   return (

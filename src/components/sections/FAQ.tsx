@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronDown, ChevronUp, Zap, ArrowRight } from 'lucide-react';
-import SEO from '../components/SEO';
+import { ChevronDown, ChevronUp, Zap } from 'lucide-react';
 
-const FAQPage: React.FC = () => {
+export const FAQSection: React.FC = () => {
   const faqs = [
     {
       question: "How does the AI workout plan generator work?",
@@ -19,74 +18,45 @@ const FAQPage: React.FC = () => {
     },
     {
       question: "Is Fitin60ai.in free to use?",
-      answer: "Generating and viewing your plan is completely free. We offer a 'Support Us' or 'Share to Unlock' model for the PDF download to keep our AI servers running and the tool accessible to everyone."
+      answer: "Generating and viewing your plan is completely free. We prioritize accessibility to help everyone start their fitness journey without financial barriers."
     },
     {
       question: "Do I need a gym membership for these plans?",
-      answer: "No. You can specify your workout location (Gym, Home, or Outdoors) and available equipment. The AI will adapt the exercises accordingly, providing effective bodyweight alternatives if needed."
-    },
-    {
-      question: "How often should I update my plan?",
-      answer: "We recommend updating your plan every 4-6 weeks or whenever you hit a plateau. As you get stronger or your body weight changes, the AI can recalibrate your macros and training intensity to keep you progressing."
+      answer: "No. You can specify your workout location (Gym, Home, or Outdoors) and available equipment. The AI will adapt the exercises accordingly."
     },
     {
       question: "Can I use this if I'm a complete beginner?",
-      answer: "Yes! Fitin60ai.in is designed for all levels. You can select 'Beginner' in the experience level, and the AI will prioritize foundational movements and safe progression schemes to help you build a solid base."
-    },
-    {
-      question: "What if I have specific dietary restrictions?",
-      answer: "Our diet generator allows you to specify preferences like Vegetarian, Vegan, Keto, or Paleo. The AI ensures your macros are met while respecting your chosen dietary lifestyle."
+      answer: "Yes! Fitin60ai.in is designed for all levels. The AI prioritizes foundational movements and safe progression for beginners."
     }
   ];
-
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqs.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white pt-32 pb-20 px-4">
-      <SEO 
-        title="Frequently Asked Questions | Fitin60ai.in Support"
-        description="Find answers to common questions about our AI workout generator, diet plans, PDF downloads, and more. Everything you need to know to get started."
-        canonical="https://fitin60ai.in/faq"
-        schema={faqSchema}
-      />
-
+    <section id="faq" className="py-24 px-4 overflow-hidden">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-20">
+        <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-neon/10 border border-neon/20 rounded-full mb-6"
           >
             <Zap className="w-4 h-4 text-neon" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neon">Support</span>
           </motion.div>
-          <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter mb-8 font-display leading-none">
+          <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter mb-8 font-display leading-none">
             Common <span className="text-neon">Questions</span>
-          </h1>
-          <p className="text-zinc-500 font-bold max-w-2xl mx-auto leading-relaxed text-xl md:text-2xl">
-            Everything you need to know about your AI-driven fitness journey.
-          </p>
+          </h2>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {faqs.map((faq, i) => (
             <motion.div 
               key={i} 
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
               className="bg-zinc-900/30 border border-white/5 rounded-[2.5rem] overflow-hidden transition-all hover:border-white/10"
             >
@@ -112,19 +82,7 @@ const FAQPage: React.FC = () => {
             </motion.div>
           ))}
         </div>
-
-        <div className="mt-32 text-center">
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="inline-flex items-center gap-4 px-12 py-6 bg-neon text-black font-black text-2xl rounded-3xl shadow-[0_0_40px_rgba(204,255,0,0.3)] hover:scale-105 transition-all font-display uppercase italic"
-          >
-            Start Your Plan Now
-            <ArrowRight className="w-8 h-8" />
-          </button>
-        </div>
       </div>
-    </div>
+    </section>
   );
 };
-
-export default FAQPage;

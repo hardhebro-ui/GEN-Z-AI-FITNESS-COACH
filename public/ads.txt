@@ -1,1 +1,3 @@
-google.com, pub-9336667123801683, DIRECT, f08c47fec0942fa0
+# fitin60ai.in ads.txt
+# Placeholder for Google AdSense - Replace with your own pub-id after approval
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

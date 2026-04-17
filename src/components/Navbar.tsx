@@ -67,21 +67,30 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
 
   const primaryLinks = [
     { path: '/', label: 'Home', icon: <Home className="w-4 h-4" /> },
-    { path: '/process', label: 'Process', icon: <Info className="w-4 h-4" /> },
+    { path: '/#process', label: 'Process', icon: <Info className="w-4 h-4" /> },
     { path: '/explore', label: 'Explore', icon: <LayoutGrid className="w-4 h-4" /> },
     { path: '/guides', label: 'Guides', icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   const secondaryLinks = [
-    { path: '/why-ai', label: 'Why AI?', icon: <ShieldCheck className="w-4 h-4" /> },
-    { path: '/faq', label: 'FAQ', icon: <HelpCircle className="w-4 h-4" /> },
-    { path: '/reviews', label: 'Reviews', icon: <UsersIcon className="w-4 h-4" /> },
-    { path: '/support', label: 'Support', icon: <Coffee className="w-4 h-4" /> },
-    { path: '/about-us', label: 'About Us', icon: <User className="w-4 h-4" /> },
-    { path: '/contact-us', label: 'Contact Us', icon: <MessageSquare className="w-4 h-4" /> },
+    { path: '/#benefits', label: 'Why AI?', icon: <ShieldCheck className="w-4 h-4" /> },
+    { path: '/#faq', label: 'FAQ', icon: <HelpCircle className="w-4 h-4" /> },
+    { path: '/#reviews', label: 'Reviews', icon: <UsersIcon className="w-4 h-4" /> },
+    { path: '/#about', label: 'About Us', icon: <User className="w-4 h-4" /> },
+    { path: '/#contact', label: 'Contact Us', icon: <MessageSquare className="w-4 h-4" /> },
     { path: '/terms-conditions', label: 'Terms', icon: <ShieldCheck className="w-4 h-4" /> },
     { path: '/privacy-policy', label: 'Privacy', icon: <ShieldCheck className="w-4 h-4" /> },
   ];
+
+  const checkActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/' && location.hash === '';
+    }
+    if (path.startsWith('/#')) {
+      return location.pathname === '/' && location.hash === path.substring(1);
+    }
+    return location.pathname === path;
+  };
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
@@ -110,20 +119,23 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-4">
             <div className="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-xl border border-white/5">
-              {primaryLinks.map((link) => (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  className={({ isActive }) => `
-                    flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
-                    ${isActive 
-                      ? 'bg-neon text-black shadow-[0_0_15px_rgba(204,255,0,0.2)]' 
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'}
-                  `}
-                >
-                  {link.label}
-                </NavLink>
-              ))}
+              {primaryLinks.map((link) => {
+                const isActive = checkActive(link.path);
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`
+                      flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
+                      ${isActive 
+                        ? 'bg-neon text-black shadow-[0_0_15px_rgba(204,255,0,0.2)]' 
+                        : 'text-zinc-400 hover:text-white hover:bg-white/5'}
+                    `}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
 
               {/* More Dropdown */}
               <div 
@@ -134,7 +146,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
                 <button
                   className={`
                     flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
-                    ${isMoreOpen || secondaryLinks.some(l => location.pathname === l.path)
+                    ${isMoreOpen || secondaryLinks.some(l => checkActive(l.path))
                       ? 'text-white bg-white/5' 
                       : 'text-zinc-400 hover:text-white hover:bg-white/5'}
                   `}
@@ -152,23 +164,26 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
                       className="absolute top-full right-0 mt-2 w-56 bg-zinc-950 border border-white/10 rounded-2xl p-2 shadow-2xl backdrop-blur-xl"
                     >
                       <div className="grid gap-1">
-                        {secondaryLinks.map((link) => (
-                          <NavLink
-                            key={link.path}
-                            to={link.path}
-                            className={({ isActive }) => `
-                              flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
-                              ${isActive 
-                                ? 'bg-neon/10 text-neon' 
-                                : 'text-zinc-400 hover:text-white hover:bg-white/5'}
-                            `}
-                          >
-                            <div className={`p-1.5 rounded-lg ${location.pathname === link.path ? 'bg-neon text-black' : 'bg-zinc-900'}`}>
-                              {React.cloneElement(link.icon as React.ReactElement<{ className?: string }>, { className: 'w-3.5 h-3.5' })}
-                            </div>
-                            {link.label}
-                          </NavLink>
-                        ))}
+                        {secondaryLinks.map((link) => {
+                          const isActive = checkActive(link.path);
+                          return (
+                            <Link
+                              key={link.path}
+                              to={link.path}
+                              className={`
+                                flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
+                                ${isActive 
+                                  ? 'bg-neon/10 text-neon' 
+                                  : 'text-zinc-400 hover:text-white hover:bg-white/5'}
+                              `}
+                            >
+                              <div className={`p-1.5 rounded-lg ${isActive ? 'bg-neon text-black' : 'bg-zinc-900'}`}>
+                                {React.cloneElement(link.icon as React.ReactElement<{ className?: string }>, { className: 'w-3.5 h-3.5' })}
+                              </div>
+                              {link.label}
+                            </Link>
+                          );
+                        })}
                       </div>
                     </motion.div>
                   )}
@@ -227,26 +242,29 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
               </div>
 
               <div className="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                {primaryLinks.map((link) => (
-                  <NavLink
-                    key={link.path}
-                    to={link.path}
-                    className={({ isActive }) => `
-                      w-full flex items-center justify-between p-4 rounded-2xl border transition-all
-                      ${isActive 
-                        ? 'bg-neon/10 border-neon/30 text-neon' 
-                        : 'bg-zinc-900/30 border-white/5 text-zinc-400'}
-                    `}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-2 rounded-xl ${location.pathname === link.path ? 'bg-neon text-black' : 'bg-zinc-800'}`}>
-                        {link.icon}
+                {primaryLinks.map((link) => {
+                  const isActive = checkActive(link.path);
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`
+                        w-full flex items-center justify-between p-4 rounded-2xl border transition-all
+                        ${isActive 
+                          ? 'bg-neon/10 border-neon/30 text-neon' 
+                          : 'bg-zinc-900/30 border-white/5 text-zinc-400'}
+                      `}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`p-2 rounded-xl ${isActive ? 'bg-neon text-black' : 'bg-zinc-800'}`}>
+                          {link.icon}
+                        </div>
+                        <span className="font-black uppercase italic tracking-tight text-sm">{link.label}</span>
                       </div>
-                      <span className="font-black uppercase italic tracking-tight text-sm">{link.label}</span>
-                    </div>
-                    <ChevronRight className={`w-4 h-4 ${location.pathname === link.path ? 'text-neon' : 'text-zinc-700'}`} />
-                  </NavLink>
-                ))}
+                      <ChevronRight className={`w-4 h-4 ${isActive ? 'text-neon' : 'text-zinc-700'}`} />
+                    </Link>
+                  );
+                })}
 
                 {/* Mobile More Collapsible */}
                 <div className="space-y-2">
@@ -254,7 +272,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
                     onClick={() => setIsMobileMoreOpen(!isMobileMoreOpen)}
                     className={`
                       w-full flex items-center justify-between p-4 rounded-2xl border transition-all
-                      ${isMobileMoreOpen || secondaryLinks.some(l => location.pathname === l.path)
+                      ${isMobileMoreOpen || secondaryLinks.some(l => checkActive(l.path))
                         ? 'bg-zinc-900/50 border-white/10 text-white' 
                         : 'bg-zinc-900/30 border-white/5 text-zinc-400'}
                     `}
@@ -276,23 +294,26 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentState }) => {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden pl-4 space-y-2"
                       >
-                        {secondaryLinks.map((link) => (
-                          <NavLink
-                            key={link.path}
-                            to={link.path}
-                            className={({ isActive }) => `
-                              w-full flex items-center gap-4 p-3 rounded-xl transition-all
-                              ${isActive 
-                                ? 'text-neon' 
-                                : 'text-zinc-500 hover:text-zinc-300'}
-                            `}
-                          >
-                            <div className={`p-1.5 rounded-lg ${location.pathname === link.path ? 'bg-neon text-black' : 'bg-zinc-900'}`}>
-                              {React.cloneElement(link.icon as React.ReactElement<{ className?: string }>, { className: 'w-3.5 h-3.5' })}
-                            </div>
-                            <span className="font-black uppercase italic tracking-tight text-xs">{link.label}</span>
-                          </NavLink>
-                        ))}
+                        {secondaryLinks.map((link) => {
+                          const isActive = checkActive(link.path);
+                          return (
+                            <Link
+                              key={link.path}
+                              to={link.path}
+                              className={`
+                                w-full flex items-center gap-4 p-3 rounded-xl transition-all
+                                ${isActive 
+                                  ? 'text-neon' 
+                                  : 'text-zinc-500 hover:text-zinc-300'}
+                              `}
+                            >
+                              <div className={`p-1.5 rounded-lg ${isActive ? 'bg-neon text-black' : 'bg-zinc-900'}`}>
+                                {React.cloneElement(link.icon as React.ReactElement<{ className?: string }>, { className: 'w-3.5 h-3.5' })}
+                              </div>
+                              <span className="font-black uppercase italic tracking-tight text-xs">{link.label}</span>
+                            </Link>
+                          );
+                        })}
                       </motion.div>
                     )}
                   </AnimatePresence>

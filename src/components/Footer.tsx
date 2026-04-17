@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
       title: "Product",
       links: [
         { label: "Home", path: "/" },
-        { label: "Process", path: "/process" },
+        { label: "Process", path: "/#process" },
         { label: "Explore Plans", path: "/explore" },
         { label: "Knowledge Base", path: "/guides" },
       ]
@@ -18,17 +18,16 @@ const Footer: React.FC = () => {
     {
       title: "Company",
       links: [
-        { label: "About Us", path: "/about-us" },
-        { label: "Reviews", path: "/reviews" },
-        { label: "Why AI?", path: "/why-ai" },
-        { label: "Contact Us", path: "/contact-us" },
+        { label: "About Us", path: "/#about" },
+        { label: "Reviews", path: "/#reviews" },
+        { label: "Why AI?", path: "/#benefits" },
+        { label: "Contact Us", path: "/#contact" },
       ]
     },
     {
       title: "Support",
       links: [
-        { label: "FAQ", path: "/faq" },
-        { label: "Support Us", path: "/support" },
+        { label: "FAQ", path: "/#faq" },
         { label: "Terms of Service", path: "/terms-conditions" },
         { label: "Privacy Policy", path: "/privacy-policy" },
         { label: "Disclaimer", path: "/disclaimer" },

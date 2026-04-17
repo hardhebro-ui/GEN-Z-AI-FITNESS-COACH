@@ -108,16 +108,26 @@ export default function PrivacyPage({ onBack }: PrivacyPageProps) {
 
             <section className="space-y-4">
               <h2 className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-3">
-                <Cookie className="w-6 h-6 text-neon" /> Cookies & Local Storage
+                <Cookie className="w-6 h-6 text-neon" /> Cookies & Advertising
               </h2>
               <p className="text-zinc-400 leading-relaxed font-medium">
-                fitin60.ai uses cookies and Local Storage strictly to enhance your experience. These technologies allow us to remember your preferences and your generated plans so you don't have to re-enter details on every visit.
+                fitin60.ai uses cookies and Local Storage to enhance your experience. We also use third-party vendors, including Google, which use cookies to serve ads based on your prior visits to our website or other websites.
               </p>
+              <div className="space-y-4 pt-4">
+                <div className="p-6 bg-zinc-900 rounded-2xl border border-white/5">
+                  <h4 className="text-white font-black uppercase tracking-widest text-xs mb-2">Google AdSense</h4>
+                  <p className="text-zinc-400 text-sm font-medium">
+                    Google's use of advertising cookies enables it and its partners to serve ads to you based on your visit to fitin60.ai and/or other sites on the Internet.
+                  </p>
+                </div>
+                <div className="p-6 bg-zinc-900 rounded-2xl border border-white/5">
+                  <h4 className="text-white font-black uppercase tracking-widest text-xs mb-2">Opt-Out Options</h4>
+                  <p className="text-zinc-400 text-sm font-medium">
+                    You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-neon hover:underline">Ads Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-neon hover:underline">www.aboutads.info</a>.
+                  </p>
+                </div>
+              </div>
               <ul className="space-y-3 pl-4">
-                <li className="flex items-start gap-3 text-sm text-zinc-400 font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-neon mt-1.5 shrink-0" />
-                  No personal identity tracking or advertising cookies.
-                </li>
                 <li className="flex items-start gap-3 text-sm text-zinc-400 font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-neon mt-1.5 shrink-0" />
                   Consent-based usage via our first-visit banner.
