@@ -376,9 +376,40 @@ function GuideWrapper({ onBack }: { onBack: () => void }) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setGuide({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          // Fallback to local guides
+          const localGuide = guides.find(g => g.id === id);
+          if (localGuide) {
+            setGuide({
+              id: localGuide.id,
+              title: localGuide.title,
+              content: localGuide.content,
+              category: localGuide.category,
+              excerpt: localGuide.description,
+              metaDescription: localGuide.description,
+              readingTime: parseInt(localGuide.readTime),
+              icon: localGuide.icon,
+              tags: [localGuide.category.toLowerCase()]
+            });
+          }
         }
       } catch (error) {
         console.error("Error fetching guide:", error);
+        // Fallback to local guides on error
+        const localGuide = guides.find(g => g.id === id);
+        if (localGuide) {
+          setGuide({
+            id: localGuide.id,
+            title: localGuide.title,
+            content: localGuide.content,
+            category: localGuide.category,
+            excerpt: localGuide.description,
+            metaDescription: localGuide.description,
+            readingTime: parseInt(localGuide.readTime),
+            icon: localGuide.icon,
+            tags: [localGuide.category.toLowerCase()]
+          });
+        }
       } finally {
         setLoading(false);
       }

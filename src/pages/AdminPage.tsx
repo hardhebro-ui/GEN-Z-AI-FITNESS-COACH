@@ -38,7 +38,6 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { Helmet } from 'react-helmet-async';
-import { guides } from '../data/guides';
 
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -126,7 +125,6 @@ const AdminPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'blog' | 'contact'>('blog');
-  const [isMigrating, setIsMigrating] = useState(false);
   
   // Blog State
   const [posts, setPosts] = useState<BlogPost[]>([]);

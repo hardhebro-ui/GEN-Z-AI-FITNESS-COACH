@@ -3,7 +3,8 @@ import { motion } from 'motion/react';
 import { FileText, ArrowRight, Activity, Loader2, Clock } from 'lucide-react';
 import SEO from '../components/SEO';
 import { db } from '../firebase';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { guides } from '../data/guides';
 
 interface GuidesPageProps {
   onShowGuide: (id: string) => void;
@@ -28,28 +29,51 @@ const GuidesPage: React.FC<GuidesPageProps> = ({ onShowGuide }) => {
         // Filter by published=true in the query to satisfy security rules
         const q = query(collection(db, 'blogPosts'), where('published', '==', true));
         const querySnapshot = await getDocs(q);
-        const fetchedArticles = querySnapshot.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          } as any))
-          .sort((a, b) => {
-            const dateA = a.createdAt?.seconds || 0;
-            const dateB = b.createdAt?.seconds || 0;
-            return dateB - dateA;
-          })
-          .map(post => ({
-            id: post.id,
-            title: post.title,
-            excerpt: post.excerpt,
-            category: post.category,
-            readingTime: post.readingTime,
-            tags: post.tags
+        
+        if (!querySnapshot.empty) {
+          const fetchedArticles = querySnapshot.docs
+            .map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            } as any))
+            .sort((a, b) => {
+              const dateA = a.createdAt?.seconds || 0;
+              const dateB = b.createdAt?.seconds || 0;
+              return dateB - dateA;
+            })
+            .map(post => ({
+              id: post.id,
+              title: post.title,
+              excerpt: post.excerpt,
+              category: post.category,
+              readingTime: post.readingTime,
+              tags: post.tags
+            }));
+          setArticles(fetchedArticles);
+        } else {
+          // Fallback to local guides if Firestore is empty
+          const fallbackArticles = guides.map(g => ({
+            id: g.id,
+            title: g.title,
+            excerpt: g.description,
+            category: g.category,
+            readingTime: parseInt(g.readTime) || 5,
+            tags: [g.category.toLowerCase()]
           }));
-          
-        setArticles(fetchedArticles);
+          setArticles(fallbackArticles);
+        }
       } catch (error) {
         console.error("Error fetching articles:", error);
+        // Fallback on error too
+        const fallbackArticles = guides.map(g => ({
+          id: g.id,
+          title: g.title,
+          excerpt: g.description,
+          category: g.category,
+          readingTime: parseInt(g.readTime) || 5,
+          tags: [g.category.toLowerCase()]
+        }));
+        setArticles(fallbackArticles);
       } finally {
         setLoading(false);
       }
